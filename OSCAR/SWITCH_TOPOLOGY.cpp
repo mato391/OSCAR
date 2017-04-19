@@ -1,0 +1,15 @@
+#include "stdafx.h"
+#include "SWITCH_TOPOLOGY.hpp"
+
+
+SWITCH_TOPOLOGY::SWITCH_TOPOLOGY()
+{
+	name = "SWITCH_TOPOLOGY";
+}
+
+
+SWITCH_TOPOLOGY::~SWITCH_TOPOLOGY()
+{
+}
+
+

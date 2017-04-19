@@ -1,0 +1,1 @@
+FFFF:CriticalStartupError;FFF0:CriticalOilLevel;FFF1:CriticalTemperature

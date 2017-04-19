@@ -1,0 +1,29 @@
+C:\Boost\include\boost-1_63;
+C:\Boost\lib
+
+HWAPI:
+0x01 - domain BDM
+0F - all door devices, 1F - all light device, FF - all devices, 00-05 - doors, 06-09 - windows, 0A-1E - lights
+00-05 - doors
+0-3 - operation: 1-0 open, close 
+
+0x01002 - opened mask
+0x01012 - opened Front left
+0x01022 - opened Front right
+0x01032 - opened Back left
+0x01042 - opened Back right
+0x01052 - opened Boot
+
+0x01003 - closed mask
+0x01013 - closed Front left
+0x01023 - closed Front right
+0x01033 - closed Back left
+0x01043 - closed Back right
+0x01053 - closed Boot
+
+0x009999xx01
+0x00 - domain WCM
+xxxx - serialNumberRC
+00 - unlockDoor
+01 - lockDoor
+xx - power
