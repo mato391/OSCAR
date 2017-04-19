@@ -39,6 +39,10 @@ void OAMConfigurator::createCPFile(std::vector<std::string> cpFileContentList)
 		{
 			cpObj_->lightVersion = std::stoi(paramSplitted[1]);
 		}
+		if (paramSplitted[0] == "AUTO_CLOSE_WIN")
+		{
+			cpObj_->autoClosingWindow = static_cast<bool>(std::stoi(paramSplitted[1]));
+		}
 	}
 	cache_.push_back(cpObj_);
 }

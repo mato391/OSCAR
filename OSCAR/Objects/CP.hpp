@@ -8,5 +8,6 @@ public:
 	~CP();
 	int doorsVersion;
 	int lightVersion;
+	bool autoClosingWindow;
 };
 

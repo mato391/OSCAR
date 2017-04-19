@@ -30,6 +30,7 @@ void DOOR::unlockDoor()
 void DOOR::lockDoor()
 {
 	lockingState = DOOR::ELockingState::locked;
+	window->lockingState = WINDOW::ELockingState::locked;
 }
 
 void DOOR::openDoor()

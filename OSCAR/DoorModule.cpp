@@ -78,6 +78,13 @@ void DoorModule::lockDoors()
 		{
 			BOOST_LOG(logger_) << "INFO " << "DoorModule::lockDoors " << door->label;
 			door->lockDoor();
+			if (cpObj_->autoClosingWindow && door->window->opened)
+			{
+				BOOST_LOG(logger_) << "INFO " << "DoorModule::lockDoors auto-closing window: " << door->label;
+				door->window->close();
+			}
+				
+
 		}
 		return;
 	}
