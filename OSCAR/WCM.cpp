@@ -56,18 +56,12 @@ void WCM::execute(std::string message)
 	{
 		BOOST_LOG(logger_) << "INFO " << "WCM::execute: BATTERY_LOW";
 		cache_->push_back(new ALARM("Battery low", 1001, "WCM"));
-		if (operation == "00")
-			bdmObjPtr_->unlockDoors();
-		else if (operation == "01")
-			bdmObjPtr_->lockDoors();
+		bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
 		return;
 	}
 	else
 	{
-		if (operation == "00")
-			bdmObjPtr_->unlockDoors();
-		else if (operation == "01")
-			bdmObjPtr_->lockDoors();
+		bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
 		return;
 	}
 	if (message.substr(message.size() - 1, 1) == "2")

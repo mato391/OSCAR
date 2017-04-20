@@ -104,7 +104,7 @@ void UCM::startUserOperationProcessing(BUTTON* button)
 					BOOST_LOG(logger_) << "INFO " << "UCM::startUserOperationProcessing: power on execution";
 					BOOST_LOG(logger_) << "INFO " << "UCM::startUserOperationProcessing: start engine execution";
 
-					component->execute(new INTER_MODULE_OPERATION("ENGINE_START_TASK"));
+					component->execute(new INTER_MODULE_OPERATION("ENGINE_START_TASK", "1"));
 					return;
 				}
 				else if (preconditions == 1)

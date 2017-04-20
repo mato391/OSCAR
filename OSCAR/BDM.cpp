@@ -33,13 +33,17 @@ void BDM::execute(std::string message)
 	{
 
 	}
-	
-	
 }
 
 void BDM::execute(INTER_MODULE_OPERATION* imo)
 {
-
+	if (imo->operation == "DOOR_LOCKING_OPERATION")
+	{
+		if (imo->details == "00")
+			doorModule_->unlockDoors();
+		else if (imo->details == "01")
+			doorModule_->lockDoors();
+	}
 }
 
 void BDM::unlockDoors()

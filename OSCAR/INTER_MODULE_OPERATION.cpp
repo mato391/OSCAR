@@ -2,9 +2,10 @@
 #include "INTER_MODULE_OPERATION.h"
 
 
-INTER_MODULE_OPERATION::INTER_MODULE_OPERATION(std::string name)
+INTER_MODULE_OPERATION::INTER_MODULE_OPERATION(std::string name, std::string details)
 {
-	operation = name;
+	this->operation = name;
+	this->details = details;
 }
 
 
