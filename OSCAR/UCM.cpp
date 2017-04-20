@@ -7,6 +7,7 @@ UCM::UCM(std::string domain, boost::log::sources::logger_mt logger)
 	this->domain = domain;
 	this->logger_ = logger;
 	BOOST_LOG(logger_) << "DEBUG " << "UCM ctor";
+	
 }
 
 UCM::~UCM()
@@ -16,6 +17,8 @@ UCM::~UCM()
 void UCM::initialize()
 {
 	prepareSwitchTopology();
+	startStopEngineButtonAgent_ = new StartStopEngineButtonAgent(switchTopology, logger_);
+	
 }
 
 void UCM::prepareSwitchTopology()
@@ -44,6 +47,8 @@ void UCM::prepareTopologyBasedOnSCF()
 			button->label = sline[0];
 			button->port = sline[1];
 			switchTopology->buttonTopology.push_back(button);
+			
+			
 		}
 		else if (sline[0].find("PEDAL") != std::string::npos)
 		{
@@ -52,7 +57,7 @@ void UCM::prepareTopologyBasedOnSCF()
 			pedal->port = sline[1];
 			switchTopology->pedals.push_back(pedal);
 		}
-	}
+	}	
 	displayTopology();
 }
 
@@ -80,8 +85,19 @@ void UCM::execute(std::string message)
 		if (port == button->port)
 		{
 			startUserOperationProcessing(button);
+			return;
 		}
 	}
+	for (const auto &pedal : switchTopology->pedals)
+	{
+		if (port == pedal->port)
+		{
+			pedal->isPushed = static_cast<bool>(std::stoi(operation));
+			startPedalOperation(pedal);
+			return;
+		}
+	}
+
 }
 
 void UCM::execute(INTER_MODULE_OPERATION* imo)
@@ -91,30 +107,34 @@ void UCM::execute(INTER_MODULE_OPERATION* imo)
 
 void UCM::startUserOperationProcessing(BUTTON* button)
 {
+	RESULT result;
 	if (button->label == "START_STOP_BUTTON")
 	{
-		BOOST_LOG(logger_) << "INFO " << "UCM::startUserOperationProcessing: " << button->label << " pressed. Starting EDM operation";
-		int preconditions = checkPreconditionToStartEngine();
-		for (const auto &component : *componentCache_)
-		{
-			if (component->name == "EDM")
-			{
-				if (preconditions == 2)
-				{
-					BOOST_LOG(logger_) << "INFO " << "UCM::startUserOperationProcessing: power on execution";
-					BOOST_LOG(logger_) << "INFO " << "UCM::startUserOperationProcessing: start engine execution";
+		result = startStopEngineButtonAgent_->buttonPushedAction();		
+		if (result.status == RESULT::EStatus::success)
+			getComponent("EDM")->execute(new INTER_MODULE_OPERATION("START_STOP_ENGINE", "1"));
+	}
+	
+}
 
-					component->execute(new INTER_MODULE_OPERATION("ENGINE_START_TASK", "1"));
-					return;
-				}
-				else if (preconditions == 1)
-				{
-					BOOST_LOG(logger_) << "INFO " << "UCM::startUserOperationProcessing: power on execution";
-				}
-			}
-			BOOST_LOG(logger_) << "ERROR " << "UCM::startUserOperationProcessing: "  << " Component cannot be found";
-			return;
+void UCM::startPedalOperation(PEDAL* pedal)
+{
+	for (auto &obj : *cache_)
+	{
+		if (obj->name == "ENGINE")
+		{
+			engineObjPtr_ = static_cast<ENGINE*>(obj);
 		}
+	}
+	if (pedal->isPushed)
+	{
+		BOOST_LOG(logger_) << "INFO " << "UCM::startPedalOperation: clutching engine";
+		engineObjPtr_->operationalState = ENGINE::EOperationalState::clutched;
+	}
+	else if (!pedal->isPushed)
+	{
+		BOOST_LOG(logger_) << "INFO " << "UCM::startPedalOperation: unclutching engine";
+		engineObjPtr_->operationalState = ENGINE::EOperationalState::notClutched;
 	}
 }
 
@@ -137,3 +157,13 @@ PEDAL* UCM::getPedalFromTopology(std::string label)
 	}
 	return nullptr;
 }
+
+Component* UCM::getComponent(std::string label)
+{
+	for (const auto &component : *componentCache_)
+	{
+		if (component->name == label)
+			return component;
+	}
+}
+

@@ -5,7 +5,9 @@
 #include "SWITCH_TOPOLOGY.hpp"
 #include "BUTTON.hpp"
 #include "PEDAL.h"
-
+#include "ENGINE.hpp"
+#include "RESULT.hpp"
+#include "StartStopEngineButtonAgent.hpp"
 class UCM :
 	public Component
 {
@@ -20,9 +22,11 @@ public:
 private:
 	SCF* scfObj_;
 	SWITCH_TOPOLOGY* switchTopology;
+	ENGINE* engineObjPtr_;
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
 	std::vector<std::string> scfVec_;
+	StartStopEngineButtonAgent* startStopEngineButtonAgent_;
 
 	void initialize();
 	void prepareSwitchTopology();
@@ -31,6 +35,9 @@ private:
 	int checkPreconditionToStartEngine();
 	void displayTopology();
 	PEDAL* getPedalFromTopology(std::string label);
+	void startPedalOperation(PEDAL* pedal);
+	RESULT* getOperationResult();
+	Component* getComponent(std::string label);
 
 };
 

@@ -4,6 +4,7 @@
 #include "ALARM.hpp"
 #include <vector>
 
+
 class ENGINE :
 	public Obj
 {
@@ -42,9 +43,16 @@ public:
 
 	};
 	EProceduralState proceduralState;
+	enum class EOperationalState
+	{
+		clutched,
+		notClutched
+	};
+	EOperationalState operationalState;
 	int rpm;
 	int startFailures;
 	int loadedMapId;
 	std::vector<ALARM*> alarms;
+	std::vector<Obj*> children;
 };
 

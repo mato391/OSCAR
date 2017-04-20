@@ -170,8 +170,11 @@
     <ClInclude Include="Objects\WINDOW.hpp" />
     <ClInclude Include="PEDAL.h" />
     <ClInclude Include="REMOTE_CONTROLLER.hpp" />
+    <ClInclude Include="RESULT.hpp" />
     <ClInclude Include="Router.hpp" />
     <ClInclude Include="SCF.hpp" />
+    <ClInclude Include="StartStopEngineButtonAgent.hpp" />
+    <ClInclude Include="StartStopEngineProcedure.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SWITCH_TOPOLOGY.hpp" />
     <ClInclude Include="targetver.h" />
@@ -202,8 +205,11 @@
     <ClCompile Include="OSCAR.cpp" />
     <ClCompile Include="PEDAL.cpp" />
     <ClCompile Include="REMOTE_CONTROLLER.cpp" />
+    <ClCompile Include="RESULT.cpp" />
     <ClCompile Include="Router.cpp" />
     <ClCompile Include="SCF.cpp" />
+    <ClCompile Include="StartStopEngineButtonAgent.cpp" />
+    <ClCompile Include="StartStopEngineProcedure.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

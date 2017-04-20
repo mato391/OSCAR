@@ -58,24 +58,36 @@ void EDM::execute(std::string message)
 
 void EDM::execute(INTER_MODULE_OPERATION* imo)
 {
-	if (imo->operation == "ENGINE_START_TASK")
+	if (imo->operation == "START_STOP_ENGINE" && imo->details == "1")
 	{
-		BOOST_LOG(logger_) << "INFO " << "EDM::execute: starting engine procedure";
-		send("0x0302");
+		startStopEngineProcedure_ = new StartStopEngineProcedure();
+		if (checkPreconditionsToStartEngine())
+		{
+			
+			BOOST_LOG(logger_) << "INFO " << "EDM::execute: starting engine procedure";
+			//send("0x0302");
+		}
+		
 	}
 }
 
 void EDM::checkIfEngineStarted(std::string data)
 {
+	RESULT* result = new RESULT();
+	
 	if (data == "0000")
 	{
 		engineObj_->proceduralState = ENGINE::EProceduralState::startedIdle;
 		//boost::thread t(std::bind(&EDM::rpmMonitor, this));
 		//t.join();
+		result->applicant = "EDM";
+		result->status = RESULT::EStatus::success;
+		engineObj_->children.push_back(result);
 		return;
 	}
 	engineObj_->alarms.push_back(new ALARM());
 	engineObj_->alarms.back()->alarmCode = std::stoi(data);
+
 
 	if (data == "FFFF")
 	{
@@ -89,9 +101,11 @@ void EDM::rpmMonitor()
 
 }
 
-void EDM::checkPreconditionsToStartEngine()
+bool EDM::checkPreconditionsToStartEngine()
 {
-	
+	if (engineObj_->operationalState == ENGINE::EOperationalState::clutched)
+		return true;
+	return false;
 }
 
 int EDM::getMilageFromPersist()

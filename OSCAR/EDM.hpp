@@ -5,6 +5,8 @@
 #include <boost\thread.hpp>
 #include <boost\asio.hpp>
 #include "EngineCommunicationService.hpp"
+#include "StartStopEngineProcedure.hpp"
+#include "RESULT.hpp"
 using boost::asio::ip::tcp;
 
 class EDM :
@@ -23,8 +25,8 @@ private:
 	void initialize();
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
-
-	void checkPreconditionsToStartEngine();
+	StartStopEngineProcedure* startStopEngineProcedure_;
+	bool checkPreconditionsToStartEngine();
 	void checkIfEngineStarted(std::string data);
 	void loadEngineMaps(int pos);
 	void rpmMonitor();
