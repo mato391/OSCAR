@@ -4,6 +4,7 @@
 
 UCM::UCM(std::string domain, boost::log::sources::logger_mt logger)
 {
+	this->name = "UCM";
 	this->domain = domain;
 	this->logger_ = logger;
 	BOOST_LOG(logger_) << "DEBUG " << "UCM ctor";
@@ -92,7 +93,7 @@ void UCM::execute(std::string message)
 	{
 		if (port == pedal->port)
 		{
-			pedal->isPushed = static_cast<bool>(std::stoi(operation));
+			pedal->isPushed = static_cast<bool>(std::stoi(operation));	//SHOULD BE CHANGED
 			startPedalOperation(pedal);
 			return;
 		}
@@ -129,12 +130,14 @@ void UCM::startPedalOperation(PEDAL* pedal)
 	if (pedal->isPushed)
 	{
 		BOOST_LOG(logger_) << "INFO " << "UCM::startPedalOperation: clutching engine";
-		engineObjPtr_->operationalState = ENGINE::EOperationalState::clutched;
+		getComponent("EDM")->execute(new INTER_MODULE_OPERATION("CLUTCH_ENGINE", "1"));
+		//engineObjPtr_->operationalState = ENGINE::EOperationalState::clutched;
 	}
 	else if (!pedal->isPushed)
 	{
 		BOOST_LOG(logger_) << "INFO " << "UCM::startPedalOperation: unclutching engine";
-		engineObjPtr_->operationalState = ENGINE::EOperationalState::notClutched;
+		getComponent("EDM")->execute(new INTER_MODULE_OPERATION("UNCLUTCH_ENGINE", "0"));
+		//engineObjPtr_->operationalState = ENGINE::EOperationalState::notClutched;
 	}
 }
 
@@ -160,10 +163,13 @@ PEDAL* UCM::getPedalFromTopology(std::string label)
 
 Component* UCM::getComponent(std::string label)
 {
+	BOOST_LOG(logger_) << "DBG " << "UCM::getComponent " << label;
 	for (const auto &component : *componentCache_)
 	{
+		BOOST_LOG(logger_) << "DBG " << component->name;
 		if (component->name == label)
 			return component;
 	}
+	return nullptr;
 }
 

@@ -7,6 +7,7 @@
 #include "EngineCommunicationService.hpp"
 #include "StartStopEngineProcedure.hpp"
 #include "RESULT.hpp"
+#include "RpmMonitor.hpp"
 using boost::asio::ip::tcp;
 
 class EDM :
@@ -26,6 +27,8 @@ private:
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
 	StartStopEngineProcedure* startStopEngineProcedure_;
+	RpmMonitor* rpmMonitor_;
+
 	bool checkPreconditionsToStartEngine();
 	void checkIfEngineStarted(std::string data);
 	void loadEngineMaps(int pos);
@@ -33,6 +36,7 @@ private:
 	int getMilageFromPersist();
 	void EDM::startDetection();
 	std::vector<std::map<int, std::string>> alarmsDescriptions_;
+	void setupEngine(ENGINE::EType type, ENGINE::EPetrolType petrolType);
 	
 };
 

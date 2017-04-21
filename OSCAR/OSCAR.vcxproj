@@ -172,6 +172,7 @@
     <ClInclude Include="REMOTE_CONTROLLER.hpp" />
     <ClInclude Include="RESULT.hpp" />
     <ClInclude Include="Router.hpp" />
+    <ClInclude Include="RpmMonitor.hpp" />
     <ClInclude Include="SCF.hpp" />
     <ClInclude Include="StartStopEngineButtonAgent.hpp" />
     <ClInclude Include="StartStopEngineProcedure.hpp" />
@@ -207,6 +208,7 @@
     <ClCompile Include="REMOTE_CONTROLLER.cpp" />
     <ClCompile Include="RESULT.cpp" />
     <ClCompile Include="Router.cpp" />
+    <ClCompile Include="RpmMonitor.cpp" />
     <ClCompile Include="SCF.cpp" />
     <ClCompile Include="StartStopEngineButtonAgent.cpp" />
     <ClCompile Include="StartStopEngineProcedure.cpp" />

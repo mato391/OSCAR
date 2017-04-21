@@ -69,7 +69,7 @@ void Router::sender(std::string data)
 		file << data;
 		file.close();
 		//std::remove("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_recv.txt");
-		BOOST_LOG(logger_) << "INFO " << "Router::sender: CAN sending signal: " << data << std::endl;
+		BOOST_LOG(logger_) << "INFO " << "Router::sender: CAN sending signal: " << data;
 		//router->receiver(content);
 	}
 }

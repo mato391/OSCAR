@@ -2,9 +2,9 @@
 #include "StartStopEngineProcedure.hpp"
 
 
-StartStopEngineProcedure::StartStopEngineProcedure(ENGINE* engineObjPtr) :
-	engineObjPtr_(engineObjPtr)
+StartStopEngineProcedure::StartStopEngineProcedure(ENGINE* engineObjPtr)
 {
+	engineObjPtr_ = engineObjPtr;
 	determineAction();
 }
 
@@ -26,10 +26,7 @@ void StartStopEngineProcedure::determineAction()
 	{
 		stopProcedure();
 	}
-	assert(engineObjPtr_ == nullptr);
-	std::fstream assertionsFile("D:\private\OSCAR\New_Architecture_OSCAR\OSCAR\Logs", std::ios::out);
-	assertionsFile << "ENGINE OBJ PTR NULLPTR";
-	assertionsFile.close();
+	assert(engineObjPtr_ != nullptr);
 	
 }
 void StartStopEngineProcedure::startProcedure()
