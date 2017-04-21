@@ -64,13 +64,3 @@ Obj* StartStopEngineButtonAgent::getObjectFromTopology(std::string label, std::s
 	
 }
 
-RESULT* StartStopEngineButtonAgent::getOperationResultAndReturnOperStatus()
-{
-	for (auto &obj : engineObjPtr_->children)
-	{
-		if (obj->name == "RESULT")
-		{
-			return static_cast<RESULT*>(obj);
-		}
-	}
-}

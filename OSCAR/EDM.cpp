@@ -60,12 +60,12 @@ void EDM::execute(INTER_MODULE_OPERATION* imo)
 {
 	if (imo->operation == "START_STOP_ENGINE" && imo->details == "1")
 	{
-		startStopEngineProcedure_ = new StartStopEngineProcedure();
-		if (checkPreconditionsToStartEngine())
+		startStopEngineProcedure_ = new StartStopEngineProcedure(engineObj_);
+		auto result = startStopEngineProcedure_->getResult();
+		if ( result.status == RESULT::EStatus::success)
 		{
-			
 			BOOST_LOG(logger_) << "INFO " << "EDM::execute: starting engine procedure";
-			//send("0x0302");
+			//send(result.feedback);
 		}
 		
 	}

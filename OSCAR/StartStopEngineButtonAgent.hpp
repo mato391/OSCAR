@@ -21,6 +21,6 @@ private:
 	boost::log::sources::logger_mt logger_;
 	BUTTON* startStopEngineButtonObjPtr_;
 	Obj* getObjectFromTopology(std::string label, std::string type);
-	RESULT* getOperationResultAndReturnOperStatus();
+
 };
 

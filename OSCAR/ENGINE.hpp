@@ -38,6 +38,7 @@ public:
 	enum class EProceduralState
 	{
 		turnedOff,
+		configured,
 		startedIdle,
 		startedLoaded
 
@@ -54,5 +55,6 @@ public:
 	int loadedMapId;
 	std::vector<ALARM*> alarms;
 	std::vector<Obj*> children;
+	std::string pathToMapsFile;
 };
 
