@@ -120,6 +120,10 @@ void UCM::startUserOperationProcessing(BUTTON* button)
 
 void UCM::startPedalOperation(PEDAL* pedal)
 {
+	if (pedal->label == "PEDAL_ACCEL")
+	{
+		getComponent("EDM")->execute(new INTER_MODULE_OPERATION("ACCELERATE_PERCENT_CHANGE", std::to_string(pedal->percent)));
+	}
 	for (auto &obj : *cache_)
 	{
 		if (obj->name == "ENGINE")
