@@ -92,8 +92,7 @@ void EDM::execute(INTER_MODULE_OPERATION* imo)
 	}
 	else if (imo->operation == "ACCELERATE_PERCENT_CHANGE")
 	{
-		float percent = std::stof(imo->details) / 100;
-		send("0x0305" + std::to_string(percent));
+		send("0x0305" + imo->details);
 	}
 }
 
