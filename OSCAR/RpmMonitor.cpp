@@ -26,7 +26,7 @@ void RpmMonitor::start()
 			rpmStream >> rpm;
 			rpmStream.close();
 			boost::filesystem::remove(rpmFileStreamPath_);
-			//BOOST_LOG(logger_) << "DBG " << boost::this_thread::get_id << " RPM change: " << rpm;
+			BOOST_LOG(logger_) << "DBG " << boost::this_thread::get_id << " RPM change: " << rpm;
 			engineObjPtr_->rpm = std::stoi(rpm);
 		}
 		boost::this_thread::sleep(boost::posix_time::millisec(100));

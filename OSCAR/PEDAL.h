@@ -9,6 +9,6 @@ public:
 	std::string label;
 	std::string port;
 	bool isPushed;
-	float percent;
+	int percent;
 };
 

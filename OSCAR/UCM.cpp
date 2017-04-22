@@ -80,7 +80,16 @@ void UCM::execute(std::string message)
 {
 	//0x02yyz; yy - port, z - operation (position)
 	std::string port = message.substr(4, 2);
-	std::string operation = message.substr(6, 1);
+	std::string percentage;
+	std::string operation;
+	if (message.size() > 7)
+	{
+		percentage = message.substr(7, message.size() - 7);
+		BOOST_LOG(logger_) << "DBG " << percentage;
+	}
+	operation = message.substr(6, 1);
+	BOOST_LOG(logger_) << "DBG operation" << percentage;
+	
 	for (const auto & button : switchTopology->buttonTopology)
 	{
 		if (port == button->port)
@@ -93,8 +102,11 @@ void UCM::execute(std::string message)
 	{
 		if (port == pedal->port)
 		{
+			pedal->percent = std::stoi(percentage);
+			BOOST_LOG(logger_) << "DBG " << "PEDAL label: " << port << " pedal percent " << pedal->percent;
+			BOOST_LOG(logger_) << "DBG " << "Operation " << std::stoi(operation);
 			pedal->isPushed = static_cast<bool>(std::stoi(operation));	//SHOULD BE CHANGED
-			startPedalOperation(pedal);
+			startPedalOperation(pedal);		//WE NEED TO CHANGE IT BECAUSE OPERATION RIGHT NOW IS PERCENTAGE
 			return;
 		}
 	}
@@ -123,6 +135,7 @@ void UCM::startPedalOperation(PEDAL* pedal)
 	if (pedal->label == "PEDAL_ACCEL")
 	{
 		getComponent("EDM")->execute(new INTER_MODULE_OPERATION("ACCELERATE_PERCENT_CHANGE", std::to_string(pedal->percent)));
+		return;
 	}
 	for (auto &obj : *cache_)
 	{
