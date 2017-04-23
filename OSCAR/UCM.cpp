@@ -78,7 +78,7 @@ void UCM::displayTopology()
 
 void UCM::execute(std::string message)
 {
-	//0x02yyz; yy - port, z - operation (position)
+	//0x02yyzppp; yy - port, z - operation (position), p - percent (percent only for port > 01 and port < 05)
 	std::string port = message.substr(4, 2);
 	std::string percentage;
 	std::string operation;
@@ -103,8 +103,8 @@ void UCM::execute(std::string message)
 			pedal->percent = std::stoi(percentage);
 			BOOST_LOG(logger_) << "DBG " << "PEDAL label: " << port << " pedal percent " << pedal->percent;
 			BOOST_LOG(logger_) << "DBG " << "Operation " << std::stoi(operation);
-			pedal->isPushed = static_cast<bool>(std::stoi(operation));	//SHOULD BE CHANGED
-			startPedalOperation(pedal);		//WE NEED TO CHANGE IT BECAUSE OPERATION RIGHT NOW IS PERCENTAGE
+			pedal->isPushed = static_cast<bool>(std::stoi(operation));	
+			startPedalOperation(pedal);		
 			return;
 		}
 	}

@@ -29,6 +29,17 @@ void EDM::initialize()
 
 void EDM::execute(std::string message)
 {
+	/*
+	0x0300 - recv - welcome message (start engine setup)
+	0x0301 - send - get type of engine request
+	0x0301yz - recv - y: type of engine, z: petrol type
+	0x0302 - send - start engine
+	0x0302yyyy - recv - response for strt engine yyyy: fault, 0000 - no fault engine started
+	0x0303 - send - stop engine
+	0x0303yyyy - recv - response for stop engine yyy: fault, 0000 - no fault engine stopped
+	0x0304y - send - load map, y: mpa index
+	0x0304y - recv - response for load map y: operation status, 0 - OK
+	*/
 	if (message == "0x0300")
 	{
 		send("0x0301");
@@ -58,14 +69,7 @@ void EDM::execute(std::string message)
 			BOOST_LOG(logger_) << "ERR " << "Engine doesn't have maps";
 		}
 	}
-	if (message.find("0x0305") != std::string::npos)
-	{
-		if (engineObj_->rpm != std::stoi(message.substr(6, message.size() - 6)))
-		{
-			engineObj_->rpm = std::stoi(message.substr(6, message.size() - 6));
-		}
-		return;
-	}
+	
 
 
 }
