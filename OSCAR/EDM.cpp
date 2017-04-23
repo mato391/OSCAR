@@ -76,7 +76,6 @@ void EDM::execute(std::string message)
 
 void EDM::execute(INTER_MODULE_OPERATION* imo)
 {
-
 	startStopEngineProcedure_ = new StartStopEngineProcedure(engineObj_, logger_);
 	if (imo->operation == "START_STOP_ENGINE" && imo->details == "1")
 	{

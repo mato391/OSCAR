@@ -14,6 +14,7 @@ RpmMonitor::RpmMonitor(ENGINE* engineObjPtr, boost::log::sources::logger_mt logg
 RpmMonitor::~RpmMonitor()
 {
 	BOOST_LOG(logger_) << "INFO " << "RpmMonitor dtor";
+	boost::filesystem::remove(rpmFileStreamPath_);
 	std::fstream rpmDump("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\Logs\\rpmDump.txt", std::ios::out);
 	for (const auto &rpm : rpmDump_)
 	{

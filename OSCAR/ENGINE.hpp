@@ -56,6 +56,5 @@ public:
 	std::vector<ALARM*> alarms;
 	std::vector<Obj*> children;
 	std::string pathToMapsFile;
-	std::map<std::string, std::string> operationsMap_;
 };
 

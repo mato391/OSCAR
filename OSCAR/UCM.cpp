@@ -178,10 +178,10 @@ PEDAL* UCM::getPedalFromTopology(std::string label)
 
 Component* UCM::getComponent(std::string label)
 {
-	BOOST_LOG(logger_) << "DBG " << "UCM::getComponent " << label;
+	//BOOST_LOG(logger_) << "DBG " << "UCM::getComponent " << label;
 	for (const auto &component : *componentCache_)
 	{
-		BOOST_LOG(logger_) << "DBG " << component->name;
+		//BOOST_LOG(logger_) << "DBG " << component->name;
 		if (component->name == label)
 			return component;
 	}
