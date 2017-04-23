@@ -6,15 +6,19 @@
 #include <boost\log\sources\logger.hpp>
 #include <boost\filesystem.hpp>
 #include <boost\thread.hpp>
+#include <fstream>
 class RpmMonitor
 {
 public:
 	RpmMonitor(ENGINE* engineObjPtr, boost::log::sources::logger_mt logger);
 	~RpmMonitor();
+	bool interupt;
 	void start();
 private:
 	ENGINE* engineObjPtr_;
+	
 	boost::log::sources::logger_mt logger_;
 	const std::string rpmFileStreamPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\rpm.txt";
+	std::vector<std::string> rpmDump_;
 };
 

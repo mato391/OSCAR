@@ -72,18 +72,31 @@ void EDM::execute(std::string message)
 
 void EDM::execute(INTER_MODULE_OPERATION* imo)
 {
-	if (startStopEngineProcedure_ == nullptr)
-		startStopEngineProcedure_ = new StartStopEngineProcedure(engineObj_);
+
+	startStopEngineProcedure_ = new StartStopEngineProcedure(engineObj_, logger_);
 	if (imo->operation == "START_STOP_ENGINE" && imo->details == "1")
 	{
 		auto result = startStopEngineProcedure_->getResult();
-		if ( result.status == RESULT::EStatus::success)
+		BOOST_LOG(logger_) << "INFO " << "EDM::execute: got result: " << result.feedback;
+		if ( result.status == RESULT::EStatus::success && result.feedback == "0x0302")
 		{
-			BOOST_LOG(logger_) << "INFO " << "EDM::execute: starting engine procedure";
+			engineObj_->proceduralState = ENGINE::EProceduralState::startedIdle;
+			BOOST_LOG(logger_) << "INFO " << "EDM::execute: starting engine procedure" 
+				<< static_cast<int>(engineObj_->proceduralState);
 			rpmMonitor_ = new RpmMonitor(engineObj_, logger_);
-			boost::thread rpmMonitorStart(std::bind(&RpmMonitor::start, rpmMonitor_));
+			rpmMonitorStart = boost::thread(std::bind(&RpmMonitor::start, rpmMonitor_));
 			rpmMonitorStart.detach();
+			
 			send("0x0302");
+		}
+		
+		else if (result.status == RESULT::EStatus::success && result.feedback == "0x0303")
+		{
+			rpmMonitor_->interupt = true;
+			BOOST_LOG(logger_) << "INFO " << "EDM::execute: stop engine procedure";
+			engineObj_->proceduralState = ENGINE::EProceduralState::turnedOff;
+			send("0x0303");
+			delete rpmMonitor_;	//TO TEST
 		}
 	}
 	else if (imo->operation == "CLUTCH_ENGINE")

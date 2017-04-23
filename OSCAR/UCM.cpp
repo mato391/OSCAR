@@ -87,9 +87,7 @@ void UCM::execute(std::string message)
 		percentage = message.substr(7, message.size() - 7);
 		BOOST_LOG(logger_) << "DBG " << percentage;
 	}
-	operation = message.substr(6, 1);
-	BOOST_LOG(logger_) << "DBG operation" << percentage;
-	
+	operation = message.substr(6, 1);	
 	for (const auto & button : switchTopology->buttonTopology)
 	{
 		if (port == button->port)

@@ -28,6 +28,7 @@ private:
 	std::vector<Component*>* componentCache_;
 	StartStopEngineProcedure* startStopEngineProcedure_;
 	RpmMonitor* rpmMonitor_;
+	boost::thread rpmMonitorStart;
 
 	bool checkPreconditionsToStartEngine();
 	void checkIfEngineStarted(std::string data);
