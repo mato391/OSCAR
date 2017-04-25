@@ -5,9 +5,11 @@
 WCM::WCM(std::string domain, boost::log::sources::logger_mt logger)
 {
 	logger_ = logger;
+	name = "WCM";
 	BOOST_LOG(logger) << "DEBUG " << "WCM ctor ";
 	this->domain = domain;
-	name = "WCM";
+	userManager_ = new UserManager();
+	
 }
 
 
@@ -52,16 +54,28 @@ void WCM::execute(std::string message)
 			return;
 		}
 	}
+	
+		
 	if (std::stoi(power) <= 20)
 	{
 		BOOST_LOG(logger_) << "INFO " << "WCM::execute: BATTERY_LOW";
 		cache_->push_back(new ALARM("Battery low", 1001, "WCM"));
 		bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
-		return;
+		
 	}
 	else
 	{
 		bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
+		
+	}
+	userManager_->setupUser(serialNumber);
+	auto userObj = userManager_->getUser();
+	cache_->push_back(userObj);
+	BOOST_LOG(logger_) << "DBG " << userObj->username << " sn: " << userObj->rcSerialCode << " isNew " << userObj->isNew;
+	if (userObj->isNew)
+	{
+		std::cout << "SHOULD BE HERE" << std::endl;
+		executeOnUIA(new INTER_MODULE_OPERATION("NEW_USER", userObj->rcSerialCode));
 		return;
 	}
 	if (message.substr(message.size() - 1, 1) == "2")
@@ -90,6 +104,20 @@ void WCM::execute(std::string message)
 void WCM::execute(INTER_MODULE_OPERATION* imo)
 {
 
+}
+
+void WCM::executeOnUIA(INTER_MODULE_OPERATION* imo)
+{
+	for (auto &component : *componentCache_)
+	{
+		BOOST_LOG(logger_) << "DBG " << "WCM::executeOnUIA " << component->name;
+		
+		if (component->name == "UIA")
+		{
+			component->execute(imo);
+			return;
+		}
+	}
 }
 
 

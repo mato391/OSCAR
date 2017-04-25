@@ -20,5 +20,7 @@ Component* ComponentFactory::createComponent(std::string name, std::string domai
 	{
 		return new EDM(domain, logger);
 	}
+	else if (name == "UIA")
+		return new UIA(domain, logger);
 
 }

@@ -10,6 +10,8 @@
 #include "WCM.hpp"
 #include "UCM.hpp"
 #include "EDM.hpp"
+#include "UIA.hpp"
+
 class ComponentFactory
 {
 public:

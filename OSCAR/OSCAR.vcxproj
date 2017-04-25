@@ -162,6 +162,7 @@
     <ClInclude Include="INTER_MODULE_OPERATION.h" />
     <ClInclude Include="LIGHTES.hpp" />
     <ClInclude Include="LightModule.h" />
+    <ClInclude Include="MirrorModule.hpp" />
     <ClInclude Include="OAMConfigurator.hpp" />
     <ClInclude Include="Objects\CP.hpp" />
     <ClInclude Include="Objects\DOOR.hpp" />
@@ -180,6 +181,9 @@
     <ClInclude Include="SWITCH_TOPOLOGY.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UCM.hpp" />
+    <ClInclude Include="UIA.hpp" />
+    <ClInclude Include="USER.hpp" />
+    <ClInclude Include="UserManager.hpp" />
     <ClInclude Include="WCM.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +201,7 @@
     <ClCompile Include="INTER_MODULE_OPERATION.cpp" />
     <ClCompile Include="LIGHTES.cpp" />
     <ClCompile Include="LightModule.cpp" />
+    <ClCompile Include="MirrorModule.cpp" />
     <ClCompile Include="OAMConfigurator.cpp" />
     <ClCompile Include="Objects\CP.cpp" />
     <ClCompile Include="Objects\DOOR.cpp" />
@@ -220,6 +225,9 @@
     </ClCompile>
     <ClCompile Include="SWITCH_TOPOLOGY.cpp" />
     <ClCompile Include="UCM.cpp" />
+    <ClCompile Include="UIA.cpp" />
+    <ClCompile Include="USER.cpp" />
+    <ClCompile Include="UserManager.cpp" />
     <ClCompile Include="WCM.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

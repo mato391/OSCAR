@@ -4,8 +4,10 @@
 #include "Component.hpp"
 #include "DoorModule.hpp"
 #include "LightModule.h"
+#include "MirrorModule.hpp"
 #include "Objects\Obj.hpp"
 #include <boost\thread.hpp>
+
 
 
 class BDM : public Component
@@ -28,6 +30,7 @@ public:
 private:
 	DoorModule* doorModule_;
 	LightModule* lightModule_;
+	MirrorModule* mirrorModule_;
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
 	void blinkersRun(int times, int interval);

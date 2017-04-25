@@ -62,6 +62,7 @@ void BDM::initialize()
 	doorModule_->initialize();
 	lightModule_ = new LightModule(cache_, logger_);
 	lightModule_->initialize();
+	mirrorModule_ = new MirrorModule(cache_, logger_);
 }
 
 void BDM::blinkersRun(int times, int interval)
