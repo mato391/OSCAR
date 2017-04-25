@@ -87,9 +87,6 @@
     <ClInclude Include="SCF.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="SWITCH_TOPOLOGY.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EDM.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,17 +99,11 @@
     <ClInclude Include="PEDAL.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="ENGINE.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EngineCommunicationService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ALARM.hpp">
       <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="RESULT.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StartStopEngineButtonAgent.hpp">
       <Filter>Header Files</Filter>
@@ -123,9 +114,6 @@
     <ClInclude Include="RpmMonitor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="USER.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UserManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -134,6 +122,24 @@
     </ClInclude>
     <ClInclude Include="MirrorModule.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MIRROR.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ENGINE.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="MIRRORS.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="RESULT.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="USER.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="SWITCH_TOPOLOGY.hpp">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -246,6 +252,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MirrorModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MIRROR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MIRRORS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

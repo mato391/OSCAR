@@ -44,6 +44,13 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 		else if (imo->details == "01")
 			doorModule_->lockDoors();
 	}
+	if (imo->operation == "GET_MIRROR_POS")
+	{
+		mirrorModule_->getMirrorPosition(std::stoi(imo->details));
+		//IMO_RESULT should be created 
+		
+		
+	}
 }
 
 void BDM::unlockDoors()

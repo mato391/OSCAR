@@ -162,7 +162,9 @@
     <ClInclude Include="INTER_MODULE_OPERATION.h" />
     <ClInclude Include="LIGHTES.hpp" />
     <ClInclude Include="LightModule.h" />
+    <ClInclude Include="MIRROR.hpp" />
     <ClInclude Include="MirrorModule.hpp" />
+    <ClInclude Include="MIRRORS.hpp" />
     <ClInclude Include="OAMConfigurator.hpp" />
     <ClInclude Include="Objects\CP.hpp" />
     <ClInclude Include="Objects\DOOR.hpp" />
@@ -201,7 +203,9 @@
     <ClCompile Include="INTER_MODULE_OPERATION.cpp" />
     <ClCompile Include="LIGHTES.cpp" />
     <ClCompile Include="LightModule.cpp" />
+    <ClCompile Include="MIRROR.cpp" />
     <ClCompile Include="MirrorModule.cpp" />
+    <ClCompile Include="MIRRORS.cpp" />
     <ClCompile Include="OAMConfigurator.cpp" />
     <ClCompile Include="Objects\CP.cpp" />
     <ClCompile Include="Objects\DOOR.cpp" />

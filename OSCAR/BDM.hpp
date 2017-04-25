@@ -7,7 +7,7 @@
 #include "MirrorModule.hpp"
 #include "Objects\Obj.hpp"
 #include <boost\thread.hpp>
-
+#include "RESULT.hpp"
 
 
 class BDM : public Component
