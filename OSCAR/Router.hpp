@@ -11,6 +11,9 @@
 #include <boost\filesystem.hpp>
 
 #include "Objects\Obj.hpp"
+#include "EQM.hpp"
+#include "MODULE.hpp"
+#include "CONNECTOR.hpp"
 
 class Router
 {
@@ -27,7 +30,16 @@ private:
 	std::vector<std::string> mmfS_;
 	std::string mmfPath_;
 	std::vector<Obj*>* cache_;
+	bool fabricStartup_;
+	EQM* eqmObj_;
+
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
+	void checkIfMMFExists();
+	void createEQM();
+	void moduleAutodetection(std::string domain);
+	void setupModule(Obj* mod);
+	void createConnectors(MODULE* mod);
+	void displayModulesTopology();
 };
 

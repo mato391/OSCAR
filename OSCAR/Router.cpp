@@ -16,20 +16,37 @@ Router::~Router()
 
 void Router::startComponentService()
 {
-	std::fstream mmf(mmfPath_, std::ios::in);
-	std::string mmf_;
-	mmf >> mmf_;
-	mmf.close();
-	BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: mmf: " << mmf_;
-	boost::split(mmfS_, mmf_, boost::is_any_of(";"));
-	BOOST_LOG(logger_) << "DEBUG " << "ROUTER:StartComponentService: mmf size: " << mmfS_[0];
-	for (const auto &line : mmfS_)
+	checkIfMMFExists();
+	if (!fabricStartup_)
 	{
-		std::vector<std::string> componentAddress;
-		//std::cout << "ROUTER:StartComponentService: mmf: " << line << std::endl;
-		boost::split(componentAddress, line, boost::is_any_of(":"));
-		startComponent(componentAddress[0], componentAddress[1]);
+		std::fstream mmf(mmfPath_, std::ios::in);
+		std::string mmf_;
+		mmf >> mmf_;
+		mmf.close();
+		BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: mmf: " << mmf_;
+		boost::split(mmfS_, mmf_, boost::is_any_of(";"));
+		BOOST_LOG(logger_) << "DEBUG " << "ROUTER:StartComponentService: mmf size: " << mmfS_[0];
+		for (const auto &line : mmfS_)
+		{
+			std::vector<std::string> componentAddress;
+			//std::cout << "ROUTER:StartComponentService: mmf: " << line << std::endl;
+			boost::split(componentAddress, line, boost::is_any_of(":"));
+			startComponent(componentAddress[0], componentAddress[1]);
+		}
 	}
+	else
+	{
+		BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: fabric startup with naked sw";
+		createEQM();
+		return;
+	}
+	
+	
+}
+
+void Router::createEQM()
+{
+	eqmObj_ = new EQM();
 }
 
 void Router::startComponent(std::string name, std::string address)
@@ -43,16 +60,22 @@ void Router::startComponent(std::string name, std::string address)
 
 void Router::receiver(std::string data)
 {
-	std::string domain = data.substr(0, 4);
-	BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << domain;
-	for (const auto &component : components_)
+	if (!fabricStartup_)
 	{
-		if (component->domain == domain)
+		std::string domain = data.substr(0, 4);
+		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << domain;
+		for (const auto &component : components_)
 		{
-			component->execute(data);
-			break;
+			if (component->domain == domain)
+			{
+				component->execute(data);
+				break;
+			}
 		}
-		
+	}
+	else
+	{
+		moduleAutodetection(data);
 	}
 }
 
@@ -72,4 +95,134 @@ void Router::sender(std::string data)
 		BOOST_LOG(logger_) << "INFO " << "Router::sender: CAN sending signal: " << data;
 		//router->receiver(content);
 	}
+}
+
+void Router::checkIfMMFExists()
+{
+	if (boost::filesystem::exists(mmfPath_))
+	{
+		fabricStartup_ = false;
+		return;
+	}
+	else
+	{
+		fabricStartup_ = true;
+	}
+}
+
+void Router::moduleAutodetection(std::string data)
+{
+
+	bool exist = false;
+	if (data.substr(4, 4) == "0000")
+	{
+		BOOST_LOG(logger_) << "INF " << "Router::moduleAutodetection: welcomeMessage received from module " << data.substr(0, 4);
+		for (const auto &mod : eqmObj_->modules_)
+		{
+			if (data.substr(0, 4) == static_cast<MODULE*>(mod)->domain)
+			{
+				
+				exist = true;
+				break;
+			}
+
+		}
+		BOOST_LOG(logger_) << "DBG " << "Router::moduleAutodetection: exist: " << exist;
+		if (!exist)
+		{
+			MODULE* module = new MODULE();
+			module->domain = data.substr(0, 4);
+			eqmObj_->addModule(module);
+			sender(module->domain + "FF");
+			BOOST_LOG(logger_) << "INF " << "Router::moduleAutodetection: module created " << module->domain;
+		}
+	}
+	else if (data.substr(4, 2) == "01")
+	{
+		for (const auto &mod : eqmObj_->modules_)
+		{
+			if (data.substr(0, 4) == static_cast<MODULE*>(mod)->domain)
+			{
+				static_cast<MODULE*>(mod)->mask = data.substr(6, 6);
+				setupModule(mod);
+				break;
+			}
+
+		}
+	}
+	else
+	{
+		BOOST_LOG(logger_) << "INF " << "Router::moduleAutodetection: info data ";
+		for (const auto &mod : eqmObj_->modules_)
+		{
+			auto module = static_cast<MODULE*>(mod);
+			if (data.substr(0, 4) == module->domain)
+			{
+				module->serialNumber = data.substr(4, 4);
+				module->productNumber = data.substr(8, 6);
+				createConnectors(module);
+				break;
+			}
+
+		}
+		
+	}
+}
+
+void Router::createConnectors(MODULE* mod)
+{
+	BOOST_LOG(logger_) << "INF " << "Router::createConnectors: for " << mod->productNumber;
+	int group = mod->productNumber.size() / 2;
+	BOOST_LOG(logger_) << "INF " << "Router::createConnectors: groups:  " << group;
+	std::vector<int> connectorsInGroups;
+	for (int i = 0; i < group; i++)
+	{
+		BOOST_LOG(logger_) << "INF " << "Router::createConnectors: group:  " << std::stoi(mod->productNumber.substr(i * 2, 2));
+		connectorsInGroups.push_back(std::stoi(mod->productNumber.substr(i * 2, 2)));
+	}
+	for (const auto &conn : connectorsInGroups)
+	{
+		mod->addConnector(conn);
+	}
+	
+}
+
+void Router::displayModulesTopology()
+{
+	for (const auto &mod : eqmObj_->modules_)
+	{
+		auto module = static_cast<MODULE*>(mod);
+		BOOST_LOG(logger_) << "DBG " << "MODULE: " << module->domain;
+		int i = 0;
+		for (const auto &group : module->connectors_)
+		{
+			BOOST_LOG(logger_) << "DBG " << "CONNECTORS_GROUP: " << i;
+			for (const auto &conn : group)
+			{
+				BOOST_LOG(logger_) << "DBG " << "CONNECTOR: " << static_cast<CONNECTOR*>(conn)->id
+					<< " used " << static_cast<CONNECTOR*>(conn)->used;
+			}
+			i++;
+		}
+	}
+}
+
+void Router::setupModule(Obj* mod)
+{
+	auto module = static_cast<MODULE*>(mod);
+	int group = module->mask.size() / 2;
+	std::vector<int> masks;
+	for (int i = 0; i < group; i++)
+	{
+		masks.push_back(std::stoi(module->mask.substr(i * 2, 2)));
+	}
+	for (int i = 0; i < masks.size(); i++)
+	{
+		BOOST_LOG(logger_) << "DBG " << "Router::setupModule: mask: " << i << " " << masks[i];
+		for (int j = 0; j < masks[i]; j++)
+		{
+			static_cast<CONNECTOR*>(module->connectors_[i][j])->used = true;
+		}
+	}
+	displayModulesTopology();
 }

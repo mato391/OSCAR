@@ -141,6 +141,18 @@
     <ClInclude Include="SWITCH_TOPOLOGY.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="EQM.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MODULE.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PORT.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CONNECTOR.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -258,6 +270,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MIRRORS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EQM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MODULE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PORT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CONNECTOR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
