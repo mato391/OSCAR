@@ -15,5 +15,6 @@ public:
 	std::string mask;
 	std::string serialNumber;
 	std::string productNumber;
+	std::string label;
 };
 

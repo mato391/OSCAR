@@ -8,5 +8,6 @@ public:
 	~CONNECTOR();
 	int id;
 	bool used;
+	std::string label;
 };
 

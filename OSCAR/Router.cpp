@@ -7,6 +7,7 @@ Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) 
 	cache_ = cache;
 	mmfPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt";
 	startComponentService();
+	timeout_ = false;
 }
 
 
@@ -47,6 +48,7 @@ void Router::startComponentService()
 void Router::createEQM()
 {
 	eqmObj_ = new EQM();
+	cache_->push_back(eqmObj_);
 }
 
 void Router::startComponent(std::string name, std::string address)
@@ -112,7 +114,8 @@ void Router::checkIfMMFExists()
 
 void Router::moduleAutodetection(std::string data)
 {
-
+	if (timer_ != nullptr)
+		delete timer_;
 	bool exist = false;
 	if (data.substr(4, 4) == "0000")
 	{
@@ -163,10 +166,34 @@ void Router::moduleAutodetection(std::string data)
 				createConnectors(module);
 				break;
 			}
-
 		}
-		
 	}
+	setupTimer();
+	if (timeout_)
+		startHWPlanerService();
+}
+
+void Router::setupTimer()
+{
+	BOOST_LOG(logger_) << "INF " << "Router::setupTimer";
+	bool timeout = false;
+	timer_ = new TIMER(25, "detectionTimeout");
+	boost::thread t(std::bind(&TIMER::start, timer_, std::placeholders::_1), &timeout_);
+}
+
+void Router::startHWPlanerService()
+{
+	
+	if (hwplannerService_ == nullptr)
+	{
+		BOOST_LOG(logger_) << "INF " << "Router::startHWPlanerService: start";
+		hwplannerService_ = new HWPlannerService(logger_, cache_);
+		boost::thread t(std::bind(&HWPlannerService::startReceiving, hwplannerService_));
+	}
+	else
+		BOOST_LOG(logger_) << "INF " << "Router::startHWPlanerService: hwPlanner has been started";
+		
+	//ShellExecute(NULL, "open", "", NULL, NULL, SW_SHOWDEFAULT);
 }
 
 void Router::createConnectors(MODULE* mod)

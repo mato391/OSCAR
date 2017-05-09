@@ -4,16 +4,20 @@
 #include <string>
 #include <fstream>
 
+
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>
 #include <boost\log\sources\logger.hpp>
 #include <boost\filesystem.hpp>
 
+#include "HWPlannerService.hpp"
 #include "Objects\Obj.hpp"
 #include "EQM.hpp"
 #include "MODULE.hpp"
 #include "CONNECTOR.hpp"
+#include "TIMER.hpp"
+
 
 class Router
 {
@@ -23,8 +27,10 @@ public:
 	~Router();
 	void receiver(std::string data);
 	void sender(std::string data);
+	void startHWPlanerService();
 	
 private:
+	HWPlannerService* hwplannerService_;
 	boost::log::sources::logger_mt logger_;
 	std::vector<Component_ptr> components_;
 	std::vector<std::string> mmfS_;
@@ -32,6 +38,8 @@ private:
 	std::vector<Obj*>* cache_;
 	bool fabricStartup_;
 	EQM* eqmObj_;
+	TIMER * timer_;
+	bool timeout_;
 
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
@@ -41,5 +49,7 @@ private:
 	void setupModule(Obj* mod);
 	void createConnectors(MODULE* mod);
 	void displayModulesTopology();
+	void setupTimer();
+
 };
 

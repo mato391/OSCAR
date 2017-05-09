@@ -141,16 +141,22 @@
     <ClInclude Include="SWITCH_TOPOLOGY.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="EQM.hpp">
+    <ClInclude Include="CONNECTOR.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MODULE.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="EQM.hpp">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="PORT.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="TIMER.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CONNECTOR.hpp">
+    <ClInclude Include="HWPlannerService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -282,6 +288,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CONNECTOR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TIMER.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HWPlannerService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

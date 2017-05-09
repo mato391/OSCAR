@@ -161,6 +161,7 @@
     <ClInclude Include="ENGINE.hpp" />
     <ClInclude Include="EngineCommunicationService.hpp" />
     <ClInclude Include="EQM.hpp" />
+    <ClInclude Include="HWPlannerService.hpp" />
     <ClInclude Include="INTER_MODULE_OPERATION.h" />
     <ClInclude Include="LIGHTES.hpp" />
     <ClInclude Include="LightModule.h" />
@@ -186,6 +187,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SWITCH_TOPOLOGY.hpp" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TIMER.hpp" />
     <ClInclude Include="UCM.hpp" />
     <ClInclude Include="UIA.hpp" />
     <ClInclude Include="USER.hpp" />
@@ -206,6 +208,7 @@
     <ClCompile Include="ENGINE.cpp" />
     <ClCompile Include="EngineCommunicationService.cpp" />
     <ClCompile Include="EQM.cpp" />
+    <ClCompile Include="HWPlannerService.cpp" />
     <ClCompile Include="INTER_MODULE_OPERATION.cpp" />
     <ClCompile Include="LIGHTES.cpp" />
     <ClCompile Include="LightModule.cpp" />
@@ -236,6 +239,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SWITCH_TOPOLOGY.cpp" />
+    <ClCompile Include="TIMER.cpp" />
     <ClCompile Include="UCM.cpp" />
     <ClCompile Include="UIA.cpp" />
     <ClCompile Include="USER.cpp" />
