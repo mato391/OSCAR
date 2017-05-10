@@ -168,6 +168,7 @@
     <ClInclude Include="MIRROR.hpp" />
     <ClInclude Include="MirrorModule.hpp" />
     <ClInclude Include="MIRRORS.hpp" />
+    <ClInclude Include="MMF.hpp" />
     <ClInclude Include="MODULE.hpp" />
     <ClInclude Include="OAMConfigurator.hpp" />
     <ClInclude Include="Objects\CP.hpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SWITCH_TOPOLOGY.hpp" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TASK.hpp" />
     <ClInclude Include="TIMER.hpp" />
     <ClInclude Include="UCM.hpp" />
     <ClInclude Include="UIA.hpp" />
@@ -215,6 +217,7 @@
     <ClCompile Include="MIRROR.cpp" />
     <ClCompile Include="MirrorModule.cpp" />
     <ClCompile Include="MIRRORS.cpp" />
+    <ClCompile Include="MMF.cpp" />
     <ClCompile Include="MODULE.cpp" />
     <ClCompile Include="OAMConfigurator.cpp" />
     <ClCompile Include="Objects\CP.cpp" />
@@ -239,6 +242,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SWITCH_TOPOLOGY.cpp" />
+    <ClCompile Include="TASK.cpp" />
     <ClCompile Include="TIMER.cpp" />
     <ClCompile Include="UCM.cpp" />
     <ClCompile Include="UIA.cpp" />

@@ -9,5 +9,11 @@ public:
 	int id;
 	bool used;
 	std::string label;
+	enum class EType
+	{
+		input,
+		output
+	};
+	EType type;
 };
 

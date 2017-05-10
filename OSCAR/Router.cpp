@@ -81,6 +81,19 @@ void Router::receiver(std::string data)
 	}
 }
 
+void Router::checkResultFromHWPlannerService()
+{
+	BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService";
+	for (auto &obj : *cache_)
+	{
+		if (obj->name == "RESULT" && static_cast<RESULT*>(obj)->applicant == "HWPlannerService" && static_cast<RESULT*>(obj)->feedback == "CONFIGURATION_DONE")
+		{
+			BOOST_LOG(logger_) << "INF " << "Router::checkResultFromHWPlannerService: Configuration done.Starting with hw";
+		}
+
+	}
+}
+
 void Router::sender(std::string data)
 {
 	while (boost::filesystem::exists("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_send.txt"))
@@ -170,7 +183,12 @@ void Router::moduleAutodetection(std::string data)
 	}
 	setupTimer();
 	if (timeout_)
-		startHWPlanerService();
+	{
+		TASK* task = new TASK("HWPlannerService", std::bind(&Router::checkResultFromHWPlannerService, this));
+		cache_->push_back(task);
+		startHWPlanerService(); //before that TASK should be created with function feedback to router
+	}
+		
 }
 
 void Router::setupTimer()
@@ -188,7 +206,7 @@ void Router::startHWPlanerService()
 	{
 		BOOST_LOG(logger_) << "INF " << "Router::startHWPlanerService: start";
 		hwplannerService_ = new HWPlannerService(logger_, cache_);
-		boost::thread t(std::bind(&HWPlannerService::startReceiving, hwplannerService_));
+		hwPlannerServiceThread_ = boost::thread(std::bind(&HWPlannerService::startReceiving, hwplannerService_));
 	}
 	else
 		BOOST_LOG(logger_) << "INF " << "Router::startHWPlanerService: hwPlanner has been started";

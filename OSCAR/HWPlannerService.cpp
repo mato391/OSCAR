@@ -5,6 +5,7 @@
 HWPlannerService::HWPlannerService(boost::log::sources::logger_mt logger, std::vector<Obj*>* cache) : logger_(logger)
 {
 	cache_ = cache;
+	work = true;
 	for (auto &obj : *cache_)
 	{
 		if (obj->name == "EQM")
@@ -22,7 +23,7 @@ HWPlannerService::~HWPlannerService()
 
 void HWPlannerService::startReceiving()
 {
-	for (;;)
+	while (work)
 	{
 
 		std::fstream file(commStreamRecvPath_, std::ios::in);
@@ -48,6 +49,21 @@ void HWPlannerService::handleMessage(std::string message)
 	{
 		loadHWF();
 		createMMF();
+		createResult();
+		work = false;
+		sendFeedback();
+	}
+}
+
+void HWPlannerService::sendFeedback()
+{
+	for (auto &obj : *cache_)
+	{
+		if (obj->name == "TASK" && static_cast<TASK*>(obj)->taskFor == "HWPlannerService")
+		{
+			auto task = static_cast<TASK*>(obj);
+			task->feedback();
+		}
 	}
 }
 
@@ -106,13 +122,13 @@ void HWPlannerService::createModule(std::string mod)
 			boost::split(sconn, conn, boost::is_any_of(":"));
 			std::vector<std::string> sconnp;
 			boost::split(sconnp, sconn[1], boost::is_any_of(","));
-			BOOST_LOG(logger_) << "DBG " << "Connector: " << sconn[1] << " size " << sconnp.size();
-			setConnector(std::stoi(sconnp[0]), sconnp[1], connectorsGroup, moduleSn); 
+			//BOOST_LOG(logger_) << "DBG " << "Connector: " << sconn[1] << " size " << sconnp.size();
+			setConnector(std::stoi(sconnp[0]), sconnp[1], std::stoi(sconnp[2]), connectorsGroup, moduleSn);
 		}
 	}
 }
 
-void HWPlannerService::setConnector(int id, std::string label, int connectorGroup, std::string moduleSn)
+void HWPlannerService::setConnector(int id, std::string label, int type, int connectorGroup, std::string moduleSn)
 {
 	MODULE* module = nullptr;
 	for (auto &mod : eqmObjPtr_->modules_)
@@ -126,18 +142,26 @@ void HWPlannerService::setConnector(int id, std::string label, int connectorGrou
 	if (module != nullptr)
 	{
 		BOOST_LOG(logger_) << "INF " << "HWPlannerService::setConnector: setConnector in module: " << module->domain;
-		BOOST_LOG(logger_) << "INF " << "HWPlannerService::setConnector: connectors in module: " << module->connectors_.size();
 		for (auto &conn : module->connectors_[connectorGroup])
 		{
-			BOOST_LOG(logger_) << "DBG " << static_cast<CONNECTOR*>(conn)->id;
 			if (static_cast<CONNECTOR*>(conn)->id == id)
 			{
 				static_cast<CONNECTOR*>(conn)->label = label;
+				static_cast<CONNECTOR*>(conn)->type = static_cast<CONNECTOR::EType>(type);
 				BOOST_LOG(logger_) << "INF " << "HWPlannerService::setConnector: setConnector in connectorsGroup: "
-					<< connectorGroup << " , connector id: " << id;
+					<< connectorGroup << " , connector id: " << id << ", connector type: " << type;
 			}
 		}
 		//delete module;
 	}
 	
+}
+
+void HWPlannerService::createResult()
+{
+	RESULT* result = new RESULT();
+	result->applicant = "HWPlannerService";
+	result->status = RESULT::EStatus::success;
+	result->feedback = "CONFIGURATION_DONE";
+	cache_->push_back(result);
 }

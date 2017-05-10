@@ -1,1 +1,1 @@
-Module:9999,DOOR_MODULE|ConnectorsGroup:0|Connector:0,DOOR_FRONT_LEFT|Connector:1,DOOR_FRONT_RIGHT|Connector:2,DOOR_BACK_LEFT|Connector:3,DOOR_BACK_RIGHT|Connector:4,DOOR_MASK|Connector:0,DOOR_BOOT;
+Module:9999,DOOR_MODULE|ConnectorsGroup:0|Connector:0,DOOR_FRONT_LEFT,1|Connector:1,DOOR_FRONT_LEFT,0|Connector:2,DOOR_FRONT_RIGHT,1|Connector:3,DOOR_FRONT_RIGHT,0|Connector:4,DOOR_MASK,1|Connector:5,DOOR_MASK,0|Connector:6,DOOR_BOOT,1|Connector:7,DOOR_BOOT,0;

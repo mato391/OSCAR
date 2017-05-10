@@ -159,6 +159,12 @@
     <ClInclude Include="HWPlannerService.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MMF.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TASK.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -294,6 +300,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HWPlannerService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MMF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TASK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

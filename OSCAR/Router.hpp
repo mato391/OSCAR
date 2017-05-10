@@ -17,7 +17,7 @@
 #include "MODULE.hpp"
 #include "CONNECTOR.hpp"
 #include "TIMER.hpp"
-
+#include "TASK.hpp"
 
 class Router
 {
@@ -40,6 +40,7 @@ private:
 	EQM* eqmObj_;
 	TIMER * timer_;
 	bool timeout_;
+	boost::thread hwPlannerServiceThread_;
 
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
@@ -50,6 +51,7 @@ private:
 	void createConnectors(MODULE* mod);
 	void displayModulesTopology();
 	void setupTimer();
+	void checkResultFromHWPlannerService();
 
 };
 

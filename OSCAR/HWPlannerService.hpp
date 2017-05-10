@@ -7,6 +7,8 @@
 #include "EQM.hpp"
 #include "MODULE.hpp"
 #include "CONNECTOR.hpp"
+#include "RESULT.hpp"
+#include "TASK.hpp"
 
 #include <boost\thread.hpp>
 #include <boost\algorithm\string.hpp>
@@ -28,11 +30,14 @@ private:
 	std::string hwfContent_;
 	std::vector<Obj*>* cache_;
 	EQM* eqmObjPtr_;
+	bool work;
 
 	void handleMessage(std::string message);
 	void loadHWF();
 	void createMMF();
 	void createModule(std::string mod);
-	void setConnector(int id, std::string label, int connectorGroup, std::string moduleSn);
+	void setConnector(int id, std::string label, int type, int connectorGroup, std::string moduleSn);
+	void createResult();
+	void sendFeedback();
 };
 
