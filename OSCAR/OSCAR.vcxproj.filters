@@ -19,6 +19,42 @@
     <Filter Include="Source Files\Objects">
       <UniqueIdentifier>{dac65166-b65d-4c69-893c-b460d7c7ffde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Router">
+      <UniqueIdentifier>{0c6bebb2-b726-4cc7-9715-5ef1f127206e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\BDM">
+      <UniqueIdentifier>{f96e7369-644e-4f9b-8c38-0507878cb835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\EDM">
+      <UniqueIdentifier>{61fd2de0-515c-4022-b54b-c52f836b83f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\WCM">
+      <UniqueIdentifier>{cdf2e074-0fa6-40de-b909-0230cb14f044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UCM">
+      <UniqueIdentifier>{143ba94b-37f8-451e-b8c0-815df6a9a72c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UIA">
+      <UniqueIdentifier>{e732e931-eb96-4815-a119-325695426057}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BDM">
+      <UniqueIdentifier>{e3264496-df05-48c5-8d84-ee916c42e1b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\EDM">
+      <UniqueIdentifier>{78d1b705-a0fe-4361-85dc-51771ca9965c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UIA">
+      <UniqueIdentifier>{d620fcbd-4cde-403e-b54e-25221e4f6b6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UCM">
+      <UniqueIdentifier>{d48462af-05ef-4315-a4f4-43a210792e1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\WCM">
+      <UniqueIdentifier>{7ac03e6b-d044-4134-8960-e48f01407ad9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Router">
+      <UniqueIdentifier>{4dc6e087-0ad7-4cf2-b158-0da9fb0b1638}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -30,22 +66,7 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Router.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentFactory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DoorModule.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OAMConfigurator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LightModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Objects\CP.hpp">
@@ -69,26 +90,14 @@
     <ClInclude Include="Objects\WINDOW.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="BDM.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="WCM.hpp">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="REMOTE_CONTROLLER.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="CARD_PORT.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="UCM.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SCF.hpp">
       <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="EDM.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BUTTON.hpp">
       <Filter>Header Files\Objects</Filter>
@@ -99,29 +108,8 @@
     <ClInclude Include="PEDAL.h">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="EngineCommunicationService.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ALARM.hpp">
       <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="StartStopEngineButtonAgent.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StartStopEngineProcedure.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RpmMonitor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UserManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UIA.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MirrorModule.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MIRROR.hpp">
       <Filter>Header Files\Objects</Filter>
@@ -141,9 +129,6 @@
     <ClInclude Include="SWITCH_TOPOLOGY.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="CONNECTOR.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MODULE.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
@@ -153,17 +138,68 @@
     <ClInclude Include="PORT.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="TIMER.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Router.hpp">
+      <Filter>Header Files\Router</Filter>
     </ClInclude>
     <ClInclude Include="HWPlannerService.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Router</Filter>
     </ClInclude>
     <ClInclude Include="MMF.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="CONNECTOR.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentFactory.hpp">
+      <Filter>Header Files\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.hpp">
+      <Filter>Header Files\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="BDM.hpp">
+      <Filter>Header Files\BDM</Filter>
+    </ClInclude>
+    <ClInclude Include="DoorModule.hpp">
+      <Filter>Header Files\BDM</Filter>
+    </ClInclude>
+    <ClInclude Include="LightModule.h">
+      <Filter>Header Files\BDM</Filter>
+    </ClInclude>
+    <ClInclude Include="MirrorModule.hpp">
+      <Filter>Header Files\BDM</Filter>
     </ClInclude>
     <ClInclude Include="TASK.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="TIMER.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="EDM.hpp">
+      <Filter>Header Files\EDM</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineCommunicationService.hpp">
+      <Filter>Header Files\EDM</Filter>
+    </ClInclude>
+    <ClInclude Include="RpmMonitor.hpp">
+      <Filter>Header Files\EDM</Filter>
+    </ClInclude>
+    <ClInclude Include="StartStopEngineProcedure.hpp">
+      <Filter>Header Files\EDM</Filter>
+    </ClInclude>
+    <ClInclude Include="WCM.hpp">
+      <Filter>Header Files\WCM</Filter>
+    </ClInclude>
+    <ClInclude Include="UCM.hpp">
+      <Filter>Header Files\UCM</Filter>
+    </ClInclude>
+    <ClInclude Include="StartStopEngineButtonAgent.hpp">
+      <Filter>Header Files\UCM</Filter>
+    </ClInclude>
+    <ClInclude Include="UserManager.hpp">
+      <Filter>Header Files\WCM</Filter>
+    </ClInclude>
+    <ClInclude Include="UIA.hpp">
+      <Filter>Header Files\UIA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -173,22 +209,7 @@
     <ClCompile Include="OSCAR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Router.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DoorModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OAMConfigurator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LightModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Objects\CP.cpp">
@@ -209,13 +230,7 @@
     <ClCompile Include="LIGHTES.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="BDM.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Objects\WINDOW.cpp">
-      <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="WCM.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="REMOTE_CONTROLLER.cpp">
@@ -224,14 +239,8 @@
     <ClCompile Include="CARD_PORT.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="UCM.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SCF.cpp">
       <Filter>Source Files\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="EDM.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="INTER_MODULE_OPERATION.cpp">
       <Filter>Source Files\Objects</Filter>
@@ -245,68 +254,95 @@
     <ClCompile Include="BUTTON.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="ENGINE.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineCommunicationService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ALARM.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="RESULT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StartStopEngineButtonAgent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StartStopEngineProcedure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RpmMonitor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="USER.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UserManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UIA.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MirrorModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MIRROR.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="CONNECTOR.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="MIRRORS.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="MIRROR.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ENGINE.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="EQM.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MODULE.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PORT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CONNECTOR.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TIMER.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HWPlannerService.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="MMF.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="MODULE.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="PORT.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="RESULT.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="TASK.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="TIMER.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="USER.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="BDM.cpp">
+      <Filter>Source Files\BDM</Filter>
+    </ClCompile>
+    <ClCompile Include="DoorModule.cpp">
+      <Filter>Source Files\BDM</Filter>
+    </ClCompile>
+    <ClCompile Include="LightModule.cpp">
+      <Filter>Source Files\BDM</Filter>
+    </ClCompile>
+    <ClCompile Include="MirrorModule.cpp">
+      <Filter>Source Files\BDM</Filter>
+    </ClCompile>
+    <ClCompile Include="EDM.cpp">
+      <Filter>Source Files\EDM</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineCommunicationService.cpp">
+      <Filter>Source Files\EDM</Filter>
+    </ClCompile>
+    <ClCompile Include="RpmMonitor.cpp">
+      <Filter>Source Files\EDM</Filter>
+    </ClCompile>
+    <ClCompile Include="StartStopEngineProcedure.cpp">
+      <Filter>Source Files\EDM</Filter>
+    </ClCompile>
+    <ClCompile Include="UIA.cpp">
+      <Filter>Source Files\UIA</Filter>
+    </ClCompile>
+    <ClCompile Include="UCM.cpp">
+      <Filter>Source Files\UCM</Filter>
+    </ClCompile>
+    <ClCompile Include="StartStopEngineButtonAgent.cpp">
+      <Filter>Source Files\UCM</Filter>
+    </ClCompile>
+    <ClCompile Include="WCM.cpp">
+      <Filter>Source Files\WCM</Filter>
+    </ClCompile>
+    <ClCompile Include="UserManager.cpp">
+      <Filter>Source Files\WCM</Filter>
+    </ClCompile>
+    <ClCompile Include="Router.cpp">
+      <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentFactory.cpp">
+      <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="HWPlannerService.cpp">
+      <Filter>Source Files\Router</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

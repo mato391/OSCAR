@@ -89,6 +89,9 @@ void Router::checkResultFromHWPlannerService()
 		if (obj->name == "RESULT" && static_cast<RESULT*>(obj)->applicant == "HWPlannerService" && static_cast<RESULT*>(obj)->feedback == "CONFIGURATION_DONE")
 		{
 			BOOST_LOG(logger_) << "INF " << "Router::checkResultFromHWPlannerService: Configuration done.Starting with hw";
+			fabricStartup_ = false;
+			createMMFFromEQM();
+			startComponentService();
 		}
 
 	}
@@ -137,7 +140,6 @@ void Router::moduleAutodetection(std::string data)
 		{
 			if (data.substr(0, 4) == static_cast<MODULE*>(mod)->domain)
 			{
-				
 				exist = true;
 				break;
 			}
@@ -270,4 +272,16 @@ void Router::setupModule(Obj* mod)
 		}
 	}
 	displayModulesTopology();
+}
+
+void Router::createMMFFromEQM()
+{
+	std::fstream mmfh("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt", std::ios::app);
+	for (const auto &mod : eqmObj_->modules_)
+	{
+		auto module = static_cast<MODULE*>(mod);
+		std::string msg = module->label + ":" + module->domain + ";";
+		mmfh << msg;
+	}
+	mmfh.close();
 }

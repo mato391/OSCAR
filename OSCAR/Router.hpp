@@ -52,6 +52,7 @@ private:
 	void displayModulesTopology();
 	void setupTimer();
 	void checkResultFromHWPlannerService();
+	void createMMFFromEQM();
 
 };
 
