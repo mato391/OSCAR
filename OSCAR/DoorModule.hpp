@@ -2,10 +2,14 @@
 #include "Component.hpp"
 #include <iostream>
 #include <boost\algorithm\string.hpp>
+#include <map>
 #include "Objects\CP.hpp"
 #include "Objects\DOOR.hpp"
 #include "DOORS.hpp"
 #include "ALARM.hpp"
+#include "MODULE.hpp"
+#include "EQM.hpp"
+#include "CONNECTOR.hpp"
 
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
@@ -28,6 +32,7 @@ public:
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;
+	MODULE* bdmModuleObj_;
 	std::vector<Obj*>* cache_;
 	DOORS* doorsObj_;
 	std::vector<std::string> door6Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "BACK_LEFT", "BACK_RIGHT", "MASK", "BOOT" };
@@ -35,10 +40,13 @@ private:
 	std::vector<std::string> door4Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "MASK", "BOOT" };
 
 	void getCP();
+	void getBDMModule();
 	void prepareTopology();
 	void displayTopology();
 	std::string* checkIfDoorsAreClosed();
 	bool checkIfBateryAlarmRaised();
+	void createDoors(std::vector<CONNECTOR*> connectors);
+	bool checkDoesDoorExist(std::string label);
 	
 	
 };

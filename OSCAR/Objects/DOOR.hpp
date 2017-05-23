@@ -1,7 +1,9 @@
 #pragma once
 #include "Obj.hpp"
 #include "WINDOW.hpp"
+#include "../PORT.hpp"
 #include <iostream>
+#include <vector>
 class DOOR : public Obj
 {
 public:
@@ -21,6 +23,7 @@ public:
 	};
 	EOpeningState openingState;
 	WINDOW* window;
+	std::vector<PORT*> ports;
 	void unlockDoor();
 	void lockDoor();
 	void openDoor();

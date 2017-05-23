@@ -11,6 +11,7 @@
 #include "TASK.hpp"
 
 #include <boost\thread.hpp>
+#include <boost\thread\mutex.hpp>
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>
@@ -36,8 +37,10 @@ private:
 	void loadHWF();
 	void createMMF();
 	void createModule(std::string mod);
+	void setupModuleLabel(std::string label, std::string serialNumber);
 	void setConnector(int id, std::string label, int type, int connectorGroup, std::string moduleSn);
 	void createResult();
 	void sendFeedback();
+	boost::mutex mtx;
 };
 

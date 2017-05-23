@@ -57,14 +57,17 @@ void HWPlannerService::handleMessage(std::string message)
 
 void HWPlannerService::sendFeedback()
 {
+	mtx.lock();
 	for (auto &obj : *cache_)
 	{
 		if (obj->name == "TASK" && static_cast<TASK*>(obj)->taskFor == "HWPlannerService")
 		{
 			auto task = static_cast<TASK*>(obj);
 			task->feedback();
+			break;
 		}
 	}
+	mtx.unlock();
 }
 
 void HWPlannerService::loadHWF()
@@ -105,6 +108,7 @@ void HWPlannerService::createModule(std::string mod)
 			std::vector<std::string> sconnp;
 			boost::split(sconnp, sconn[1], boost::is_any_of(","));
 			moduleSn = sconnp[0];
+			setupModuleLabel(sconnp[1], moduleSn);
 			BOOST_LOG(logger_) << "INF " << "HWPlannerService::createModule: module serialNumber: " << sconnp[0];
 		}
 		if (conn.find("ConnectorsGroup") != std::string::npos)
@@ -124,6 +128,18 @@ void HWPlannerService::createModule(std::string mod)
 			boost::split(sconnp, sconn[1], boost::is_any_of(","));
 			//BOOST_LOG(logger_) << "DBG " << "Connector: " << sconn[1] << " size " << sconnp.size();
 			setConnector(std::stoi(sconnp[0]), sconnp[1], std::stoi(sconnp[2]), connectorsGroup, moduleSn);
+		}
+	}
+}
+
+void HWPlannerService::setupModuleLabel(std::string label, std::string serialNumber)
+{
+	for (auto &mod : eqmObjPtr_->modules_)
+	{
+		if (static_cast<MODULE*>(mod)->serialNumber == serialNumber)
+		{
+			static_cast<MODULE*>(mod)->label = label;
+			return;
 		}
 	}
 }

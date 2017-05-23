@@ -20,6 +20,7 @@ void Router::startComponentService()
 	checkIfMMFExists();
 	if (!fabricStartup_)
 	{
+		createEQM();
 		std::fstream mmf(mmfPath_, std::ios::in);
 		std::string mmf_;
 		mmf >> mmf_;
@@ -29,10 +30,14 @@ void Router::startComponentService()
 		BOOST_LOG(logger_) << "DEBUG " << "ROUTER:StartComponentService: mmf size: " << mmfS_[0];
 		for (const auto &line : mmfS_)
 		{
-			std::vector<std::string> componentAddress;
-			//std::cout << "ROUTER:StartComponentService: mmf: " << line << std::endl;
-			boost::split(componentAddress, line, boost::is_any_of(":"));
-			startComponent(componentAddress[0], componentAddress[1]);
+			if (line != "")
+			{
+				std::vector<std::string> componentAddress;
+				//std::cout << "ROUTER:StartComponentService: mmf: " << line << std::endl;
+				boost::split(componentAddress, line, boost::is_any_of(":"));
+				startComponent(componentAddress[0], componentAddress[1]);
+			}
+			
 		}
 	}
 	else
@@ -84,14 +89,16 @@ void Router::receiver(std::string data)
 void Router::checkResultFromHWPlannerService()
 {
 	BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService";
-	for (auto &obj : *cache_)
+	for (auto &obj : *cache_)//crash
 	{
+		BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService: " << obj->name;
 		if (obj->name == "RESULT" && static_cast<RESULT*>(obj)->applicant == "HWPlannerService" && static_cast<RESULT*>(obj)->feedback == "CONFIGURATION_DONE")
 		{
 			BOOST_LOG(logger_) << "INF " << "Router::checkResultFromHWPlannerService: Configuration done.Starting with hw";
 			fabricStartup_ = false;
 			createMMFFromEQM();
 			startComponentService();
+			break;
 		}
 
 	}
@@ -183,14 +190,13 @@ void Router::moduleAutodetection(std::string data)
 			}
 		}
 	}
-	setupTimer();
-	if (timeout_)
+	if (task == nullptr)
 	{
-		TASK* task = new TASK("HWPlannerService", std::bind(&Router::checkResultFromHWPlannerService, this));
+		task = new TASK("HWPlannerService", std::bind(&Router::checkResultFromHWPlannerService, this));
 		cache_->push_back(task);
-		startHWPlanerService(); //before that TASK should be created with function feedback to router
+		startHWPlanerService();
 	}
-		
+	
 }
 
 void Router::setupTimer()

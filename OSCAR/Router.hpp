@@ -41,7 +41,7 @@ private:
 	TIMER * timer_;
 	bool timeout_;
 	boost::thread hwPlannerServiceThread_;
-
+	TASK* task;
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
 	void checkIfMMFExists();

@@ -20,6 +20,7 @@ void DoorModule::initialize()
 {
 	BOOST_LOG(logger_) << "INFO " << "DoorModule::initialize";
 	getCP();
+	getBDMModule();
 	prepareTopology();
 	displayTopology();
 }
@@ -37,9 +38,31 @@ void DoorModule::getCP()
 	BOOST_LOG(logger_) << "ERROR " << "DoorModule::getCP: There is no CP in cache";
 }
 
+void DoorModule::getBDMModule()
+{
+	for (const auto &obj : *cache_)
+	{
+		if (obj->name == "EQM")
+		{
+			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
+			{
+				if (static_cast<MODULE*>(mod)->label == "BDM")
+				{
+					BOOST_LOG(logger_) << "INF " << "DoorModule::getBDMModule: MODULE found";
+					bdmModuleObj_ = static_cast<MODULE*>(mod);
+					return;
+				}
+					
+			}
+		}
+	}
+	BOOST_LOG(logger_) << "ERR " << "DoorModule::getBDMModule: MODULE not found";
+}
+
 void DoorModule::prepareTopology()
 {
 	doorsObj_ = new DOORS();
+	/*
 	std::vector<std::string> labels;
 	if (cpObj_->doorsVersion == 6)
 		labels = door6Labels_;
@@ -55,7 +78,112 @@ void DoorModule::prepareTopology()
 		door->closeDoor();
 		doorsObj_->addDoors(door);
 	}
+	*/
+	std::vector<CONNECTOR*> connectors;
+	for (const auto &connGr : bdmModuleObj_->connectors_)
+	{
+		for (const auto &conn : connGr)
+		{
+			if (static_cast<CONNECTOR*>(conn)->label.find("DOOR") != std::string::npos)
+			{
+				connectors.push_back(static_cast<CONNECTOR*>(conn));
+			}
+		}
+	}
+	if (connectors.size() == 0)
+	{
+		BOOST_LOG(logger_) << "INFO " << "DoorModule::prepareTopology: no connectors";
+		return;
+	}
+	else
+	{
+		createDoors(connectors);
+	}
+		
+	displayTopology();
 	cache_->push_back(doorsObj_);
+}
+
+void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
+{
+	BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors";
+	std::vector<PORT*> ports;
+	for (const auto &conn : connectors)
+	{
+		BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: connector label: " << conn->label;
+		std::string label = [](std::string label)->std::string
+		{
+			std::vector<std::string> slabel;
+			boost::split(slabel, label, boost::is_any_of("_"));
+			if (slabel.size() == 2)
+				return slabel[1];
+			else
+				return slabel[1] + "_" + slabel[2];
+		}(conn->label);
+		
+		bool exist = ![](std::string label, std::vector<PORT*> ports)-> bool
+		{
+			for (const auto &port : ports)
+			{
+				
+				if (port->label == label)
+					return true;
+			}
+			return false;
+		}(label, ports);
+		BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors check label exist: " << label << " " << exist;
+		if (!exist)
+		{
+			BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: port label does not exist. Creating : " << label;
+			PORT* port = new PORT();
+			port->label = label;
+			port->connectors.push_back(conn);
+		}
+		else
+		{
+			BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: port label exist. Creating : " << label;
+			for (const auto &port : ports)
+			{
+				if (port->label == label)
+				{
+					port->connectors.push_back(conn);
+					break;
+				}
+			}
+		}
+	}
+	for (const auto &port : ports)
+	{
+		if (!checkDoesDoorExist(port->label))
+		{
+			BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: door label does not exist. Creating : " << port->label;
+			DOOR* door = new DOOR(port->label);
+			door->ports.push_back(port);
+			doorsObj_->container_.push_back(door);
+		}
+		else
+		{
+			BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: port label does exist.";
+			for (const auto &door : doorsObj_->container_)
+			{
+				if (door->label == port->label)
+				{
+					door->ports.push_back(port);
+					break;
+				}
+			}
+		}
+	}
+}
+
+bool DoorModule::checkDoesDoorExist(std::string label)
+{
+	for (const auto &door : doorsObj_->container_)
+	{
+		if (door->label == label)
+			return true;
+	}
+	return false;
 }
 
 void DoorModule::unlockDoors()
@@ -217,7 +345,6 @@ void DoorModule::changeOpeningState(std::string port, DOOR::EOpeningState state)
 					door->closeDoor();
 				break;
 			}
-			
 		}
 	}
 }
@@ -228,5 +355,13 @@ void DoorModule::displayTopology()
 	for (const auto &door : doorsObj_->container_)
 	{
 		BOOST_LOG(logger_) << "DEBUG " << door->label;
+		for (const auto &port : door->ports)
+		{
+			BOOST_LOG(logger_) << "DEBUG " << "PORT " << port->label;
+			for (const auto &conn : port->connectors)
+			{
+				BOOST_LOG(logger_) << "DEBUG " << "CONNECTOR " << conn->id << " " << static_cast<int>(conn->type);
+			}
+		}
 	}
 }
