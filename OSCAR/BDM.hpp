@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+#include <iostream>
 #include "Component.hpp"
 #include "DoorModule.hpp"
 #include "LightModule.h"

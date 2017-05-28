@@ -12,6 +12,7 @@
 #include <boost\filesystem.hpp>
 
 #include "HWPlannerService.hpp"
+#include "HWFService.hpp"
 #include "Objects\Obj.hpp"
 #include "EQM.hpp"
 #include "MODULE.hpp"
@@ -42,6 +43,7 @@ private:
 	bool timeout_;
 	boost::thread hwPlannerServiceThread_;
 	TASK* task;
+	HWFService* hwfService_;
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
 	void checkIfMMFExists();

@@ -25,6 +25,8 @@ void Router::startComponentService()
 		std::string mmf_;
 		mmf >> mmf_;
 		mmf.close();
+		hwfService_ = new HWFService(eqmObj_);
+		hwfService_->prepareTopology();
 		BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: mmf: " << mmf_;
 		boost::split(mmfS_, mmf_, boost::is_any_of(";"));
 		BOOST_LOG(logger_) << "DEBUG " << "ROUTER:StartComponentService: mmf size: " << mmfS_[0];

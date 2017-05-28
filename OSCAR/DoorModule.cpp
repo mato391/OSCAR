@@ -100,7 +100,7 @@ void DoorModule::prepareTopology()
 		createDoors(connectors);
 	}
 		
-	displayTopology();
+	//displayTopology();
 	cache_->push_back(doorsObj_);
 }
 
@@ -121,11 +121,11 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 				return slabel[1] + "_" + slabel[2];
 		}(conn->label);
 		
-		bool exist = ![](std::string label, std::vector<PORT*> ports)-> bool
+		bool exist = [](std::string label, std::vector<PORT*> ports)-> bool
 		{
 			for (const auto &port : ports)
 			{
-				
+				std::cout << "createDoors: " << port << " label: " << label << std::endl;
 				if (port->label == label)
 					return true;
 			}
@@ -138,6 +138,7 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 			PORT* port = new PORT();
 			port->label = label;
 			port->connectors.push_back(conn);
+			ports.push_back(port);
 		}
 		else
 		{
@@ -174,6 +175,7 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 			}
 		}
 	}
+	BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: " << doorsObj_->container_.size() << " door has been created";
 }
 
 bool DoorModule::checkDoesDoorExist(std::string label)
@@ -352,6 +354,7 @@ void DoorModule::changeOpeningState(std::string port, DOOR::EOpeningState state)
 void DoorModule::displayTopology()
 {
 	BOOST_LOG(logger_) << "DEBUG " << "DoorModule::displayTopology";
+	BOOST_LOG(logger_) << "DEBUG " << doorsObj_->container_.size();
 	for (const auto &door : doorsObj_->container_)
 	{
 		BOOST_LOG(logger_) << "DEBUG " << door->label;

@@ -201,6 +201,9 @@
     <ClInclude Include="UIA.hpp">
       <Filter>Header Files\UIA</Filter>
     </ClInclude>
+    <ClInclude Include="HWFService.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -343,6 +346,9 @@
     </ClCompile>
     <ClCompile Include="HWPlannerService.cpp">
       <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="HWFService.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

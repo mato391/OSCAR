@@ -161,6 +161,7 @@
     <ClInclude Include="ENGINE.hpp" />
     <ClInclude Include="EngineCommunicationService.hpp" />
     <ClInclude Include="EQM.hpp" />
+    <ClInclude Include="HWFService.hpp" />
     <ClInclude Include="HWPlannerService.hpp" />
     <ClInclude Include="INTER_MODULE_OPERATION.h" />
     <ClInclude Include="LIGHTES.hpp" />
@@ -210,6 +211,7 @@
     <ClCompile Include="ENGINE.cpp" />
     <ClCompile Include="EngineCommunicationService.cpp" />
     <ClCompile Include="EQM.cpp" />
+    <ClCompile Include="HWFService.cpp" />
     <ClCompile Include="HWPlannerService.cpp" />
     <ClCompile Include="INTER_MODULE_OPERATION.cpp" />
     <ClCompile Include="LIGHTES.cpp" />
