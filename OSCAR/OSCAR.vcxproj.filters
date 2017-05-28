@@ -348,7 +348,7 @@
       <Filter>Source Files\Router</Filter>
     </ClCompile>
     <ClCompile Include="HWFService.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Router</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

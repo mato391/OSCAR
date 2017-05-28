@@ -6,7 +6,7 @@ Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) 
 {
 	cache_ = cache;
 	mmfPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt";
-	startComponentService();
+	startAutodetection();
 	timeout_ = false;
 }
 
@@ -14,19 +14,29 @@ Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) 
 Router::~Router()
 {
 }
-
-void Router::startComponentService()
+void Router::startAutodetection()
 {
+	createEQM();
 	checkIfMMFExists();
 	if (!fabricStartup_)
 	{
-		createEQM();
+		hwfService_ = new HWFService(eqmObj_);
+		hwfService_->prepareTopology();
+	}
+	BOOST_LOG(logger_) << "INF " << "startAutodetection hwfTopologyDone. Waiting for hardware";
+}
+void Router::startComponentService()
+{
+	createEQM();
+	checkIfMMFExists();
+	if (!fabricStartup_)
+	{
+		
 		std::fstream mmf(mmfPath_, std::ios::in);
 		std::string mmf_;
 		mmf >> mmf_;
 		mmf.close();
-		hwfService_ = new HWFService(eqmObj_);
-		hwfService_->prepareTopology();
+		
 		BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: mmf: " << mmf_;
 		boost::split(mmfS_, mmf_, boost::is_any_of(";"));
 		BOOST_LOG(logger_) << "DEBUG " << "ROUTER:StartComponentService: mmf size: " << mmfS_[0];
@@ -45,8 +55,6 @@ void Router::startComponentService()
 	else
 	{
 		BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: fabric startup with naked sw";
-		createEQM();
-		return;
 	}
 	
 	
@@ -60,32 +68,61 @@ void Router::createEQM()
 
 void Router::startComponent(std::string name, std::string address)
 {
-	components_.push_back(ComponentFactory::createComponent(name, address, logger_));
-	components_.back()->setCache(cache_);
-	components_.back()->setComponentsCache(&components_);
-	components_.back()->initialize();
-	components_.back()->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
+	BOOST_LOG(logger_) << "DBG " << "startComponent " << name << " " << address;
+	bool exist = false;
+	for (auto &component : components_)
+	{
+		BOOST_LOG(logger_) << "DBG " << " startComponent found: " << component->name;
+		if (name.find(component->name) != std::string::npos)
+		{
+			exist = true;
+			break;
+		}
+	}
+	if (!exist)
+	{
+		components_.push_back(ComponentFactory::createComponent(name, address, logger_));
+	}
+}
+
+void Router::initializeComponent(std::string name)
+{
+	BOOST_LOG(logger_) << "DBG " << "INITIALIZE COMPONENT " << name;
+	for (auto &component : components_)
+	{
+		if (name.find(component->name) != std::string::npos)
+		{
+			if (!component->initialized)
+			{
+				component->setCache(cache_);
+				component->setComponentsCache(&components_);
+				component->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
+				component->initialized = true;
+			}
+			BOOST_LOG(logger_) << "DBG " << "INITIALIZE COMPONENT start init for subcomponent: " << name;
+			component->initialize(name);
+		}
+	}
 }
 
 void Router::receiver(std::string data)
 {
+	moduleAutodetection(data);
 	if (!fabricStartup_)
 	{
 		std::string domain = data.substr(0, 4);
 		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << domain;
 		for (const auto &component : components_)
 		{
-			if (component->domain == domain)
+			if (component->initialized && component->domain == domain)
 			{
 				component->execute(data);
 				break;
 			}
 		}
 	}
-	else
-	{
-		moduleAutodetection(data);
-	}
+	
+	
 }
 
 void Router::checkResultFromHWPlannerService()
@@ -159,19 +196,38 @@ void Router::moduleAutodetection(std::string data)
 		{
 			MODULE* module = new MODULE();
 			module->domain = data.substr(0, 4);
+			module->detectionStatus = MODULE::EDetectionStatus::online;
 			eqmObj_->addModule(module);
 			sender(module->domain + "FF");
-			BOOST_LOG(logger_) << "INF " << "Router::moduleAutodetection: module created " << module->domain;
+			BOOST_LOG(logger_) << "INF " << "Router::moduleAutodetection: module created " << module->domain << " " << module->label;
+		}
+		else
+		{
+			for (auto &mod : eqmObj_->modules_)
+			{
+				auto module = static_cast<MODULE*>(mod);
+				if (module->domain == data.substr(0, 4))
+				{
+					module->detectionStatus = MODULE::EDetectionStatus::online;
+					sender(module->domain + "FF");
+					BOOST_LOG(logger_) << "INF " << "Router::moduleAutodetection: module created " << module->domain << " " << module->label;
+				}
+			}
 		}
 	}
 	else if (data.substr(4, 2) == "01")
 	{
 		for (const auto &mod : eqmObj_->modules_)
 		{
-			if (data.substr(0, 4) == static_cast<MODULE*>(mod)->domain)
+			auto module = static_cast<MODULE*>(mod);
+			BOOST_LOG(logger_) << "DBG " << "moduleAutodetection: " << module->label;
+			if (data.substr(0, 4) == module->domain)
 			{
-				static_cast<MODULE*>(mod)->mask = data.substr(6, 6);
-				setupModule(mod);
+				module->mask = data.substr(6, 6);
+				if (fabricStartup_)
+					setupModule(module);
+				module->operationalState = MODULE::EOperationalState::configured;
+				initializeComponent(module->label);
 				break;
 			}
 
@@ -183,11 +239,16 @@ void Router::moduleAutodetection(std::string data)
 		for (const auto &mod : eqmObj_->modules_)
 		{
 			auto module = static_cast<MODULE*>(mod);
-			if (data.substr(0, 4) == module->domain)
+			BOOST_LOG(logger_) << "DBG " << "WHY IT IS: " << module->label;
+			if (data.substr(0, 4) == module->domain )
 			{
 				module->serialNumber = data.substr(4, 4);
 				module->productNumber = data.substr(8, 6);
-				createConnectors(module);
+				if (fabricStartup_)
+					createConnectors(module);
+				module->operationalState = MODULE::EOperationalState::enabled;
+				BOOST_LOG(logger_) << "DEBUG starting Component for module: " << module->name;
+				startComponent(module->label, module->domain);
 				break;
 			}
 		}

@@ -13,13 +13,14 @@ class Component
 public:
 	std::string domain;
 	std::string name;
+	bool initialized;
 	std::function<void(std::string)> send;
 	virtual void setSenderPtr(std::function<void(std::string)> func) = 0;
 	virtual void setCache(std::vector<Obj*>* cache) = 0;
 	virtual void setComponentsCache(std::vector<Component*>* componentCache) = 0;
 	virtual void execute(std::string message) = 0;
 	virtual void execute(INTER_MODULE_OPERATION* imo) = 0;
-	virtual void initialize() = 0;
+	virtual void initialize(std::string subcomponent) = 0;
 	
 	boost::log::sources::logger_mt logger_;
 	

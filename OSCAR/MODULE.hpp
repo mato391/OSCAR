@@ -16,5 +16,18 @@ public:
 	std::string serialNumber;
 	std::string productNumber;
 	std::string label;
+	enum class EDetectionStatus
+	{
+		offline,
+		online
+	};
+	EDetectionStatus detectionStatus;
+	enum class EOperationalState
+	{
+		disabled,
+		configured,
+		enabled
+	};
+	EOperationalState operationalState;
 };
 

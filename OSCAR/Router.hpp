@@ -44,8 +44,11 @@ private:
 	boost::thread hwPlannerServiceThread_;
 	TASK* task;
 	HWFService* hwfService_;
+
+	void startAutodetection();
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
+	void initializeComponent(std::string name);
 	void checkIfMMFExists();
 	void createEQM();
 	void moduleAutodetection(std::string domain);

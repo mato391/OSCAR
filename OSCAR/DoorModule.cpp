@@ -20,7 +20,7 @@ void DoorModule::initialize()
 {
 	BOOST_LOG(logger_) << "INFO " << "DoorModule::initialize";
 	getCP();
-	getBDMModule();
+	getBDMModules();
 	prepareTopology();
 	displayTopology();
 }
@@ -38,7 +38,7 @@ void DoorModule::getCP()
 	BOOST_LOG(logger_) << "ERROR " << "DoorModule::getCP: There is no CP in cache";
 }
 
-void DoorModule::getBDMModule()
+void DoorModule::getBDMModules()
 {
 	for (const auto &obj : *cache_)
 	{
@@ -46,7 +46,7 @@ void DoorModule::getBDMModule()
 		{
 			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
 			{
-				if (static_cast<MODULE*>(mod)->label == "BDM")
+				if (static_cast<MODULE*>(mod)->label.find("BDM_DOOR") != std::string::npos)
 				{
 					BOOST_LOG(logger_) << "INF " << "DoorModule::getBDMModule: MODULE found";
 					bdmModuleObj_ = static_cast<MODULE*>(mod);
@@ -62,23 +62,6 @@ void DoorModule::getBDMModule()
 void DoorModule::prepareTopology()
 {
 	doorsObj_ = new DOORS();
-	/*
-	std::vector<std::string> labels;
-	if (cpObj_->doorsVersion == 6)
-		labels = door6Labels_;
-	else if (cpObj_->doorsVersion == 5)
-		labels = door5Labels_;
-	else if (cpObj_->doorsVersion == 4)
-		labels = door4Labels_;
-	BOOST_LOG(logger_) << "INFO " << "DoorModule::prepareTopology for: " << labels.size() << " door";
-	for (const auto &label : labels)
-	{
-		DOOR* door = new DOOR(label);
-		door->lockDoor();
-		door->closeDoor();
-		doorsObj_->addDoors(door);
-	}
-	*/
 	std::vector<CONNECTOR*> connectors;
 	for (const auto &connGr : bdmModuleObj_->connectors_)
 	{
@@ -117,6 +100,8 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 			boost::split(slabel, label, boost::is_any_of("_"));
 			if (slabel.size() == 2)
 				return slabel[1];
+			else if (slabel.size() == 4)
+				return slabel[0] + "_" + slabel[2] + "_" + slabel[3];
 			else
 				return slabel[1] + "_" + slabel[2];
 		}(conn->label);
@@ -125,7 +110,6 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 		{
 			for (const auto &port : ports)
 			{
-				std::cout << "createDoors: " << port << " label: " << label << std::endl;
 				if (port->label == label)
 					return true;
 			}
@@ -366,5 +350,6 @@ void DoorModule::displayTopology()
 				BOOST_LOG(logger_) << "DEBUG " << "CONNECTOR " << conn->id << " " << static_cast<int>(conn->type);
 			}
 		}
+		
 	}
 }

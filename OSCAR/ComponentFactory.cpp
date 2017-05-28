@@ -4,8 +4,10 @@
 
 Component* ComponentFactory::createComponent(std::string name, std::string domain, boost::log::sources::logger_mt logger)
 {
-	if (name == "BDM")
+	std::cout << "ComponentFactory " << name << " " << domain << std::endl;
+	if (name.find("BDM") != std::string::npos)
 	{
+		std::cout << "ComponentFactory returning new BDM"<<  std::endl;
 		return new BDM(domain, logger);
 	}
 	else if (name == "WCM")

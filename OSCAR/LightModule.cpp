@@ -16,9 +16,11 @@ LightModule::~LightModule()
 
 void LightModule::initialize()
 {
+	BOOST_LOG(logger_) << "INF " << "LightModule::initialize";
 	getCP();
+	getBDMModules();
 	createLightsTopology();
-	displayTopology();
+	//displayTopology();
 }
 
 void LightModule::getCP()
@@ -34,20 +36,55 @@ void LightModule::getCP()
 	BOOST_LOG(logger_) << "ERROR " << "LightModule::getCP: There is no CP in cache";
 }
 
+void LightModule::getBDMModules()
+{
+	for (const auto &obj : *cache_)
+	{
+		if (obj->name == "EQM")
+		{
+			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
+			{
+				if (static_cast<MODULE*>(mod)->label == "BDM_LIGHT")
+				{
+					BOOST_LOG(logger_) << "INF " << "LightModule::getBDMModule: MODULE found";
+					bdmModuleObj_ = static_cast<MODULE*>(mod);
+					return;
+				}
+
+			}
+		}
+	}
+	BOOST_LOG(logger_) << "ERR " << "LightModule::getBDMModule: MODULE not found";
+}
+
 void LightModule::createLightsTopology()
 {
 	BOOST_LOG(logger_) << "INFO " << "LightModule::createLightsTopology";
-	lightes_ = new LIGHTES();
+	/*lightes_ = new LIGHTES();
 	createFrontLight(cpObj_->lightVersion);
 	createCenterBlinkers(cpObj_->lightVersion);
 	createBackLight(cpObj_->lightVersion);
-	cache_->push_back(lightes_);
+	cache_->push_back(lightes_);*/
+	std::vector<CONNECTOR*> conns;
+	for (const auto &vec : bdmModuleObj_->connectors_)
+	{
+		for (const auto &obj : vec)
+		{
+			auto conn = static_cast<CONNECTOR*>(obj);
+			if (conn->label.find("LIGHT") != std::string::npos)
+				conns.push_back(conn);
+		}
+	}
+	for (auto &conn : conns)
+	{
+
+	}
 }
 
 
 void LightModule::createFrontLight(int version)
 {
-	if (version >= 1)
+	/*if (version >= 1)
 	{
 		lightes_->addLight(lightFactory("BEAM_FRONT_LEFT", LIGHT::EType::bulb));
 		lightes_->addLight(lightFactory("BEAM_FRONT_RIGHT", LIGHT::EType::bulb));
@@ -77,7 +114,8 @@ void LightModule::createFrontLight(int version)
 		lightes_->addLight(lightFactory("DAILY_LEFT", LIGHT::EType::led));
 		lightes_->addLight(lightFactory("DAILY_RIGHT", LIGHT::EType::led));
 
-	}
+	}*/
+	
 }
 
 void LightModule::createCenterBlinkers(int version)

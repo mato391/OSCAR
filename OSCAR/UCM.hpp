@@ -28,7 +28,7 @@ private:
 	std::vector<std::string> scfVec_;
 	StartStopEngineButtonAgent* startStopEngineButtonAgent_;
 
-	void initialize();
+	void initialize(std::string subcomponent);
 	void prepareSwitchTopology();
 	void prepareTopologyBasedOnSCF();
 	void startUserOperationProcessing(BUTTON* button);

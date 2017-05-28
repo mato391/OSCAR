@@ -14,6 +14,7 @@ public:
 		input,
 		output
 	};
+	int value;
 	EType type;
 };
 

@@ -15,7 +15,7 @@ UCM::~UCM()
 {
 }
 
-void UCM::initialize()
+void UCM::initialize(std::string subcomponent)
 {
 	prepareSwitchTopology();
 	startStopEngineButtonAgent_ = new StartStopEngineButtonAgent(switchTopology, logger_);

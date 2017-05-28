@@ -1,5 +1,6 @@
 #pragma once
 #include "Obj.hpp"
+
 class WINDOW :
 	public Obj
 {

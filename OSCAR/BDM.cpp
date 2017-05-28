@@ -4,6 +4,7 @@
 
 BDM::BDM(std::string domain, boost::log::sources::logger_mt logger) 
 {
+	initialized = false;
 	logger_ = logger;
 	BOOST_LOG(logger_) << "DEBUG " << "BDM ctor";
 	this->domain = domain;
@@ -40,9 +41,13 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 	if (imo->operation == "DOOR_LOCKING_OPERATION")
 	{
 		if (imo->details == "00")
+		{
 			doorModule_->unlockDoors();
+		}
 		else if (imo->details == "01")
+		{
 			doorModule_->lockDoors();
+		}
 	}
 	if (imo->operation == "GET_MIRROR_POS")
 	{
@@ -63,13 +68,24 @@ void BDM::lockDoors()
 	doorModule_->lockDoors();
 }
 
-void BDM::initialize()
+void BDM::initialize(std::string subcomponent)
 {
-	doorModule_ = new DoorModule(cache_, logger_);
-	doorModule_->initialize();
-	//lightModule_ = new LightModule(cache_, logger_);
-	//lightModule_->initialize();
+	if (subcomponent == "BDM_DOOR")
+	{
+		doorModule_ = new DoorModule(cache_, logger_);
+		doorModule_->initialize();
+	}
+	else if (subcomponent == "BDM_LIGHT")
+	{
+		lightModule_ = new LightModule(cache_, logger_);
+		lightModule_->initialize();
+	}
+
+
+		
+	
 	//mirrorModule_ = new MirrorModule(cache_, logger_);
+	//mirrorModule_->initialize();
 }
 
 void BDM::blinkersRun(int times, int interval)

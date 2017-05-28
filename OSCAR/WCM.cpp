@@ -17,7 +17,7 @@ WCM::~WCM()
 {
 }
 
-void WCM::initialize()
+void WCM::initialize(std::string subcomponent)
 {
 	getBDM();
 	cardPortObj_ = new CARD_PORT();

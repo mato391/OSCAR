@@ -16,7 +16,7 @@ public:
 	void setCache(std::vector<Obj*>* cache) { cache_ = cache; }
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
-	void initialize();
+	void initialize(std::string subcomponent);
 private:
 	REMOTE_CONTROLLER* rcObj_;
 	CARD_PORT* cardPortObj_;

@@ -9,14 +9,14 @@ EDM::EDM(std::string domain, boost::log::sources::logger_mt logger)
 	this->domain = domain;
 	this->logger_ = logger;
 	BOOST_LOG(logger_) << "DEBUG " << "EDM ctor";
-	initialize();
+	//initialize();
 }
 
 EDM::~EDM()
 {
 }
 
-void EDM::initialize()
+void EDM::initialize(std::string subcomponent)
 {
 	engineObj_ = new ENGINE();
 	engineObj_->detectionState = ENGINE::EDetectionState::offline;

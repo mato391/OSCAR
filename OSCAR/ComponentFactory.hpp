@@ -4,7 +4,7 @@
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>
 #include <boost\log\sources\logger.hpp>
-
+#include <iostream>
 #include "Component.hpp"
 #include "BDM.hpp"
 #include "WCM.hpp"

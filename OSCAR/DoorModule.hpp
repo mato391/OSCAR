@@ -40,7 +40,7 @@ private:
 	std::vector<std::string> door4Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "MASK", "BOOT" };
 
 	void getCP();
-	void getBDMModule();
+	void getBDMModules();
 	void prepareTopology();
 	void displayTopology();
 	std::string* checkIfDoorsAreClosed();

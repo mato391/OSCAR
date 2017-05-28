@@ -31,6 +31,17 @@ void DOOR::lockDoor()
 {
 	lockingState = DOOR::ELockingState::locked;
 	window->lockingState = WINDOW::ELockingState::locked;
+	for (auto &port : ports)
+	{
+		if (port->label == label)
+		{
+			for (auto &conn : port->connectors)
+			{
+				if (conn->type == CONNECTOR::EType::output)
+					conn->value = 1;
+			}
+		}
+	}
 }
 
 void DOOR::openDoor()

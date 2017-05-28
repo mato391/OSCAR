@@ -52,7 +52,10 @@ MODULE* HWFService::createModule(std::string data)
 	boost::split(moduleInf, moduleInfRawData[1], boost::is_any_of(","));
 	MODULE* module = new MODULE();
 	module->serialNumber = moduleInf[0];
-	module->label = moduleInf[1];
+	module->domain = moduleInf[1];
+	module->label = moduleInf[2];
+	std::cout << "HWFService::createModule: " << module->label << std::endl;
+	module->detectionStatus = MODULE::EDetectionStatus::offline;
 	return module;
 }
 
