@@ -13,7 +13,13 @@ class Component
 public:
 	std::string domain;
 	std::string name;
-	bool initialized;
+	enum class EConfiguringState
+	{
+		online,
+		initialized,
+		configured
+	};
+	EConfiguringState configuringState;
 	std::function<void(std::string)> send;
 	virtual void setSenderPtr(std::function<void(std::string)> func) = 0;
 	virtual void setCache(std::vector<Obj*>* cache) = 0;

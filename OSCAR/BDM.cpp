@@ -4,7 +4,7 @@
 
 BDM::BDM(std::string domain, boost::log::sources::logger_mt logger) 
 {
-	initialized = false;
+	configuringState = EConfiguringState::online;
 	logger_ = logger;
 	BOOST_LOG(logger_) << "DEBUG " << "BDM ctor";
 	this->domain = domain;
@@ -86,6 +86,15 @@ void BDM::initialize(std::string subcomponent)
 	
 	//mirrorModule_ = new MirrorModule(cache_, logger_);
 	//mirrorModule_->initialize();
+}
+
+void BDM::setConfiguringStateIfNeeded()
+{
+	if (lightModule_ != nullptr && doorModule_ != nullptr && mirrorModule_ != nullptr)
+	{
+		BOOST_LOG(logger_) << "INF " << "BDM::setConfiguringStateIfNeeded: " << "OK";
+		configuringState = EConfiguringState::configured;
+	}
 }
 
 void BDM::blinkersRun(int times, int interval)

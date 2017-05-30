@@ -2,6 +2,7 @@
 #include "Objects\Obj.hpp"
 #include "Objects\DOOR.hpp"
 #include <vector>
+#include "PORT.hpp"
 class DOORS :
 	public Obj
 {
@@ -10,5 +11,6 @@ public:
 	~DOORS();
 	void addDoors(DOOR* door);
 	std::vector<DOOR*> container_;
+	PORT* commonLockGND;
 };
 

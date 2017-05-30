@@ -92,12 +92,12 @@ void Router::initializeComponent(std::string name)
 	{
 		if (name.find(component->name) != std::string::npos)
 		{
-			if (!component->initialized)
+			if (component->configuringState != Component::EConfiguringState::initialized)
 			{
 				component->setCache(cache_);
 				component->setComponentsCache(&components_);
 				component->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
-				component->initialized = true;
+				component->configuringState = Component::EConfiguringState::initialized;
 			}
 			BOOST_LOG(logger_) << "DBG " << "INITIALIZE COMPONENT start init for subcomponent: " << name;
 			component->initialize(name);
@@ -114,7 +114,7 @@ void Router::receiver(std::string data)
 		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << domain;
 		for (const auto &component : components_)
 		{
-			if (component->initialized && component->domain == domain)
+			if (component->configuringState == Component::EConfiguringState::configured && component->domain == domain)
 			{
 				component->execute(data);
 				break;

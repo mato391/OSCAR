@@ -23,6 +23,7 @@ public:
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
 	void unlockDoors();
 	void lockDoors();
+	void setConfiguringStateIfNeeded();
 	void openWindow(std::string port);
 	void closeWindow(std::string port);
 	void lockWindow();

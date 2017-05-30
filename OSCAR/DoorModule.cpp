@@ -91,8 +91,11 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 {
 	BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors";
 	std::vector<PORT*> ports;
+	CONNECTOR* commonLockGNDConn;
 	for (const auto &conn : connectors)
 	{
+		if (conn->label.find("GND") != std::string::npos)
+			commonLockGNDConn = conn;
 		BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: connector label: " << conn->label;
 		std::string label = [](std::string label)->std::string
 		{
@@ -139,12 +142,17 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 	}
 	for (const auto &port : ports)
 	{
-		if (!checkDoesDoorExist(port->label))
+		if (!checkDoesDoorExist(port->label) && port->label.find("GND") == std::string::npos)
 		{
 			BOOST_LOG(logger_) << "INF " << "DoorModule::createDoors: door label does not exist. Creating : " << port->label;
 			DOOR* door = new DOOR(port->label);
 			door->ports.push_back(port);
 			doorsObj_->container_.push_back(door);
+		}
+		else if (port->label.find("GND") != std::string::npos)
+		{
+			doorsObj_->commonLockGND = port;
+			doorsObj_->commonLockGND->connectors.push_back(commonLockGNDConn);
 		}
 		else
 		{
@@ -339,6 +347,9 @@ void DoorModule::displayTopology()
 {
 	BOOST_LOG(logger_) << "DEBUG " << "DoorModule::displayTopology";
 	BOOST_LOG(logger_) << "DEBUG " << doorsObj_->container_.size();
+	BOOST_LOG(logger_) << "DEBUG " << "DOORS_COMMON_LOCK_PORT " << doorsObj_->commonLockGND->label;
+	BOOST_LOG(logger_) << "DEBUG " << "CONNECTOR " << doorsObj_->commonLockGND->connectors[0]->id << " " 
+		<< doorsObj_->commonLockGND->connectors[0]->label;
 	for (const auto &door : doorsObj_->container_)
 	{
 		BOOST_LOG(logger_) << "DEBUG " << door->label;
