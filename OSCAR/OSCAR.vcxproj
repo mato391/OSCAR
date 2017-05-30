@@ -179,6 +179,7 @@
     <ClInclude Include="Objects\WINDOW.hpp" />
     <ClInclude Include="PEDAL.h" />
     <ClInclude Include="PORT.hpp" />
+    <ClInclude Include="POWER_GROUP.hpp" />
     <ClInclude Include="REMOTE_CONTROLLER.hpp" />
     <ClInclude Include="RESULT.hpp" />
     <ClInclude Include="Router.hpp" />
@@ -230,6 +231,7 @@
     <ClCompile Include="OSCAR.cpp" />
     <ClCompile Include="PEDAL.cpp" />
     <ClCompile Include="PORT.cpp" />
+    <ClCompile Include="POWER_GROUP.cpp" />
     <ClCompile Include="REMOTE_CONTROLLER.cpp" />
     <ClCompile Include="RESULT.cpp" />
     <ClCompile Include="Router.cpp" />

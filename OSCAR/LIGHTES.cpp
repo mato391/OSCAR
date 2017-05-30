@@ -14,5 +14,5 @@ LIGHTES::~LIGHTES()
 
 void LIGHTES::addLight(LIGHT* light)
 {
-	container_.push_back(light);
+	//container_.push_back(light);
 }

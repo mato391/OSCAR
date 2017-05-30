@@ -215,7 +215,7 @@ void Router::moduleAutodetection(std::string data)
 			}
 		}
 	}
-	else if (data.substr(4, 2) == "01")
+	else if (data.substr(4, 2) == "EE")
 	{
 		for (const auto &mod : eqmObj_->modules_)
 		{

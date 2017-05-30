@@ -2,12 +2,14 @@
 #include <vector>
 #include <iostream>
 #include <map>
+
 #include "Objects\Obj.hpp"
 #include "Objects\CP.hpp"
 #include "Objects\LIGHT.hpp"
 #include "LIGHTES.hpp"
 #include "MODULE.hpp"
 #include "EQM.hpp"
+#include "POWER_GROUP.hpp"
 
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
@@ -33,12 +35,16 @@ private:
 	void getCP();
 	void getBDMModules();
 	void createLightsTopology();
+	void createLightsObj();
+	void createLightObjs();
+	std::string getShortLabelForPowerGroup(std::string label);
 	void createLowestVersionLightTopology();
 	void createFrontLight(int version);
 	void createCenterBlinkers(int version);
 	void createBackLight(int version);
 	LIGHT* lightFactory(std::string label, LIGHT::EType type);
 	void displayTopology();
+	std::vector<CONNECTOR*> conns;
 	
 };
 

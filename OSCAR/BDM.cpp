@@ -92,7 +92,7 @@ void BDM::blinkersRun(int times, int interval)
 {
 	for (int i = 0; i < times; i++)
 	{
-		lightModule_->blink();
+		//lightModule_->blink();
 		boost::this_thread::sleep(boost::posix_time::millisec(interval));
 	}
 	
