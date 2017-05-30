@@ -27,7 +27,7 @@ void Router::startAutodetection()
 }
 void Router::startComponentService()
 {
-	createEQM();
+	//createEQM();
 	checkIfMMFExists();
 	if (!fabricStartup_)
 	{
@@ -166,10 +166,12 @@ void Router::checkIfMMFExists()
 	if (boost::filesystem::exists(mmfPath_))
 	{
 		fabricStartup_ = false;
+		eqmObj_->configuringState = EQM::EConfiguringState::naked;
 		return;
 	}
 	else
 	{
+		eqmObj_->configuringState = EQM::EConfiguringState::configured;
 		fabricStartup_ = true;
 	}
 }

@@ -346,7 +346,6 @@ void DoorModule::changeOpeningState(std::string port, DOOR::EOpeningState state)
 void DoorModule::displayTopology()
 {
 	BOOST_LOG(logger_) << "DEBUG " << "DoorModule::displayTopology";
-	BOOST_LOG(logger_) << "DEBUG " << doorsObj_->container_.size();
 	BOOST_LOG(logger_) << "DEBUG " << "DOORS_COMMON_LOCK_PORT " << doorsObj_->commonLockGND->label;
 	BOOST_LOG(logger_) << "DEBUG " << "CONNECTOR " << doorsObj_->commonLockGND->connectors[0]->id << " " 
 		<< doorsObj_->commonLockGND->connectors[0]->label;

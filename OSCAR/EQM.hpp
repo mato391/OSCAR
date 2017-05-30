@@ -9,5 +9,11 @@ public:
 	~EQM();
 	void addModule(Obj* obj);
 	std::vector<Obj*> modules_;
+	enum class EConfiguringState
+	{
+		naked,
+		configured
+	};
+	EConfiguringState configuringState;
 };
 
