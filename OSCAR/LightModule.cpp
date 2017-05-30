@@ -114,18 +114,18 @@ void LightModule::createLightsTopology()
 		}(&labels, sconnLabel[1]);
 		if (!isAlready)
 		{
-			//BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology adding label: " << conn->label;
+			BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology adding label: " << conn->label;
 			labels.push_back(conn->label);
 		}
-		//else
-			//BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology is already added: " << conn->label;
+		else
+			BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology is already added: " << conn->label;
 			
 	}
 	createLightsObj();
 	for (const auto &label : labels)
 	{
-		//BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology creating powerGroup: " << label << " with shortcut "
-//				<< getShortLabelForPowerGroup(label);
+		BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology creating powerGroup: " << label << " with shortcut "
+				<< getShortLabelForPowerGroup(label);
 		lightes_->powerGroups_.push_back(new POWER_GROUP(
 			getShortLabelForPowerGroup(label)));
 	}
@@ -144,14 +144,14 @@ void LightModule::createLightObjs()
 {
 	for (const auto &conn : conns)
 	{
-		//BOOST_LOG(logger_) << "DBG " << "createLightObjs for connector: " << conn->id << " " << conn->label;
+		BOOST_LOG(logger_) << "DBG " << "createLightObjs for connector: " << conn->id << " " << conn->label;
 		std::string lightLabel = [](std::string label)->std::string
 		{
 			std::vector<std::string> splittedLabel;
 			boost::split(splittedLabel, label, boost::is_any_of("_"));
 			return splittedLabel [1] + "_" + splittedLabel[2] + "_" + splittedLabel[3];
 		}(conn->label);
-		//BOOST_LOG(logger_) << "DBG " << "createLightObjs check is light exist: " << lightLabel;
+		BOOST_LOG(logger_) << "DBG " << "createLightObjs check is light exist: " << lightLabel;
 		auto isAlreadyCreated = [](std::string label, LIGHTES* lightsObjPtr)->std::pair<std::string, POWER_GROUP*>
 		{
 			std::vector<std::string> splittedLabel;
@@ -167,17 +167,22 @@ void LightModule::createLightObjs()
 					}
 					return std::make_pair("NOT_EXIST", powerGroup);
 				}
-				return std::make_pair("NOT_EXIST", nullptr);
+				
 			}
+			return std::make_pair("NOT_EXIST", nullptr);
 		}(lightLabel, lightes_);
-		//BOOST_LOG(logger_) << "DBG " << "isAlreadtCreated: " << isAlreadyCreated.first << " " << isAlreadyCreated.second;
-		if (isAlreadyCreated.first == "NOT_EXIST" && isAlreadyCreated.second != nullptr)
+		BOOST_LOG(logger_) << "DBG " << "isAlreadyCreated: " << isAlreadyCreated.first << " " << isAlreadyCreated.second;
+		if (isAlreadyCreated.first == "NOT_EXIST" && isAlreadyCreated.second != nullptr && conn->label.find("GND") == std::string::npos)
 		{
 			LIGHT* light = new LIGHT();
 			light->label = lightLabel;
 			light->proceduralState = LIGHT::EProceduralState::on;//Should be setup based on connector state;
 			light->connector = conn;
 			isAlreadyCreated.second->lights_.push_back(light);
+		}
+		else if (conn->label.find("GND") != std::string::npos && isAlreadyCreated.first == "NOT_EXIST" && isAlreadyCreated.second != nullptr)
+		{
+			isAlreadyCreated.second->commonGND = conn;
 		}
 	}
 	displayTopology();
@@ -284,6 +289,8 @@ void LightModule::displayTopology()
 	for (const auto &powerGroup : lightes_->powerGroups_)
 	{
 		BOOST_LOG(logger_) << "DEBUG " << "POWER_GROUP: "  << powerGroup->label;
+		if (powerGroup->commonGND != nullptr)
+			BOOST_LOG(logger_) << "DEBUG " << "COMMON_GND: " << powerGroup->commonGND->id << " " << powerGroup->commonGND->label;
 		for (const auto &light : powerGroup->lights_)
 		{
 			BOOST_LOG(logger_) << "DEBUG " << "LIGHT: " << light->label;
