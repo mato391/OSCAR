@@ -23,6 +23,9 @@ void Router::startAutodetection()
 		hwfService_ = new HWFService(eqmObj_);
 		hwfService_->prepareTopology();
 	}
+	//check and start WCM module
+	//start script to run ipconfig/ifconfig -> file with response
+	//if file exists initialize WCM with subcomponen WirelessCardModule
 	BOOST_LOG(logger_) << "INF " << "startAutodetection hwfTopologyDone. Waiting for hardware";
 }
 void Router::startComponentService()
