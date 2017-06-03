@@ -124,22 +124,27 @@ void Router::initializeComponent(std::string name)
 
 void Router::receiver(std::string data)
 {
-	moduleAutodetection(data);
+	
 	if (!fabricStartup_)
 	{
 		std::string domain = data.substr(0, 4);
 		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << domain;
 		for (const auto &component : components_)
 		{
-			if (component->configuringState == Component::EConfiguringState::configured && component->domain == domain)
+			BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: " << component->name;
+			BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component configuringState: " << static_cast<int>( component->configuringState);
+			BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: domain " << component->domain;
+			if (component->configuringState == Component::EConfiguringState::configured && domain.find(component->domain) != std::string::npos)
 			{
+				BOOST_LOG(logger_) << "INFO " << "Router::receiver: transferring message to " << component->name;
 				component->execute(data);
 				break;
 			}
+			
+			BOOST_LOG(logger_) << "INFO " << "Router::receiver: No component found" ;
 		}
 	}
-	
-	
+	moduleAutodetection(data);
 }
 
 void Router::checkResultFromHWPlannerService()
@@ -252,7 +257,7 @@ void Router::moduleAutodetection(std::string data)
 
 		}
 	}
-	else
+	else if (data.substr(4, 1) == "9" )
 	{
 		BOOST_LOG(logger_) << "INF " << "Router::moduleAutodetection: info data ";
 		for (const auto &mod : eqmObj_->modules_)

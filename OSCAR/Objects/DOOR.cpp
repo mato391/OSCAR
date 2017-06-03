@@ -76,3 +76,30 @@ void DOOR::closeDoor()
 		}
 	}
 }
+
+void DOOR::changeConnectorState(int connId, int value)
+{
+	for (const auto &port : ports)
+	{
+		for (auto &conn : port->connectors)
+		{
+			if (conn->id == connId)
+			{
+				conn->value = value;
+				if (conn->type == CONNECTOR::EType::input)
+				{
+					std::cout << "CHANGE_INPUT_CONNECTOR_STATE: " << conn->id << std::endl;
+					lockingState = static_cast<ELockingState>(value);
+				}
+				else if (conn->type == CONNECTOR::EType::output)
+				{
+					std::cout << "CHANGE_OUTPUT_CONNECTOR_STATE: " << conn->id << std::endl;
+					openingState = static_cast<EOpeningState>(value);
+				}
+					
+				return;
+			}
+				
+		}
+	}
+}

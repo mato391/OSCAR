@@ -201,9 +201,6 @@
     <ClInclude Include="UIA.hpp">
       <Filter>Header Files\UIA</Filter>
     </ClInclude>
-    <ClInclude Include="HWFService.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="POWER_GROUP.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -212,6 +209,12 @@
     </ClInclude>
     <ClInclude Include="NET_INTERFACE.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HWFService.hpp">
+      <Filter>Header Files\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="ANTENNA.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -366,6 +369,9 @@
       <Filter>Source Files\WCM</Filter>
     </ClCompile>
     <ClCompile Include="NET_INTERFACE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ANTENNA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

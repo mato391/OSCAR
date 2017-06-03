@@ -49,7 +49,7 @@ void WCM::getBDM()
 
 void WCM::execute(std::string message)
 {
-	//0x0099992001
+	//0x0799792001
 	if (bdmObjPtr_ == nullptr)
 		getBDM();
 	if (eqmObjPtr_ == nullptr)

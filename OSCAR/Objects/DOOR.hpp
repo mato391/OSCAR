@@ -28,5 +28,6 @@ public:
 	void lockDoor();
 	void openDoor();
 	void closeDoor();
+	void changeConnectorState(int connId, int value);
 };
 

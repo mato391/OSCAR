@@ -188,76 +188,7 @@ void LightModule::createLightObjs()
 	displayTopology();
 }
 
-void LightModule::createFrontLight(int version)
-{
-	/*if (version >= 1)
-	{
-		lightes_->addLight(lightFactory("BEAM_FRONT_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("BEAM_FRONT_RIGHT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("LOW_BEAM_FRONT_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("LOW_BEAM_FRONT_RIGHT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("BLINKER_FRONT_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("BLINKER_FRONT_RIGHT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("POSITION_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("POSITION_RIGHT", LIGHT::EType::bulb));
-		
-	}
-	if (version == 2)
-	{
-		lightes_->addLight(lightFactory("DAILY_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("DAILY_RIGHT", LIGHT::EType::bulb));
-	}
-	if (version == 3)
-	{
-		lightes_->addLight(lightFactory("BEAM_FRONT_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("BEAM_FRONT_RIGHT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("LOW_BEAM_FRONT_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("LOW_BEAM_FRONT_RIGHT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("BLINKER_FRONT_LEFT", LIGHT::EType::led));
-		lightes_->addLight(lightFactory("BLINKER_FRONT_RIGHT", LIGHT::EType::led));
-		lightes_->addLight(lightFactory("POSITION_LEFT", LIGHT::EType::led));
-		lightes_->addLight(lightFactory("POSITION_RIGHT", LIGHT::EType::led));
-		lightes_->addLight(lightFactory("DAILY_LEFT", LIGHT::EType::led));
-		lightes_->addLight(lightFactory("DAILY_RIGHT", LIGHT::EType::led));
 
-	}*/
-	
-}
-
-void LightModule::createCenterBlinkers(int version)
-{
-	if (version >= 1)
-	{
-		lightes_->addLight(lightFactory("BLINKER_CENTER_LEFT", LIGHT::EType::bulb));
-		lightes_->addLight(lightFactory("BLINKER_CENTER_RIGHT", LIGHT::EType::bulb));
-	}
-	else if (version == 3)
-	{
-		lightes_->addLight(lightFactory("BLINKER_CENTER_LEFT", LIGHT::EType::led));
-		lightes_->addLight(lightFactory("BLINKER_CENTER_RIGHT", LIGHT::EType::led));
-	}
-	
-}
-
-void LightModule::createBackLight(int version)
-{
-	LIGHT::EType type;
-	if (version >= 1)
-		type = LIGHT::EType::bulb;
-	if (version == 3)
-		type = LIGHT::EType::led;
-	else
-		BOOST_LOG(logger_) << "WARNING " << "LightModule::createBackLight: Unknown type";
-
-	lightes_->addLight(lightFactory("BACK_LOW_BEAM_LEFT", type));
-	lightes_->addLight(lightFactory("BACK_LOW_BEAM_RIGHT", type));
-	lightes_->addLight(lightFactory("STOP_LEFT", type));
-	lightes_->addLight(lightFactory("STOP_CENTER", type));
-	lightes_->addLight(lightFactory("STOP_RIGHT", type));
-	lightes_->addLight(lightFactory("FOG", LIGHT::EType::bulb));
-	lightes_->addLight(lightFactory("REVERSE", LIGHT::EType::bulb));
-
-}
 
 LIGHT* LightModule::lightFactory(std::string label, LIGHT::EType type)
 {
@@ -266,21 +197,23 @@ LIGHT* LightModule::lightFactory(std::string label, LIGHT::EType type)
 	light->type = type;
 	return light;
 }
-/*void LightModule::blink()
+
+void LightModule::blink(int count)
 {
-	for (auto &pg : lightes_->powerGroups_)
+	std::vector<CONNECTOR*> commonGNDs;
+	for (const auto &pg : lightes_->powerGroups_)
 	{
-		if (light->label.find("BLINKER") != std::string::npos)
+		if (pg->label.find("BLINKER") != std::string::npos)
 		{
-			BOOST_LOG(logger_) << "INFO " << "LightModule::blink";
-			//Should be added calling hwapi message
-			if (light->proceduralState == LIGHT::EProceduralState::on)
-				light->proceduralState = LIGHT::EProceduralState::off;
-			else
-				light->proceduralState = LIGHT::EProceduralState::on;
+			commonGNDs.push_back(pg->commonGND);
 		}
 	}
-}*/
+	RESULT* result = new RESULT();
+	result->applicant = bdmModuleObj_->label;
+	result->status = RESULT::EStatus::success;
+	result->feedback = commonGNDs[0]->id + commonGNDs[1]->id;
+	bdmModuleObj_->children.push_back(result);
+}
 
 
 void LightModule::displayTopology()

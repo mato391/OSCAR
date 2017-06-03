@@ -8,6 +8,7 @@
 #include "Objects\Obj.hpp"
 #include <boost\thread.hpp>
 #include "RESULT.hpp"
+#include "MODULE.hpp"
 
 
 class BDM : public Component
@@ -34,7 +35,10 @@ private:
 	MirrorModule* mirrorModule_;
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
+	std::map<std::string, MODULE*> bdmModules_;
+	void getBDMObjectIfNeeded();
 	void blinkersRun(int times, int interval);
+	void getResultAndSendToRouter(std::string moduleLabel);
 	
 };
 

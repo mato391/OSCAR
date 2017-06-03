@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ALARM.hpp" />
+    <ClInclude Include="ANTENNA.h" />
     <ClInclude Include="BDM.hpp" />
     <ClInclude Include="BUTTON.hpp" />
     <ClInclude Include="CARD_PORT.hpp" />
@@ -202,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ALARM.cpp" />
+    <ClCompile Include="ANTENNA.cpp" />
     <ClCompile Include="BUTTON.cpp" />
     <ClCompile Include="CARD_PORT.cpp" />
     <ClCompile Include="BDM.cpp" />

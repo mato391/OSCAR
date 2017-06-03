@@ -188,6 +188,13 @@ void DoorModule::unlockDoors()
 		BOOST_LOG(logger_) << "INFO " << "DoorModule::unlockDoors " << door->label;
 		door->unlockDoor();
 	}
+	doorsObj_->commonLockGND->connectors[0]->value = 1;
+	RESULT* result = new RESULT();
+	result->status = RESULT::EStatus::success;
+	result->applicant = "BDM_DOOR";
+	result->feedback = doorsObj_->commonLockGND->connectors[0]->id + doorsObj_->commonLockGND->connectors[0]->value;
+	bdmModuleObj_->children.push_back(result);
+
 }
 
 void DoorModule::lockDoors()
@@ -292,7 +299,6 @@ void DoorModule::closeWindow(std::string port)
 					door->window->close();
 					break;
 				}
-
 			}
 		}
 	}
@@ -321,23 +327,32 @@ void DoorModule::unlockWindow()
 	}
 }
 
-void DoorModule::changeOpeningState(std::string port, DOOR::EOpeningState state)
+void DoorModule::changeConnectorState(std::string connectorId, std::string value)
 {
-	
-	if (doorsObj_->container_.size() == 6)
+	BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState";
+	for (const auto &door : doorsObj_->container_)
 	{
-		//displayTopology();
-		for (auto &door : doorsObj_->container_)
+		for (const auto &port : door->ports)
 		{
-			
-			if (door->label == door6Labels_[std::stoi(port)])
+			for ( auto &conn : port->connectors)
 			{
-				BOOST_LOG(logger_) << "INFO " << "DoorModule::changeOpeningState: " << static_cast<int>(state) << " on " << door->label;
-				if (state == DOOR::EOpeningState::opened)
-					door->openDoor();
-				else
-					door->closeDoor();
-				break;
+				if (conn->id == std::stoi(connectorId))
+				{
+					BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: on door: " << door->label
+						<< " on port" << port->label << " connector ID: " << conn->id;
+					door->changeConnectorState(std::stoi(connectorId), std::stoi(value));
+					return;
+				}
+					
+
+			}
+		}
+		for (auto &conn : doorsObj_->commonLockGND->connectors)
+		{
+			if (conn->id == std::stoi(connectorId))
+			{
+				doorsObj_->setLockingState(std::stoi(value));
+				
 			}
 		}
 	}

@@ -1,0 +1,12 @@
+WCM-execute(DOOR_LOCKING_OPERATION)->BDM
+BDM-unlockDoors->doorModule
+doorModule-unlockDoor->DOOR
+
+doorModule-RESULT->BDM
+BDM-send(data)->Router		//domain(0x05)connectorId(0-*)operation(0-1)
+
+Router-recv(data)		//domain90x05)connectorId(0-*)operation(0-1)
+Router-execute->BDM
+BDM-changeConnectorState(port,operation)->doorModule
+doorModule-changeConnectorState(id, value)->DOOR
+

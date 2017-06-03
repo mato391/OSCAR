@@ -12,5 +12,6 @@ public:
 	void addDoors(DOOR* door);
 	std::vector<DOOR*> container_;
 	PORT* commonLockGND;
+	void setLockingState(int state);
 };
 

@@ -80,6 +80,19 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 			conn->type = static_cast<CONNECTOR::EType>(std::stoi(connectorData[2]));
 			connectorsGroup.push_back(conn);
 		}
+		if ((*i).find("Antenna") != std::string::npos)
+		{
+			std::cout << "createModuleTopology in for: " << *i << std::endl;
+			std::vector<std::string> connectorRawData;
+			boost::split(connectorRawData, *i, boost::is_any_of(":"));
+			std::vector<std::string> connectorData;
+			boost::split(connectorData, connectorRawData[1], boost::is_any_of(","));
+			std::cout << "createModuleTopology: connectorData size: " << connectorData.size() << std::endl;
+			ANTENNA* antenna = new ANTENNA();
+			antenna->id = std::stoi(connectorData[0]);
+			antenna->label = connectorData[1];
+			connectorsGroup.push_back(antenna);
+		}
 	}
 	moduleObj->connectors_.push_back(connectorsGroup);
 }

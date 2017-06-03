@@ -59,7 +59,7 @@ Wireless LAN adapter Wireless Network Connection 4:
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Lease Obtained. . . . . . . . . . : Friday, June 02, 2017 6:50:17 PM
-   Lease Expires . . . . . . . . . . : Sunday, June 04, 2017 9:57:32 AM
+   Lease Expires . . . . . . . . . . : Sunday, June 04, 2017 3:30:49 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283
@@ -115,7 +115,7 @@ Ethernet adapter VMware Network Adapter VMnet1:
    IPv4 Address. . . . . . . . . . . : 192.168.114.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Lease Obtained. . . . . . . . . . : Saturday, June 03, 2017 9:57:26 AM
-   Lease Expires . . . . . . . . . . : Saturday, June 03, 2017 12:20:16 PM
+   Lease Expires . . . . . . . . . . : Saturday, June 03, 2017 5:02:27 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.114.254
    DHCPv6 IAID . . . . . . . . . . . : 1258311766
@@ -134,7 +134,7 @@ Ethernet adapter VMware Network Adapter VMnet8:
    IPv4 Address. . . . . . . . . . . : 192.168.242.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Lease Obtained. . . . . . . . . . : Saturday, June 03, 2017 9:57:25 AM
-   Lease Expires . . . . . . . . . . : Saturday, June 03, 2017 12:20:21 PM
+   Lease Expires . . . . . . . . . . : Saturday, June 03, 2017 5:02:33 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.242.254
    DHCPv6 IAID . . . . . . . . . . . : 1275088982

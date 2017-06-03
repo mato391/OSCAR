@@ -10,6 +10,7 @@
 #include "MODULE.hpp"
 #include "EQM.hpp"
 #include "POWER_GROUP.hpp"
+#include "RESULT.hpp"
 
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
@@ -22,7 +23,7 @@ public:
 	LightModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger);
 	~LightModule();
 	void initialize();
-	void blink();
+	void blink(int count);
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;
@@ -38,10 +39,6 @@ private:
 	void createLightsObj();
 	void createLightObjs();
 	std::string getShortLabelForPowerGroup(std::string label);
-	void createLowestVersionLightTopology();
-	void createFrontLight(int version);
-	void createCenterBlinkers(int version);
-	void createBackLight(int version);
 	LIGHT* lightFactory(std::string label, LIGHT::EType type);
 	void displayTopology();
 	std::vector<CONNECTOR*> conns;

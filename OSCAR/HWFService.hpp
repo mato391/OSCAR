@@ -7,6 +7,7 @@
 #include "MODULE.hpp"
 #include "CONNECTOR.hpp"
 #include "EQM.hpp"
+#include "ANTENNA.h"
 
 class HWFService
 {

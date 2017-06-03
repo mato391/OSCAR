@@ -10,6 +10,7 @@
 #include "MODULE.hpp"
 #include "EQM.hpp"
 #include "CONNECTOR.hpp"
+#include "RESULT.hpp"
 
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
@@ -27,8 +28,8 @@ public:
 	void closeWindow(std::string port);
 	void lockWindow();
 	void unlockWindow();
-	void changeOpeningState(std::string port, DOOR::EOpeningState state);
 	void initialize();
+	void changeConnectorState(std::string connectorId, std::string value);
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;
