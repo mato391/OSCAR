@@ -207,6 +207,12 @@
     <ClInclude Include="POWER_GROUP.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EthernetIntrfaceConfigurator.hpp">
+      <Filter>Header Files\WCM</Filter>
+    </ClInclude>
+    <ClInclude Include="NET_INTERFACE.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -354,6 +360,12 @@
       <Filter>Source Files\Router</Filter>
     </ClCompile>
     <ClCompile Include="POWER_GROUP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EthernetIntrfaceConfigurator.cpp">
+      <Filter>Source Files\WCM</Filter>
+    </ClCompile>
+    <ClCompile Include="NET_INTERFACE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

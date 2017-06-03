@@ -5,6 +5,10 @@
 #include "CARD_PORT.hpp"
 #include "ALARM.hpp"
 #include "UserManager.hpp"
+#include "EthernetIntrfaceConfigurator.hpp"
+#include "MODULE.hpp"
+#include "EQM.hpp"
+
 class WCM :
 	public Component
 {
@@ -23,10 +27,17 @@ private:
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
 	BDM* bdmObjPtr_;
+	EQM* eqmObjPtr_;
+	MODULE* wcmModule_;
 	UserManager* userManager_;
-
+	EthernetIntrfaceConfigurator* ethIntConfigurator_;
+	void ethernetInitialize();
+	void prepareTopology();
 	void getBDM();
 	std::string WCM::getSerialNumberFromRefRCObj();
 	void executeOnUIA(INTER_MODULE_OPERATION* imo);
+	void displayTopology();
+	void getEQM();
+	void startWebUIServiceIsNeeded();
 };
 

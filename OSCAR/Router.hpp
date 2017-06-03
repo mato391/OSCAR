@@ -19,6 +19,7 @@
 #include "CONNECTOR.hpp"
 #include "TIMER.hpp"
 #include "TASK.hpp"
+#include "EthernetIntrfaceConfigurator.hpp"
 
 class Router
 {
@@ -44,8 +45,10 @@ private:
 	boost::thread hwPlannerServiceThread_;
 	TASK* task;
 	HWFService* hwfService_;
+	EthernetIntrfaceConfigurator* ethIntConfigurator_;
 
 	void startAutodetection();
+	void startInternalModuleAutodetection();
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
 	void initializeComponent(std::string name);

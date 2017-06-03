@@ -25,6 +25,16 @@ DOOR::~DOOR()
 void DOOR::unlockDoor()
 {
 	lockingState = DOOR::ELockingState::unlocked;
+	for (auto &port : ports)
+	{
+		for (auto &conn : port->connectors)
+		{
+			if (conn->type == CONNECTOR::EType::output)
+			{
+				conn->value = 0;
+			}
+		}
+	}
 }
 
 void DOOR::lockDoor()
@@ -33,13 +43,10 @@ void DOOR::lockDoor()
 	window->lockingState = WINDOW::ELockingState::locked;
 	for (auto &port : ports)
 	{
-		if (port->label == label)
+		for (auto &conn : port->connectors)
 		{
-			for (auto &conn : port->connectors)
-			{
-				if (conn->type == CONNECTOR::EType::output)
-					conn->value = 1;
-			}
+			if (conn->type == CONNECTOR::EType::output)
+				conn->value = 1;	
 		}
 	}
 }
@@ -47,9 +54,25 @@ void DOOR::lockDoor()
 void DOOR::openDoor()
 {
 	openingState = DOOR::EOpeningState::opened;
+	for (auto &port : ports)
+	{
+		for (auto &conn : port->connectors)
+		{
+			if (conn->type == CONNECTOR::EType::input)
+				conn->value = 0;
+		}
+	}
 }
 
 void DOOR::closeDoor()
 {
 	openingState = DOOR::EOpeningState::closed;
+	for (auto &port : ports)
+	{
+		for (auto &conn : port->connectors)
+		{
+			if (conn->type == CONNECTOR::EType::input)
+				conn->value = 1;
+		}
+	}
 }

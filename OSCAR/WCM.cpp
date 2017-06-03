@@ -17,10 +17,21 @@ WCM::~WCM()
 {
 }
 
+void WCM::ethernetInitialize()
+{
+	ethIntConfigurator_->getEthernetInformation();
+}
+
 void WCM::initialize(std::string subcomponent)
 {
+	prepareTopology();
 	getBDM();
 	cardPortObj_ = new CARD_PORT();
+}
+
+void WCM::prepareTopology()
+{
+
 }
 
 void WCM::getBDM()
@@ -41,6 +52,8 @@ void WCM::execute(std::string message)
 	//0x0099992001
 	if (bdmObjPtr_ == nullptr)
 		getBDM();
+	if (eqmObjPtr_ == nullptr)
+		getEQM();
 	BOOST_LOG(logger_) << "INFO " << "WCM::execute: " << message;
 	std::string serialNumber = message.substr(4, 4);
 	std::string power = message.substr(8, 2);
@@ -103,7 +116,37 @@ void WCM::execute(std::string message)
 
 void WCM::execute(INTER_MODULE_OPERATION* imo)
 {
+	if (eqmObjPtr_ == nullptr)
+		getEQM();
+	if (imo->operation == "ETHERNET_INIT")
+	{
+		wcmModule_ = new MODULE();
+		wcmModule_->domain = domain;
+		wcmModule_->label = name;
+		eqmObjPtr_->addModule(wcmModule_);
+		ethIntConfigurator_ = new EthernetIntrfaceConfigurator(cache_, logger_);
+		ethernetInitialize();
+		displayTopology();
+	}
+	startWebUIServiceIsNeeded();
+}
 
+void WCM::startWebUIServiceIsNeeded()
+{
+	for (const auto &connVec : wcmModule_->connectors_)
+	{
+		for (const auto &conn : connVec)
+		{
+			auto netIf = static_cast<NET_INTERFACE*>(conn);
+			if (netIf->ifName.find("Wireless") != std::string::npos)
+			{
+				//WebUiService Here should be started
+				BOOST_LOG(logger_) << "INF " << "WCM::startWebUIServiceIsNeeded: starting web service";
+				return;
+			}
+		}
+	}
+	BOOST_LOG(logger_) << "INF " << "WCM::startWebUIServiceIsNeeded: Wireless connection does not exist";
 }
 
 void WCM::executeOnUIA(INTER_MODULE_OPERATION* imo)
@@ -117,6 +160,35 @@ void WCM::executeOnUIA(INTER_MODULE_OPERATION* imo)
 			component->execute(imo);
 			return;
 		}
+	}
+}
+
+void WCM::getEQM()
+{
+	for (auto &obj : *cache_)
+	{
+		if (obj->name == "EQM")
+		{
+			eqmObjPtr_ = static_cast<EQM*>(obj);
+		}
+	}
+}
+
+void WCM::displayTopology()
+{
+	for (const auto &connsVec : wcmModule_->connectors_)
+	{
+		BOOST_LOG(logger_) << "DBG " << "CONNECTOR: ";
+		for (const auto &conn : connsVec)
+		{
+			auto netIf = static_cast<NET_INTERFACE*>(conn);
+			BOOST_LOG(logger_) << "DBG " << "NAME: " << netIf->ifName;
+			BOOST_LOG(logger_) << "DBG " << "IP: " << netIf->ip;
+			BOOST_LOG(logger_) << "DBG " << "MASK: " << netIf->mask;
+			BOOST_LOG(logger_) << "DBG " << "GW: " << netIf->gateway;
+			BOOST_LOG(logger_) << "DBG " << "DHCP: " << netIf->dhcp;
+		}
+		
 	}
 }
 

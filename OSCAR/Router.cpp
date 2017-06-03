@@ -18,16 +18,30 @@ void Router::startAutodetection()
 {
 	createEQM();
 	checkIfMMFExists();
+	startInternalModuleAutodetection();
 	if (!fabricStartup_)
 	{
 		hwfService_ = new HWFService(eqmObj_);
 		hwfService_->prepareTopology();
 	}
+	
 	//check and start WCM module
 	//start script to run ipconfig/ifconfig -> file with response
 	//if file exists initialize WCM with subcomponen WirelessCardModule
 	BOOST_LOG(logger_) << "INF " << "startAutodetection hwfTopologyDone. Waiting for hardware";
 }
+
+void Router::startInternalModuleAutodetection()
+{
+
+	components_.push_back(ComponentFactory::createComponent("WCM", "0x07", logger_));
+	components_.back()->setCache(cache_);
+	components_.back()->execute(new INTER_MODULE_OPERATION("ETHERNET_INIT", ""));
+	components_.back()->setComponentsCache(&components_);
+	components_.back()->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
+	components_.back()->configuringState = Component::EConfiguringState::initialized;
+}
+
 void Router::startComponentService()
 {
 	//createEQM();

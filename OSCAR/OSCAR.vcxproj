@@ -161,6 +161,7 @@
     <ClInclude Include="ENGINE.hpp" />
     <ClInclude Include="EngineCommunicationService.hpp" />
     <ClInclude Include="EQM.hpp" />
+    <ClInclude Include="EthernetIntrfaceConfigurator.hpp" />
     <ClInclude Include="HWFService.hpp" />
     <ClInclude Include="HWPlannerService.hpp" />
     <ClInclude Include="INTER_MODULE_OPERATION.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="MIRRORS.hpp" />
     <ClInclude Include="MMF.hpp" />
     <ClInclude Include="MODULE.hpp" />
+    <ClInclude Include="NET_INTERFACE.hpp" />
     <ClInclude Include="OAMConfigurator.hpp" />
     <ClInclude Include="Objects\CP.hpp" />
     <ClInclude Include="Objects\DOOR.hpp" />
@@ -212,6 +214,7 @@
     <ClCompile Include="ENGINE.cpp" />
     <ClCompile Include="EngineCommunicationService.cpp" />
     <ClCompile Include="EQM.cpp" />
+    <ClCompile Include="EthernetIntrfaceConfigurator.cpp" />
     <ClCompile Include="HWFService.cpp" />
     <ClCompile Include="HWPlannerService.cpp" />
     <ClCompile Include="INTER_MODULE_OPERATION.cpp" />
@@ -222,6 +225,7 @@
     <ClCompile Include="MIRRORS.cpp" />
     <ClCompile Include="MMF.cpp" />
     <ClCompile Include="MODULE.cpp" />
+    <ClCompile Include="NET_INTERFACE.cpp" />
     <ClCompile Include="OAMConfigurator.cpp" />
     <ClCompile Include="Objects\CP.cpp" />
     <ClCompile Include="Objects\DOOR.cpp" />
