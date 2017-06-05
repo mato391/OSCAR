@@ -339,8 +339,9 @@ void DoorModule::changeConnectorState(std::string connectorId, std::string value
 				if (conn->id == std::stoi(connectorId))
 				{
 					BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: on door: " << door->label
-						<< " on port" << port->label << " connector ID: " << conn->id;
+						<< " on port" << port->label << " connector ID: " << conn->id << " to value " << std::stoi(value);
 					door->changeConnectorState(std::stoi(connectorId), std::stoi(value));
+					changeDOORSOpeningStateIfNeeded(std::stoi(value));
 					return;
 				}
 					
@@ -356,6 +357,19 @@ void DoorModule::changeConnectorState(std::string connectorId, std::string value
 			}
 		}
 	}
+}
+
+void DoorModule::changeDOORSOpeningStateIfNeeded(int value)
+{
+	bool diff = false;
+	for (const auto &door : doorsObj_->container_)
+	{
+		if (door->openingState != static_cast<DOOR::EOpeningState>(value))
+			diff = true;
+	}
+	if (!diff && doorsObj_->openingState != static_cast<DOORS::EOpeningState>(value))
+		doorsObj_->openingState = static_cast<DOORS::EOpeningState>(value);
+
 }
 
 void DoorModule::displayTopology()

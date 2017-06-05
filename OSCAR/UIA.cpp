@@ -15,7 +15,7 @@ UIA::~UIA()
 {
 }
 
-void UIA::initialize(std::string subcomponent)
+void UIA::initialize()
 {
 	
 }

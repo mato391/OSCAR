@@ -16,7 +16,7 @@ EDM::~EDM()
 {
 }
 
-void EDM::initialize(std::string subcomponent)
+void EDM::initialize()
 {
 	engineObj_ = new ENGINE();
 	engineObj_->detectionState = ENGINE::EDetectionState::offline;

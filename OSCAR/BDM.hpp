@@ -18,7 +18,7 @@ public:
 	~BDM();
 	void execute(std::string message);
 	void execute(INTER_MODULE_OPERATION* imo);
-	void initialize(std::string component);
+	void initialize();
 	void setCache(std::vector<Obj*>* cache) { cache_ = cache; }
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }

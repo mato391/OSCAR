@@ -26,7 +26,7 @@ public:
 	virtual void setComponentsCache(std::vector<Component*>* componentCache) = 0;
 	virtual void execute(std::string message) = 0;
 	virtual void execute(INTER_MODULE_OPERATION* imo) = 0;
-	virtual void initialize(std::string subcomponent) = 0;
+	virtual void initialize() = 0;
 	
 	boost::log::sources::logger_mt logger_;
 	

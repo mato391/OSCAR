@@ -22,7 +22,7 @@ void WCM::ethernetInitialize()
 	ethIntConfigurator_->getEthernetInformation();
 }
 
-void WCM::initialize(std::string subcomponent)
+void WCM::initialize()
 {
 	prepareTopology();
 	getBDM();

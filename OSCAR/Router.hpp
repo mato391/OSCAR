@@ -48,13 +48,10 @@ private:
 	EthernetIntrfaceConfigurator* ethIntConfigurator_;
 
 	void startAutodetection();
-	void startInternalModuleAutodetection();
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
-	void initializeComponent(std::string name);
 	void checkIfMMFExists();
 	void createEQM();
-	void moduleAutodetection(std::string domain);
 	void setupModule(Obj* mod);
 	void createConnectors(MODULE* mod);
 	void displayModulesTopology();

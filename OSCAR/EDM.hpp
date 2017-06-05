@@ -23,7 +23,7 @@ public:
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
 private:
 	ENGINE* engineObj_;
-	void initialize(std::string subcomponent);
+	void initialize();
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
 	StartStopEngineProcedure* startStopEngineProcedure_;

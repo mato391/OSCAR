@@ -19,28 +19,60 @@ BDM::~BDM()
 void BDM::execute(std::string message)
 {
 	//0x01012
+	getBDMObjectIfNeeded();
 	BOOST_LOG(logger_) << "INFO " << "BDM::execute";
 	std::string domain = message.substr(0, 4);
 	std::string data = message.substr(4, 3);
 	std::string port = data.substr(0, 2);
 	std::string operation = data.substr(2, 1);
 	std::string moduleLabel;
-	for (const auto &mod : bdmModules_)
+	if (data.find("AA") != std::string::npos)
 	{
-		if (mod.second->domain == domain)
+		BOOST_LOG(logger_) << "INF " << "BDM::execute: " << "Module " << domain << " has been detected";
+		for (auto &module : bdmModules_)
 		{
-			moduleLabel = mod.first;
+			BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << module.second->domain << " has been found";
+			if (module.second->domain == domain)
+			{
+				module.second->detectionStatus = MODULE::EDetectionStatus::online;
+				moduleLabel = module.first;
+				BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << moduleLabel << " has been set";
+				break;
+				
+			}
+		}
+		if (moduleLabel == "BDM_DOOR")
+		{
+			if (doorModule_ == nullptr)
+				doorModule_ = new DoorModule(cache_, logger_);
+			doorModule_->initialize();
+		}
+		else if (moduleLabel == "BDM_LIGHT")
+		{
+			if (lightModule_ == nullptr)
+				lightModule_ = new LightModule(cache_, logger_);
+			lightModule_->initialize();
 		}
 	}
-	if (moduleLabel == "BDM_DOOR")
+	else
 	{
-		doorModule_->changeConnectorState(port, operation);
-	}
-	else if (moduleLabel == "BDM_LIGHT")
-	{
+		BOOST_LOG(logger_) << "INF " << "BDM::execute: " << "Module " << domain << " indicates";
+		for (const auto &mod : bdmModules_)
+		{
+			if (mod.second->domain == domain)
+			{
+				moduleLabel = mod.first;
+			}
+		}
+		if (moduleLabel == "BDM_DOOR")
+		{
+			doorModule_->changeConnectorState(port, operation);
+		}
+		else if (moduleLabel == "BDM_LIGHT")
+		{
 
+		}
 	}
-	
 }
 
 void BDM::execute(INTER_MODULE_OPERATION* imo)
@@ -80,19 +112,12 @@ void BDM::lockDoors()
 	doorModule_->lockDoors();
 }
 
-void BDM::initialize(std::string subcomponent)
+void BDM::initialize()
 {
-	getBDMObjectIfNeeded();
-	if (subcomponent == "BDM_DOOR")
-	{
-		doorModule_ = new DoorModule(cache_, logger_);
-		doorModule_->initialize();
-	}
-	else if (subcomponent == "BDM_LIGHT")
-	{
-		lightModule_ = new LightModule(cache_, logger_);
-		lightModule_->initialize();
-	}	
+	
+	doorModule_->initialize();
+	lightModule_ = new LightModule(cache_, logger_);
+	lightModule_->initialize();
 	setConfiguringStateIfNeeded();
 	//mirrorModule_ = new MirrorModule(cache_, logger_);
 	//mirrorModule_->initialize();
@@ -112,6 +137,7 @@ void BDM::getBDMObjectIfNeeded()
 					auto module = static_cast<MODULE*>(mod);
 					if (module->label.find("BDM") != std::string::npos)
 					{
+						BOOST_LOG(logger_) << "INF " << "BDM::getBDMObjectIfNeeded: setting module " << module->label;
 						bdmModules_[module->label] = module;
 					}
 				}

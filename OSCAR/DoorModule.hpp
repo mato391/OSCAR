@@ -48,6 +48,7 @@ private:
 	bool checkIfBateryAlarmRaised();
 	void createDoors(std::vector<CONNECTOR*> connectors);
 	bool checkDoesDoorExist(std::string label);
+	void changeDOORSOpeningStateIfNeeded(int value);
 	
 	
 };
