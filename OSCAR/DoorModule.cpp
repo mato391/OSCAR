@@ -201,7 +201,7 @@ void DoorModule::lockDoors()
 {
 	BOOST_LOG(logger_) << "INFO " << "DoorModule::lockDoors";
 	std::string* label = checkIfDoorsAreClosed();
-	if (label == nullptr && !checkIfBateryAlarmRaised())
+	if (label == nullptr && !checkIfBateryAlarmRaised() && doorsObj_->openingState != DOORS::EOpeningState::opened)
 	{
 		for (auto &door : doorsObj_->container_)
 		{
@@ -212,8 +212,6 @@ void DoorModule::lockDoors()
 				BOOST_LOG(logger_) << "INFO " << "DoorModule::lockDoors auto-closing window: " << door->label;
 				door->window->close();
 			}
-				
-
 		}
 		return;
 	}
