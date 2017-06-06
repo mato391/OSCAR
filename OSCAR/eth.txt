@@ -18,9 +18,9 @@ Ethernet adapter Local Area Connection 2:
    Physical Address. . . . . . . . . : 00-05-9A-3C-7A-00
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
-   Link-local IPv6 Address . . . . . : fe80::568e:25fc:d5ed:5efe%31(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::b74e:231b:5816:bf31%31(Preferred) 
    Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%31(Preferred) 
-   IPv4 Address. . . . . . . . . . . : 10.154.73.209(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.154.79.50(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.0.0.0
    Default Gateway . . . . . . . . . : ::
                                        10.0.0.1
@@ -58,8 +58,8 @@ Wireless LAN adapter Wireless Network Connection 4:
    Link-local IPv6 Address . . . . . : fe80::39af:aab1:7b81:831a%21(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Friday, June 02, 2017 6:50:17 PM
-   Lease Expires . . . . . . . . . . : Sunday, June 04, 2017 3:30:49 PM
+   Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:30 PM
+   Lease Expires . . . . . . . . . . : Wednesday, June 07, 2017 6:20:23 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283
@@ -114,8 +114,8 @@ Ethernet adapter VMware Network Adapter VMnet1:
    Link-local IPv6 Address . . . . . : fe80::689b:2b7b:fbb6:83de%32(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.114.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Saturday, June 03, 2017 9:57:26 AM
-   Lease Expires . . . . . . . . . . : Saturday, June 03, 2017 5:02:27 PM
+   Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:26 PM
+   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 7:39:07 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.114.254
    DHCPv6 IAID . . . . . . . . . . . : 1258311766
@@ -133,8 +133,8 @@ Ethernet adapter VMware Network Adapter VMnet8:
    Link-local IPv6 Address . . . . . : fe80::1dc5:e2f3:9535:2ad8%33(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.242.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Saturday, June 03, 2017 9:57:25 AM
-   Lease Expires . . . . . . . . . . : Saturday, June 03, 2017 5:02:33 PM
+   Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:26 PM
+   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 7:39:03 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.242.254
    DHCPv6 IAID . . . . . . . . . . . : 1275088982
@@ -182,7 +182,7 @@ Tunnel adapter isatap.{8B7A18ED-F89C-44BF-89CC-5E8364A84B04}:
 Tunnel adapter isatap.emea.nsn-net.net:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : emea.nsn-net.net
+   Connection-specific DNS Suffix  . : 
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #5
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No

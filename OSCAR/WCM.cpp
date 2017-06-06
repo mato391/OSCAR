@@ -24,25 +24,60 @@ void WCM::ethernetInitialize()
 
 void WCM::initialize()
 {
+	getWCM();
+	ethIntConfigurator_ = new EthernetIntrfaceConfigurator(cache_, logger_);
+	getAllAntenaDecives();
 	prepareTopology();
-	getBDM();
-	cardPortObj_ = new CARD_PORT();
+	this->configuringState = EConfiguringState::configured;
 }
 
 void WCM::prepareTopology()
 {
-
+	for (const auto &antenna : antenaDevices_)
+	{
+		if (antenna->label.find( "RC" ) != std::string::npos && rcMan_ == nullptr)
+		{
+			rcMan_ = new rcManager(wcmModule_, logger_);
+			rcMan_->prepareRCInterface();
+		}
+		else if (antenna->label == "CARD_PORT")
+		{
+			//TODO
+		}
+	}
+	ethernetInitialize();
 }
 
-void WCM::getBDM()
+void WCM::getAllAntenaDecives()
 {
-	for (auto &component : *componentCache_)
+	for (const auto &objVec : wcmModule_->connectors_)
 	{
-		if (component->name == "BDM")
+		for (auto &obj : objVec)
 		{
-			BOOST_LOG(logger_) << "INFO " << "WCM::getBDM found";
-			bdmObjPtr_ = static_cast<BDM*>(component);
-			return;
+			if (obj->name == "ANTENNA")
+			{
+				antenaDevices_.push_back(static_cast<ANTENNA*>(obj));
+			}
+		}
+	}
+	BOOST_LOG(logger_) << "INF " << "WCM::getAllAntenaDecives: " << antenaDevices_.size() << " antena devices have been found";
+}
+
+void WCM::getWCM()
+{
+	for (auto &obj : *cache_)
+	{
+		if (obj->name == "EQM")
+		{
+			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
+			{
+				auto module = static_cast<MODULE*>(mod);
+				if (module->label == "WCM")
+				{
+					wcmModule_ = module;
+					return;
+				}
+			}
 		}
 	}
 }
@@ -50,67 +85,85 @@ void WCM::getBDM()
 void WCM::execute(std::string message)
 {
 	//0x0799792001
-	if (bdmObjPtr_ == nullptr)
-		getBDM();
-	if (eqmObjPtr_ == nullptr)
-		getEQM();
-	BOOST_LOG(logger_) << "INFO " << "WCM::execute: " << message;
-	std::string serialNumber = message.substr(4, 4);
-	std::string power = message.substr(8, 2);
-	std::string operation = message.substr(10, 2);
-	if (serialNumber.substr(0, 1) == "9")
+	std::string domain;
+	std::string serialNumber;
+	std::string power;
+	std::string operation;
+	std::string moduleLabel;
+	if (message.find("AA") != std::string::npos)
 	{
-		rcObj_ = new REMOTE_CONTROLLER(serialNumber);
-		if (!rcObj_->login())
-		{
-			delete rcObj_;
-			return;
-		}
-	}
-	
-		
-	if (std::stoi(power) <= 20)
-	{
-		BOOST_LOG(logger_) << "INFO " << "WCM::execute: BATTERY_LOW";
-		cache_->push_back(new ALARM("Battery low", 1001, "WCM"));
-		bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
-		
+		BOOST_LOG(logger_) << "INF " << "WCM::execute: " << "Module " << domain << " has been detected";
+		initialize();
+		wcmModule_->detectionStatus = MODULE::EDetectionStatus::online;
 	}
 	else
 	{
-		bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
+			domain = message.substr(0, 4);
+			serialNumber = message.substr(4, 4);
+			power = message.substr(8, 2);
+			operation = message.substr(10, 2);
 		
-	}
-	userManager_->setupUser(serialNumber);
-	auto userObj = userManager_->getUser();
-	cache_->push_back(userObj);
-	BOOST_LOG(logger_) << "DBG " << userObj->username << " sn: " << userObj->rcSerialCode << " isNew " << userObj->isNew;
-	if (userObj->isNew)
-	{
-		std::cout << "SHOULD BE HERE" << std::endl;
-		executeOnUIA(new INTER_MODULE_OPERATION("NEW_USER", userObj->rcSerialCode));
-		return;
-	}
-	if (message.substr(message.size() - 1, 1) == "2")
-	{
-		BOOST_LOG(logger_) << "INFO " << "WCM::execute: CARD detected";
-		if (serialNumber == rcObj_->serialNumber)
+	
+		if (bdmObjPtr_ == nullptr)
+			//getBDM();
+		if (eqmObjPtr_ == nullptr)
+			getEQM();
+		BOOST_LOG(logger_) << "INFO " << "WCM::execute: " << message;
+	
+		if (serialNumber.substr(0, 1) == "9")
 		{
-			BOOST_LOG(logger_) << "INFO " << "WCM::execute: CARD validated";
-			cardPortObj_->detectionState = CARD_PORT::EDetectionState::detectedDone;
-			cardPortObj_->cardRef = rcObj_->serialNumber;
+			rcObj_ = new REMOTE_CONTROLLER(serialNumber);
+			if (!rcObj_->login())
+			{
+				delete rcObj_;
+				return;
+			}
+		}
+	
+		
+		if (std::stoi(power) <= 20)
+		{
+			BOOST_LOG(logger_) << "INFO " << "WCM::execute: BATTERY_LOW";
+			cache_->push_back(new ALARM("Battery low", 1001, "WCM"));
+			bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
+		
 		}
 		else
 		{
-			cardPortObj_->detectionState = CARD_PORT::EDetectionState::notValidated;
+			bdmObjPtr_->execute(new INTER_MODULE_OPERATION("DOOR_LOCKING_OPERATION", operation));
+		
 		}
-		return;
-	}
-	if (message.substr(message.size() - 1, 1) == "3")
-	{
-		BOOST_LOG(logger_) << "INFO " << "WCM::execute: CARD pulled";
-		cardPortObj_->detectionState = CARD_PORT::EDetectionState::notDetected;
-		return;
+		userManager_->setupUser(serialNumber);
+		auto userObj = userManager_->getUser();
+		cache_->push_back(userObj);
+		BOOST_LOG(logger_) << "DBG " << userObj->username << " sn: " << userObj->rcSerialCode << " isNew " << userObj->isNew;
+		if (userObj->isNew)
+		{
+			std::cout << "SHOULD BE HERE" << std::endl;
+			executeOnUIA(new INTER_MODULE_OPERATION("NEW_USER", userObj->rcSerialCode));
+			return;
+		}
+		if (message.substr(message.size() - 1, 1) == "2")
+		{
+			BOOST_LOG(logger_) << "INFO " << "WCM::execute: CARD detected";
+			if (serialNumber == rcObj_->serialNumber)
+			{
+				BOOST_LOG(logger_) << "INFO " << "WCM::execute: CARD validated";
+				cardPortObj_->detectionState = CARD_PORT::EDetectionState::detectedDone;
+				cardPortObj_->cardRef = rcObj_->serialNumber;
+			}
+			else
+			{
+				cardPortObj_->detectionState = CARD_PORT::EDetectionState::notValidated;
+			}
+			return;
+		}
+		if (message.substr(message.size() - 1, 1) == "3")
+		{
+			BOOST_LOG(logger_) << "INFO " << "WCM::execute: CARD pulled";
+			cardPortObj_->detectionState = CARD_PORT::EDetectionState::notDetected;
+			return;
+		}
 	}
 }
 

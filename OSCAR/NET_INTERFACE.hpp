@@ -12,5 +12,6 @@ public:
 	std::string mask;
 	bool dhcp;
 	std::string gateway;
+	
 };
 

@@ -114,7 +114,6 @@ void BDM::lockDoors()
 
 void BDM::initialize()
 {
-	
 	doorModule_->initialize();
 	lightModule_ = new LightModule(cache_, logger_);
 	lightModule_->initialize();

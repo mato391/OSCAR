@@ -8,6 +8,8 @@
 #include "EthernetIntrfaceConfigurator.hpp"
 #include "MODULE.hpp"
 #include "EQM.hpp"
+#include "ANTENNA.h"
+#include "rcManager.hpp"
 
 class WCM :
 	public Component
@@ -22,18 +24,22 @@ public:
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
 	void initialize();
 private:
+	boost::log::sources::logger_mt logger_;
 	REMOTE_CONTROLLER* rcObj_;
 	CARD_PORT* cardPortObj_;
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
-	BDM* bdmObjPtr_;
-	EQM* eqmObjPtr_;
 	MODULE* wcmModule_;
+	std::vector<ANTENNA*> antenaDevices_;
 	UserManager* userManager_;
 	EthernetIntrfaceConfigurator* ethIntConfigurator_;
+	rcManager* rcMan_;
+	BDM* bdmObjPtr_;
+	EQM* eqmObjPtr_;
 	void ethernetInitialize();
 	void prepareTopology();
-	void getBDM();
+	void getAllAntenaDecives();
+	void getWCM();
 	std::string WCM::getSerialNumberFromRefRCObj();
 	void executeOnUIA(INTER_MODULE_OPERATION* imo);
 	void displayTopology();

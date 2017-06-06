@@ -2,8 +2,9 @@
 #include "OAMConfigurator.hpp"
 
 
-OAMConfigurator::OAMConfigurator(boost::log::sources::logger_mt logger) : logger_(logger)
+OAMConfigurator::OAMConfigurator(boost::log::sources::logger_mt logger)
 {
+	logger_ = logger;
 	BOOST_LOG(logger_) << "OAMConfigurator ctor";
 	prepareCP();
 }

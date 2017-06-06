@@ -207,13 +207,16 @@
     <ClInclude Include="EthernetIntrfaceConfigurator.hpp">
       <Filter>Header Files\WCM</Filter>
     </ClInclude>
-    <ClInclude Include="NET_INTERFACE.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HWFService.hpp">
       <Filter>Header Files\Router</Filter>
     </ClInclude>
     <ClInclude Include="ANTENNA.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="rcManager.hpp">
+      <Filter>Header Files\WCM</Filter>
+    </ClInclude>
+    <ClInclude Include="NET_INTERFACE.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
@@ -373,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="ANTENNA.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rcManager.cpp">
+      <Filter>Source Files\WCM</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
