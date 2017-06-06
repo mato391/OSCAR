@@ -20,14 +20,14 @@ void rcManager::prepareRCInterface()
 	{
 		for (auto &conn : connVec)
 		{
-			if (static_cast<ANTENNA*>(conn)->label == "RC_SIMPLE")
+			if (conn->name == "ANTENNA" && static_cast<ANTENNA*>(conn)->label == "RC_SIMPLE")
 			{
 				BOOST_LOG(logger_) << "INF " << "rcManager::prepareRCInterface " << "SIMPLE RC has been found";
 				rControler_ = new REMOTE_CONTROLLER("");
 				wcmModule_->children.push_back(rControler_);
 				return;
 			}
-			else
+			else if (conn->name == "ANTENNA" && static_cast<ANTENNA*>(conn)->label == "RC_ADV")
 			{
 				configureAdvancedRemoteController();
 			}

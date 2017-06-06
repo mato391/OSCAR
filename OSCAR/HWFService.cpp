@@ -80,7 +80,7 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 			conn->type = static_cast<CONNECTOR::EType>(std::stoi(connectorData[2]));
 			connectorsGroup.push_back(conn);
 		}
-		if ((*i).find("Antenna") != std::string::npos)
+		else if ((*i).find("Antenna") != std::string::npos)
 		{
 			std::cout << "createModuleTopology in for: " << *i << std::endl;
 			std::vector<std::string> connectorRawData;

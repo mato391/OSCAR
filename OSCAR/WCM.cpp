@@ -50,10 +50,12 @@ void WCM::prepareTopology()
 
 void WCM::getAllAntenaDecives()
 {
+	BOOST_LOG(logger_) << "DBG " << "WCM::getAllAntenaDecives: " << wcmModule_->connectors_[0].size();
 	for (const auto &objVec : wcmModule_->connectors_)
 	{
 		for (auto &obj : objVec)
 		{
+			BOOST_LOG(logger_) << "DBG " << "WCM::getAllAntenaDecives: checking: " << obj->name;
 			if (obj->name == "ANTENNA")
 			{
 				antenaDevices_.push_back(static_cast<ANTENNA*>(obj));
