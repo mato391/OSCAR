@@ -107,7 +107,7 @@ void WCM::execute(std::string message)
 		
 	
 		if (bdmObjPtr_ == nullptr)
-			//getBDM();
+			getBDM();
 		if (eqmObjPtr_ == nullptr)
 			getEQM();
 		BOOST_LOG(logger_) << "INFO " << "WCM::execute: " << message;
@@ -225,6 +225,18 @@ void WCM::getEQM()
 		if (obj->name == "EQM")
 		{
 			eqmObjPtr_ = static_cast<EQM*>(obj);
+		}
+	}
+}
+
+void WCM::getBDM()
+{
+	for (const auto &component : *componentCache_)
+	{
+		if (component->name == "BDM")
+		{
+			bdmObjPtr_ = static_cast<BDM*>(component);
+			return;
 		}
 	}
 }

@@ -201,9 +201,6 @@
     <ClInclude Include="UIA.hpp">
       <Filter>Header Files\UIA</Filter>
     </ClInclude>
-    <ClInclude Include="POWER_GROUP.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EthernetIntrfaceConfigurator.hpp">
       <Filter>Header Files\WCM</Filter>
     </ClInclude>
@@ -218,6 +215,9 @@
     </ClInclude>
     <ClInclude Include="NET_INTERFACE.hpp">
       <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="POWER_GROUP.hpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

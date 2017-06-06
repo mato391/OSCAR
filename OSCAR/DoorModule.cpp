@@ -192,7 +192,7 @@ void DoorModule::unlockDoors()
 	RESULT* result = new RESULT();
 	result->status = RESULT::EStatus::success;
 	result->applicant = "BDM_DOOR";
-	result->feedback = doorsObj_->commonLockGND->connectors[0]->id + doorsObj_->commonLockGND->connectors[0]->value;
+	result->feedback = std::to_string(doorsObj_->commonLockGND->connectors[0]->id) + std::to_string(doorsObj_->commonLockGND->connectors[0]->value);
 	bdmModuleObj_->children.push_back(result);
 
 }
@@ -346,13 +346,14 @@ void DoorModule::changeConnectorState(std::string connectorId, std::string value
 
 			}
 		}
-		for (auto &conn : doorsObj_->commonLockGND->connectors)
+	}
+	for (auto &conn : doorsObj_->commonLockGND->connectors)
+	{
+		if (conn->id == std::stoi(connectorId))
 		{
-			if (conn->id == std::stoi(connectorId))
-			{
-				doorsObj_->setLockingState(std::stoi(value));
-				
-			}
+			BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: GND connector " << conn->id;
+			doorsObj_->setLockingState(std::stoi(value));
+
 		}
 	}
 }

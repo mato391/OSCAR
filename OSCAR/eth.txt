@@ -106,7 +106,7 @@ Ethernet adapter VirtualBox Host-Only Network:
 
 Ethernet adapter VMware Network Adapter VMnet1:
 
-   Connection-specific DNS Suffix  . : localdomain
+   Connection-specific DNS Suffix  . : 
    Description . . . . . . . . . . . : VMware Virtual Ethernet Adapter for VMnet1
    Physical Address. . . . . . . . . : 00-50-56-C0-00-01
    DHCP Enabled. . . . . . . . . . . : Yes
@@ -115,17 +115,19 @@ Ethernet adapter VMware Network Adapter VMnet1:
    IPv4 Address. . . . . . . . . . . : 192.168.114.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:26 PM
-   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 9:03:48 PM
+   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 9:32:02 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.114.254
    DHCPv6 IAID . . . . . . . . . . . : 1258311766
    DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-1F-A2-5A-4A-D0-BF-9C-1F-60-99
-   DNS Servers . . . . . . . . . . . : 192.168.114.1
+   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
    NetBIOS over Tcpip. . . . . . . . : Enabled
 
 Ethernet adapter VMware Network Adapter VMnet8:
 
-   Connection-specific DNS Suffix  . : localdomain
+   Connection-specific DNS Suffix  . : 
    Description . . . . . . . . . . . : VMware Virtual Ethernet Adapter for VMnet8
    Physical Address. . . . . . . . . : 00-50-56-C0-00-08
    DHCP Enabled. . . . . . . . . . . : Yes
@@ -134,12 +136,14 @@ Ethernet adapter VMware Network Adapter VMnet8:
    IPv4 Address. . . . . . . . . . . : 192.168.242.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:26 PM
-   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 9:03:40 PM
+   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 9:31:53 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.242.254
    DHCPv6 IAID . . . . . . . . . . . : 1275088982
    DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-1F-A2-5A-4A-D0-BF-9C-1F-60-99
-   DNS Servers . . . . . . . . . . . : 192.168.242.2
+   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
    Primary WINS Server . . . . . . . : 192.168.242.2
    NetBIOS over Tcpip. . . . . . . . : Enabled
 
@@ -164,7 +168,7 @@ Tunnel adapter Teredo Tunneling Pseudo-Interface:
 Tunnel adapter isatap.localdomain:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : localdomain
+   Connection-specific DNS Suffix  . : 
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #2
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No

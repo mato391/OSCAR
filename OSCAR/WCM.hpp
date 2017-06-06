@@ -40,6 +40,7 @@ private:
 	void prepareTopology();
 	void getAllAntenaDecives();
 	void getWCM();
+	void getBDM();
 	std::string WCM::getSerialNumberFromRefRCObj();
 	void executeOnUIA(INTER_MODULE_OPERATION* imo);
 	void displayTopology();
