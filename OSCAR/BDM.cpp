@@ -70,7 +70,7 @@ void BDM::execute(std::string message)
 		}
 		else if (moduleLabel == "BDM_LIGHT")
 		{
-
+			lightModule_->changeConnectorStateIndication(port, operation);
 		}
 	}
 }

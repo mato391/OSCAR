@@ -24,6 +24,7 @@ public:
 	~LightModule();
 	void initialize();
 	void blink(int count);
+	void changeConnectorStateIndication(std::string connectorId, std::string value);
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;

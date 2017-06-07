@@ -23,6 +23,31 @@ void LightModule::initialize()
 	//displayTopology();
 }
 
+void LightModule::changeConnectorStateIndication(std::string connectorId, std::string value)
+{
+	for (const auto &pg : lightes_->powerGroups_)
+	{
+		for (auto &light : pg->lights_)
+		{
+			if (light->connector->id == std::stoi(connectorId))
+			{
+				light->proceduralState = static_cast<LIGHT::EProceduralState>(std::stoi(value));
+				return;
+			}
+				
+		}
+		if (pg->commonGND->id == std::stoi(connectorId))
+		{
+			for (auto &light : pg->lights_)
+			{
+				light->proceduralState = static_cast<LIGHT::EProceduralState>(std::stoi(value));
+				return;
+			}
+		}
+	}
+	
+}
+
 void LightModule::getCP()
 {
 	for (const auto &obj : *cache_)
