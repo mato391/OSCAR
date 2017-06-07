@@ -18,45 +18,37 @@ void Router::startAutodetection()
 {
 	createEQM();
 	checkIfMMFExists();
-	//startInternalModuleAutodetection();
 	if (!fabricStartup_)
 	{
 		hwfService_ = new HWFService(eqmObj_);
 		hwfService_->prepareTopology();
 	}
 	startComponentService();
-	//check and start WCM module
-	//start script to run ipconfig/ifconfig -> file with response
-	//if file exists initialize WCM with subcomponen WirelessCardModule
 	BOOST_LOG(logger_) << "INF " << "startAutodetection hwfTopologyDone. Waiting for hardware";
 }
 
 
 void Router::startComponentService()
 {
-	//createEQM();
 	checkIfMMFExists();
 	if (!fabricStartup_)
 	{
-		
 		std::fstream mmf(mmfPath_, std::ios::in);
 		std::string mmf_;
 		mmf >> mmf_;
 		mmf.close();
 		
-		BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: mmf: " << mmf_;
+		BOOST_LOG(logger_) << "INFO " << "Router::StartComponentService: mmf: " << mmf_;
 		boost::split(mmfS_, mmf_, boost::is_any_of(";"));
-		BOOST_LOG(logger_) << "DEBUG " << "ROUTER:StartComponentService: mmf size: " << mmfS_[0];
+		BOOST_LOG(logger_) << "DEBUG " << "Router::StartComponentService: mmf size: " << mmfS_[0];
 		for (const auto &line : mmfS_)
 		{
 			if (line != "")
 			{
 				std::vector<std::string> componentAddress;
-				//std::cout << "ROUTER:StartComponentService: mmf: " << line << std::endl;
 				boost::split(componentAddress, line, boost::is_any_of(":"));
 				startComponent(componentAddress[0], componentAddress[1]);
 			}
-			
 		}
 	}
 	else
@@ -75,11 +67,11 @@ void Router::createEQM()
 
 void Router::startComponent(std::string name, std::string address)
 {
-	BOOST_LOG(logger_) << "DBG " << "startComponent " << name << " " << address;
+	BOOST_LOG(logger_) << "INF " << "startComponent " << name << " " << address;
 	bool exist = false;
 	for (auto &component : components_)
 	{
-		BOOST_LOG(logger_) << "DBG " << " startComponent found: " << component->name;
+		//BOOST_LOG(logger_) << "DBG " << " startComponent found: " << component->name;
 		if (name.find(component->name) != std::string::npos)
 		{
 			exist = true;
@@ -103,7 +95,7 @@ void Router::receiver(std::string data)
 	{
 		std::string domain = data.substr(0, 4);
 		std::string modLabel = "";
-		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << domain;
+		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
 		for (const auto &mod : eqmObj_->modules_)
 		{
 			auto module = static_cast<MODULE*>(mod);
@@ -129,10 +121,10 @@ void Router::receiver(std::string data)
 
 void Router::checkResultFromHWPlannerService()
 {
-	BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService";
+	//BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService";
 	for (auto &obj : *cache_)//crash
 	{
-		BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService: " << obj->name;
+		//BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService: " << obj->name;
 		if (obj->name == "RESULT" && static_cast<RESULT*>(obj)->applicant == "HWPlannerService" && static_cast<RESULT*>(obj)->feedback == "CONFIGURATION_DONE")
 		{
 			BOOST_LOG(logger_) << "INF " << "Router::checkResultFromHWPlannerService: Configuration done.Starting with hw";
@@ -141,7 +133,6 @@ void Router::checkResultFromHWPlannerService()
 			startComponentService();
 			break;
 		}
-
 	}
 }
 
@@ -188,7 +179,6 @@ void Router::setupTimer()
 
 void Router::startHWPlanerService()
 {
-	
 	if (hwplannerService_ == nullptr)
 	{
 		BOOST_LOG(logger_) << "INF " << "Router::startHWPlanerService: start";
@@ -197,8 +187,6 @@ void Router::startHWPlanerService()
 	}
 	else
 		BOOST_LOG(logger_) << "INF " << "Router::startHWPlanerService: hwPlanner has been started";
-		
-	//ShellExecute(NULL, "open", "", NULL, NULL, SW_SHOWDEFAULT);
 }
 
 void Router::createConnectors(MODULE* mod)
@@ -216,7 +204,6 @@ void Router::createConnectors(MODULE* mod)
 	{
 		mod->addConnector(conn);
 	}
-	
 }
 
 void Router::displayModulesTopology()

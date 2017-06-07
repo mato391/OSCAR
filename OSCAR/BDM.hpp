@@ -9,6 +9,7 @@
 #include <boost\thread.hpp>
 #include "RESULT.hpp"
 #include "MODULE.hpp"
+#include <vector>
 
 
 class BDM : public Component
@@ -37,8 +38,9 @@ private:
 	std::vector<Component*>* componentCache_;
 	std::map<std::string, MODULE*> bdmModules_;
 	void getBDMObjectIfNeeded();
+	void setupCurrentConnectorStates(std::string mask, std::string domain);
+	void setConnector(std::string connId, std::string value);
 	void blinkersRun(int times, int interval);
 	void getResultAndSendToRouter(std::string moduleLabel);
-	
 };
 
