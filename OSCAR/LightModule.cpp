@@ -20,7 +20,6 @@ void LightModule::initialize()
 	getCP();
 	getBDMModules();
 	createLightsTopology();
-	createLightsObj();
 	//displayTopology();
 }
 
@@ -130,6 +129,7 @@ void LightModule::createLightsTopology()
 			getShortLabelForPowerGroup(label)));
 	}
 	createLightObjs();
+	bdmModuleObj_->children.push_back(lightes_);
 }
 
 std::string LightModule::getShortLabelForPowerGroup(std::string label)
@@ -182,6 +182,7 @@ void LightModule::createLightObjs()
 		}
 		else if (conn->label.find("GND") != std::string::npos && isAlreadyCreated.first == "NOT_EXIST" && isAlreadyCreated.second != nullptr)
 		{
+			BOOST_LOG(logger_) << "DBG " << "LightModule::createLightObjs: Adding common GND conn";
 			isAlreadyCreated.second->commonGND = conn;
 		}
 	}
@@ -201,13 +202,16 @@ LIGHT* LightModule::lightFactory(std::string label, LIGHT::EType type)
 void LightModule::blink(int count)
 {
 	std::vector<CONNECTOR*> commonGNDs;
+	BOOST_LOG(logger_) << "DBG " << "LightModule::blink: powerGroup label: " << lightes_->powerGroups_.size();
 	for (const auto &pg : lightes_->powerGroups_)
 	{
 		if (pg->label.find("BLINKER") != std::string::npos)
 		{
+			BOOST_LOG(logger_) << "DBG " << "LightModule::blink: powerGroup label: " << pg->commonGND->label;
 			commonGNDs.push_back(pg->commonGND);
 		}
 	}
+	BOOST_LOG(logger_) << "DBG " << "LightModule::blink: commonGND founded: " << commonGNDs.size();
 	RESULT* result = new RESULT();
 	result->applicant = bdmModuleObj_->label;
 	result->status = RESULT::EStatus::success;

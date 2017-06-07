@@ -18,9 +18,10 @@ Ethernet adapter Local Area Connection 2:
    Physical Address. . . . . . . . . : 00-05-9A-3C-7A-00
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
-   Link-local IPv6 Address . . . . . : fe80::b74e:231b:5816:bf31%31(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::b736:52e9:aebb:d169%31(Preferred) 
    Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%31(Preferred) 
-   IPv4 Address. . . . . . . . . . . : 10.154.79.50(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::cc23:3d38:aa90:7081%31(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.154.79.109(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.0.0.0
    Default Gateway . . . . . . . . . : ::
                                        10.0.0.1
@@ -58,8 +59,8 @@ Wireless LAN adapter Wireless Network Connection 4:
    Link-local IPv6 Address . . . . . : fe80::39af:aab1:7b81:831a%21(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:30 PM
-   Lease Expires . . . . . . . . . . : Wednesday, June 07, 2017 6:20:24 PM
+   Lease Obtained. . . . . . . . . . : Wednesday, June 07, 2017 5:06:22 PM
+   Lease Expires . . . . . . . . . . : Thursday, June 08, 2017 5:06:24 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283
@@ -106,7 +107,7 @@ Ethernet adapter VirtualBox Host-Only Network:
 
 Ethernet adapter VMware Network Adapter VMnet1:
 
-   Connection-specific DNS Suffix  . : 
+   Connection-specific DNS Suffix  . : localdomain
    Description . . . . . . . . . . . : VMware Virtual Ethernet Adapter for VMnet1
    Physical Address. . . . . . . . . : 00-50-56-C0-00-01
    DHCP Enabled. . . . . . . . . . . : Yes
@@ -114,20 +115,18 @@ Ethernet adapter VMware Network Adapter VMnet1:
    Link-local IPv6 Address . . . . . : fe80::689b:2b7b:fbb6:83de%32(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.114.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:26 PM
-   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 9:32:02 PM
+   Lease Obtained. . . . . . . . . . : Wednesday, June 07, 2017 5:50:08 PM
+   Lease Expires . . . . . . . . . . : Wednesday, June 07, 2017 6:20:16 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.114.254
    DHCPv6 IAID . . . . . . . . . . . : 1258311766
    DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-1F-A2-5A-4A-D0-BF-9C-1F-60-99
-   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
-                                       fec0:0:0:ffff::2%1
-                                       fec0:0:0:ffff::3%1
+   DNS Servers . . . . . . . . . . . : 192.168.114.1
    NetBIOS over Tcpip. . . . . . . . : Enabled
 
 Ethernet adapter VMware Network Adapter VMnet8:
 
-   Connection-specific DNS Suffix  . : 
+   Connection-specific DNS Suffix  . : localdomain
    Description . . . . . . . . . . . : VMware Virtual Ethernet Adapter for VMnet8
    Physical Address. . . . . . . . . : 00-50-56-C0-00-08
    DHCP Enabled. . . . . . . . . . . : Yes
@@ -135,15 +134,13 @@ Ethernet adapter VMware Network Adapter VMnet8:
    Link-local IPv6 Address . . . . . : fe80::1dc5:e2f3:9535:2ad8%33(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.242.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Tuesday, June 06, 2017 5:44:26 PM
-   Lease Expires . . . . . . . . . . : Tuesday, June 06, 2017 9:31:53 PM
+   Lease Obtained. . . . . . . . . . : Wednesday, June 07, 2017 5:50:09 PM
+   Lease Expires . . . . . . . . . . : Wednesday, June 07, 2017 6:20:13 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.242.254
    DHCPv6 IAID . . . . . . . . . . . : 1275088982
    DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-1F-A2-5A-4A-D0-BF-9C-1F-60-99
-   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
-                                       fec0:0:0:ffff::2%1
-                                       fec0:0:0:ffff::3%1
+   DNS Servers . . . . . . . . . . . : 192.168.242.2
    Primary WINS Server . . . . . . . : 192.168.242.2
    NetBIOS over Tcpip. . . . . . . . : Enabled
 
@@ -168,7 +165,7 @@ Tunnel adapter Teredo Tunneling Pseudo-Interface:
 Tunnel adapter isatap.localdomain:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : 
+   Connection-specific DNS Suffix  . : localdomain
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #2
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No
@@ -183,7 +180,7 @@ Tunnel adapter isatap.{8B7A18ED-F89C-44BF-89CC-5E8364A84B04}:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.emea.nsn-net.net:
+Tunnel adapter isatap.nsn-intra.net:
 
    Media State . . . . . . . . . . . : Media disconnected
    Connection-specific DNS Suffix  . : 
@@ -192,7 +189,7 @@ Tunnel adapter isatap.emea.nsn-net.net:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.nsn-intra.net:
+Tunnel adapter isatap.emea.nsn-net.net:
 
    Media State . . . . . . . . . . . : Media disconnected
    Connection-specific DNS Suffix  . : 

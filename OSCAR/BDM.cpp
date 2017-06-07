@@ -82,13 +82,15 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 		if (imo->details == "00")
 		{
 			doorModule_->unlockDoors();
-			//lightModule_->blink(1);
+			lightModule_->blink(1);
 			getResultAndSendToRouter("BDM_DOOR");
+			getResultAndSendToRouter("BDM_LIGHT");
 		}
 		else if (imo->details == "01")
 		{
 			doorModule_->lockDoors();
 			lightModule_->blink(2);
+			getResultAndSendToRouter("BDM_DOOR");
 			getResultAndSendToRouter("BDM_LIGHT");
 		}
 	}
