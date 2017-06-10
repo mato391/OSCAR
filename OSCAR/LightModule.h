@@ -25,6 +25,7 @@ public:
 	void initialize();
 	void blink(int count);
 	void changeConnectorStateIndication(std::string connectorId, std::string value);
+	void setup();
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;
@@ -39,6 +40,7 @@ private:
 	void createLightsTopology();
 	void createLightsObj();
 	void createLightObjs();
+	void changeLightProceduralState(std::string label, int value);
 	std::string getShortLabelForPowerGroup(std::string label);
 	LIGHT* lightFactory(std::string label, LIGHT::EType type);
 	void displayTopology();

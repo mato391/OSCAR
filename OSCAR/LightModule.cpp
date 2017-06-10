@@ -14,6 +14,34 @@ LightModule::~LightModule()
 {
 }
 
+void LightModule::setup()
+{
+	for (const auto &connGr : bdmModuleObj_->connectors_)
+	{
+		for (auto &conn : connGr)
+		{
+			auto connector = (static_cast<CONNECTOR*>(conn));
+			changeLightProceduralState(connector->label, connector->value);
+		}
+	}
+}
+
+void LightModule::changeLightProceduralState(std::string label, int value)
+{
+	for (const auto &pg : lightes_->powerGroups_)
+	{
+		for (auto &light : pg->lights_)
+		{
+			auto common = pg->commonGND;
+			if (label.find(light->label) != std::string::npos)
+			{
+				int state = value * common->value;
+				light->proceduralState = static_cast<LIGHT::EProceduralState>(state);
+			}
+		}
+	}
+}
+
 void LightModule::initialize()
 {
 	BOOST_LOG(logger_) << "INF " << "LightModule::initialize";

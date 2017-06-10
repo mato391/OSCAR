@@ -23,6 +23,10 @@ void BDM::setup(std::string domain)
 	{
 		doorModule_->setup();
 	}
+	else if (domain == "0x06")
+	{
+		lightModule_->setup();
+	}
 }
 
 void BDM::execute(std::string message)

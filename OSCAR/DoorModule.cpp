@@ -47,12 +47,14 @@ void DoorModule::setup()
 void DoorModule::setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label)
 {
 	BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
+	auto common = doorsObj_->commonLockGND;
 	for (auto &door : doorsObj_->container_)
 	{
 		BOOST_LOG(logger_) << "DBG " << "DoorModule::setDoorLockingInitState: door " << door->label << " has been found";
 		if (door->label.find(label) != std::string::npos)
 		{
-			door->lockingState = lockState;
+			int state = static_cast<int>(lockState) * common->connectors[0]->value;
+			door->lockingState = static_cast<DOOR::ELockingState>(state);
 			BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
 			return;
 		}
@@ -73,9 +75,9 @@ void DoorModule::setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::st
 
 	}
 	if (checkIfDoorsAreClosed() == nullptr)
-		doorsObj_->openingState == DOORS::EOpeningState::closed;
+		doorsObj_->openingState = DOORS::EOpeningState::closed;
 	else
-		doorsObj_->openingState == DOORS::EOpeningState::opened;	
+		doorsObj_->openingState = DOORS::EOpeningState::opened;	
 }
 
 void DoorModule::getCP()
