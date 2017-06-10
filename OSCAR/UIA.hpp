@@ -14,6 +14,7 @@ public:
 	void setCache(std::vector<Obj*>* cache) { cache_ = cache; }
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
+	void setup(std::string domain) {}
 	void initialize();
 private:
 	std::vector<Obj*>* cache_;

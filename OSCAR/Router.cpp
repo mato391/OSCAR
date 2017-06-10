@@ -8,6 +8,7 @@ Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) 
 	mmfPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt";
 	startAutodetection();
 	timeout_ = false;
+
 }
 
 
@@ -96,6 +97,35 @@ void Router::receiver(std::string data)
 		std::string domain = data.substr(0, 4);
 		std::string modLabel = "";
 		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
+		if (data.find("BB") != std::string::npos)
+		{
+			std::string mask = data.substr(6, 4);
+			for (const auto &mod : eqmObj_->modules_)
+			{
+				auto module = static_cast<MODULE*>(mod);
+				if (module->domain == domain)
+				{
+					module->mask = mask;
+					mIC_ = new ModuleInitialConfigurator(module);
+					for (const auto &mod : eqmObj_->modules_)
+					{
+						auto module = static_cast<MODULE*>(mod);
+						if (module->domain == domain)
+							modLabel = module->label;
+					}
+					BOOST_LOG(logger_) << "Router: modLabel: " << modLabel;
+					for (const auto &component : components_)
+					{
+						BOOST_LOG(logger_) << "Router component: " << component->name;
+						if (modLabel != "" && modLabel.find(component->name) != std::string::npos)
+						{
+							component->setup(domain);
+						}
+					}
+					return;
+				}
+			}
+		}
 		for (const auto &mod : eqmObj_->modules_)
 		{
 			auto module = static_cast<MODULE*>(mod);

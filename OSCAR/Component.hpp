@@ -27,6 +27,7 @@ public:
 	virtual void execute(std::string message) = 0;
 	virtual void execute(INTER_MODULE_OPERATION* imo) = 0;
 	virtual void initialize() = 0;
+	virtual void setup(std::string domain) = 0;
 	
 	boost::log::sources::logger_mt logger_;
 	

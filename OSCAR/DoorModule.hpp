@@ -29,6 +29,7 @@ public:
 	void lockWindow();
 	void unlockWindow();
 	void initialize();
+	void setup();
 	void changeConnectorState(std::string connectorId, std::string value);
 private:
 	boost::log::sources::logger_mt logger_;
@@ -39,7 +40,8 @@ private:
 	std::vector<std::string> door6Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "BACK_LEFT", "BACK_RIGHT", "MASK", "BOOT" };
 	std::vector<std::string> door5Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "MASK", "BOOT" ,"ROOF" };
 	std::vector<std::string> door4Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "MASK", "BOOT" };
-
+	void setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label);
+	void setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::string label);
 	void getCP();
 	void getBDMModules();
 	void prepareTopology();

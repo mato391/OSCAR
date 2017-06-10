@@ -173,6 +173,7 @@
     <ClInclude Include="MIRRORS.hpp" />
     <ClInclude Include="MMF.hpp" />
     <ClInclude Include="MODULE.hpp" />
+    <ClInclude Include="ModuleInitialConfigurator.hpp" />
     <ClInclude Include="NET_INTERFACE.hpp" />
     <ClInclude Include="OAMConfigurator.hpp" />
     <ClInclude Include="Objects\CP.hpp" />
@@ -228,6 +229,7 @@
     <ClCompile Include="MIRRORS.cpp" />
     <ClCompile Include="MMF.cpp" />
     <ClCompile Include="MODULE.cpp" />
+    <ClCompile Include="ModuleInitialConfigurator.cpp" />
     <ClCompile Include="NET_INTERFACE.cpp" />
     <ClCompile Include="OAMConfigurator.cpp" />
     <ClCompile Include="Objects\CP.cpp" />

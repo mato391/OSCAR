@@ -219,6 +219,9 @@
     <ClInclude Include="POWER_GROUP.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleInitialConfigurator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -379,6 +382,9 @@
     </ClCompile>
     <ClCompile Include="rcManager.cpp">
       <Filter>Source Files\WCM</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleInitialConfigurator.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

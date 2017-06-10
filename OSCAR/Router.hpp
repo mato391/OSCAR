@@ -20,7 +20,7 @@
 #include "TIMER.hpp"
 #include "TASK.hpp"
 #include "EthernetIntrfaceConfigurator.hpp"
-
+#include "ModuleInitialConfigurator.hpp"
 class Router
 {
 public:
@@ -46,6 +46,7 @@ private:
 	TASK* task;
 	HWFService* hwfService_;
 	EthernetIntrfaceConfigurator* ethIntConfigurator_;
+	ModuleInitialConfigurator* mIC_;
 
 	void startAutodetection();
 	void startComponentService();

@@ -25,6 +25,55 @@ void DoorModule::initialize()
 	displayTopology();
 }
 
+void DoorModule::setup()
+{
+	BOOST_LOG(logger_) << "DBG " << "DoorModule::setup";
+	for (const auto &connGr : bdmModuleObj_->connectors_)
+	{
+		for (auto &conn : connGr)
+		{
+			auto connector = static_cast<CONNECTOR*>(conn);
+			BOOST_LOG(logger_) << "DBG " << "DoorModule::setup: connector::Etype: " << static_cast<int>(connector->type);
+			if (connector->type == CONNECTOR::EType::input)
+				setDoorOpeningInitStatus(static_cast<DOOR::EOpeningState>(connector->value), connector->label);
+			else if (connector->type == CONNECTOR::EType::output)
+			{
+				setDoorLockingInitStatus(static_cast<DOOR::ELockingState>(connector->value), connector->label);
+			}
+		}
+	}
+}
+
+void DoorModule::setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label)
+{
+	BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
+	for (auto &door : doorsObj_->container_)
+	{
+		BOOST_LOG(logger_) << "DBG " << "DoorModule::setDoorLockingInitState: door " << door->label << " has been found";
+		if (door->label.find(label) != std::string::npos)
+		{
+			door->lockingState = lockState;
+			BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
+			return;
+		}
+			
+	}
+}
+
+void DoorModule::setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::string label)
+{
+	for (auto &door : doorsObj_->container_)
+	{
+		if (door->label.find(label) != std::string::npos)
+		{
+			door->openingState = openState;
+			BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorOpeningInitStatus " << label << " " << static_cast<int>(openState);
+			return;
+		}
+
+	}
+}
+
 void DoorModule::getCP()
 {
 	for (const auto &obj : (*cache_))

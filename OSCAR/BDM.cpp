@@ -16,6 +16,15 @@ BDM::~BDM()
 {
 }
 
+void BDM::setup(std::string domain)
+{
+	BOOST_LOG(logger_) << "INF " << "BDM::setup: " << domain;
+	if (domain == "0x05")
+	{
+		doorModule_->setup();
+	}
+}
+
 void BDM::execute(std::string message)
 {
 	//0x01012
@@ -54,12 +63,6 @@ void BDM::execute(std::string message)
 			lightModule_->initialize();
 		}
 	}
-	else if (data.find("BB") != std::string::npos)
-	{
-		std::string mask = data.substr(6, 16);
-		std::string domain = data.substr(0, 4);
-		setupCurrentConnectorStates(mask, domain);
-	}
 	else
 	{
 		BOOST_LOG(logger_) << "INF " << "BDM::execute: " << "Module " << domain << " indicates";
@@ -81,20 +84,9 @@ void BDM::execute(std::string message)
 	}
 }
 
-void BDM::setupCurrentConnectorStates(std::string mask, std::string domain)
-{
-	std::vector<int> b_mask;
-	int i = 0;
-	for (const auto &conn : mask)
-	{
-		setConnector(std::to_string(i), std::to_string(conn));
-		i++;	
-	}
-}
-
 void BDM::setConnector(std::string connId, std::string value)
 {
-	doorModule_->changeConnectorState(connId, value)
+	doorModule_->changeConnectorState(connId, value);
 }
 
 void BDM::execute(INTER_MODULE_OPERATION* imo)

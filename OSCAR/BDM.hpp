@@ -23,6 +23,7 @@ public:
 	void setCache(std::vector<Obj*>* cache) { cache_ = cache; }
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
+	void setup(std::string domain);
 	void unlockDoors();
 	void lockDoors();
 	void setConfiguringStateIfNeeded();
@@ -38,7 +39,6 @@ private:
 	std::vector<Component*>* componentCache_;
 	std::map<std::string, MODULE*> bdmModules_;
 	void getBDMObjectIfNeeded();
-	void setupCurrentConnectorStates(std::string mask, std::string domain);
 	void setConnector(std::string connId, std::string value);
 	void blinkersRun(int times, int interval);
 	void getResultAndSendToRouter(std::string moduleLabel);
