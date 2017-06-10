@@ -35,8 +35,10 @@ void LightModule::changeLightProceduralState(std::string label, int value)
 			auto common = pg->commonGND;
 			if (label.find(light->label) != std::string::npos)
 			{
-				int state = value * common->value;
-				light->proceduralState = static_cast<LIGHT::EProceduralState>(state);
+				if (common->value == 0)
+					light->proceduralState = static_cast<LIGHT::EProceduralState>(value);
+				else
+					light->proceduralState = static_cast<LIGHT::EProceduralState>(!value);
 			}
 		}
 	}
