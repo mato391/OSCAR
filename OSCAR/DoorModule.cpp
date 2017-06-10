@@ -53,10 +53,19 @@ void DoorModule::setDoorLockingInitStatus(DOOR::ELockingState lockState, std::st
 		BOOST_LOG(logger_) << "DBG " << "DoorModule::setDoorLockingInitState: door " << door->label << " has been found";
 		if (door->label.find(label) != std::string::npos)
 		{
-			int state = static_cast<int>(lockState) * common->connectors[0]->value;
-			door->lockingState = static_cast<DOOR::ELockingState>(state);
-			BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
-			return;
+			if (common->connectors[0]->value == 0)
+			{
+				door->lockingState = lockState;
+				BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
+				return;
+			}
+			else 
+			{
+				door->lockingState = static_cast<DOOR::ELockingState>(!static_cast<int>(lockState));
+				BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
+				return;
+			}
+			
 		}
 			
 	}
