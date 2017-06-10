@@ -72,6 +72,10 @@ void DoorModule::setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::st
 		}
 
 	}
+	if (checkIfDoorsAreClosed() == nullptr)
+		doorsObj_->openingState == DOORS::EOpeningState::closed;
+	else
+		doorsObj_->openingState == DOORS::EOpeningState::opened;	
 }
 
 void DoorModule::getCP()
