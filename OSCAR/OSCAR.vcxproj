@@ -152,7 +152,9 @@
     <ClInclude Include="ANTENNA.h" />
     <ClInclude Include="BDM.hpp" />
     <ClInclude Include="BUTTON.hpp" />
+    <ClInclude Include="CAN.h" />
     <ClInclude Include="CARD_PORT.hpp" />
+    <ClInclude Include="commonGNDChecker.hpp" />
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="ComponentFactory.hpp" />
     <ClInclude Include="CONNECTOR.hpp" />
@@ -165,6 +167,8 @@
     <ClInclude Include="EthernetIntrfaceConfigurator.hpp" />
     <ClInclude Include="HWFService.hpp" />
     <ClInclude Include="HWPlannerService.hpp" />
+    <ClInclude Include="HWSIMMODULE.hpp" />
+    <ClInclude Include="HwSimulator.hpp" />
     <ClInclude Include="INTER_MODULE_OPERATION.h" />
     <ClInclude Include="LIGHTES.hpp" />
     <ClInclude Include="LightModule.h" />
@@ -207,8 +211,10 @@
     <ClCompile Include="ALARM.cpp" />
     <ClCompile Include="ANTENNA.cpp" />
     <ClCompile Include="BUTTON.cpp" />
+    <ClCompile Include="CAN.cpp" />
     <ClCompile Include="CARD_PORT.cpp" />
     <ClCompile Include="BDM.cpp" />
+    <ClCompile Include="commonGNDChecker.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="CONNECTOR.cpp" />
@@ -221,6 +227,8 @@
     <ClCompile Include="EthernetIntrfaceConfigurator.cpp" />
     <ClCompile Include="HWFService.cpp" />
     <ClCompile Include="HWPlannerService.cpp" />
+    <ClCompile Include="HWSIMMODULE.cpp" />
+    <ClCompile Include="HwSimulator.cpp" />
     <ClCompile Include="INTER_MODULE_OPERATION.cpp" />
     <ClCompile Include="LIGHTES.cpp" />
     <ClCompile Include="LightModule.cpp" />

@@ -27,19 +27,40 @@ void BDM::setup(std::string domain)
 	{
 		lightModule_->setup();
 	}
+	//getResultAndSendToRouter();
 }
 
 void BDM::execute(std::string message)
 {
 	//0x01012
+	std::string domain;
+	std::string data;
+	std::string port;
+	std::string operation;
 	getBDMObjectIfNeeded();
 	BOOST_LOG(logger_) << "INFO " << "BDM::execute";
-	std::string domain = message.substr(0, 4);
-	std::string data = message.substr(4, 3);
-	std::string port = data.substr(0, 2);
-	std::string operation = data.substr(2, 1);
+	int startPoint = std::string::npos;
+	startPoint = message.find("aa");
+	if (startPoint == std::string::npos)
+	{
+		startPoint = message.find("bb");
+		if (startPoint == std::string::npos)
+		{
+			startPoint = message.find("cc");
+		}
+	}
+	if (startPoint == 1)
+	{
+		domain = "0x0" + message.substr(0, 1);
+		operation = message.substr(1, 2);
+		
+	}
+	//TODO: if domain is not 1 number
+	//		port getting
+	 
+	
 	std::string moduleLabel;
-	if (data.find("AA") != std::string::npos)
+	if (operation == "aa")
 	{
 		BOOST_LOG(logger_) << "INF " << "BDM::execute: " << "Module " << domain << " has been detected";
 		for (auto &module : bdmModules_)

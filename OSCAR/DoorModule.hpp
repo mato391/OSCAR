@@ -11,7 +11,7 @@
 #include "EQM.hpp"
 #include "CONNECTOR.hpp"
 #include "RESULT.hpp"
-
+#include "commonGNDChecker.hpp"
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>

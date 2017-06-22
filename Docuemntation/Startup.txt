@@ -1,0 +1,12 @@
+Router odczytuje hwf i buduje EQM topology
+nastepnie zczytuje MMF i odpala zawarte w nim komponenty
+Komponenty buduja swoje topologie na podstawie EQM
+Po wykryciu sie modulu message:
+0xyyAA 0xyy - domena
+Komponent ustawia swój stan na configured a modul zmienia swoj detectionState
+Po wykryciu messega:
+0xyyBBzzzz zzzz - mask stanów
+Router ustawia wszystkie stany na connectorach dnaego modulu
+Nastepnie wola na danym komponencie setup.
+Komponent w setup'ie uzupelnia topologie w oparciu o stany konektorów
+Komponent przechodzi w tryb runtime.

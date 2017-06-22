@@ -220,6 +220,18 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="ModuleInitialConfigurator.hpp">
+      <Filter>Header Files\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="commonGNDChecker.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CAN.h">
+      <Filter>Header Files\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="HwSimulator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HWSIMMODULE.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -384,6 +396,18 @@
       <Filter>Source Files\WCM</Filter>
     </ClCompile>
     <ClCompile Include="ModuleInitialConfigurator.cpp">
+      <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="commonGNDChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CAN.cpp">
+      <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="HwSimulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HWSIMMODULE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

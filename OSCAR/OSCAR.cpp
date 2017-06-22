@@ -1,6 +1,5 @@
 // OSCAR.cpp : Defines the entry point for the console application.
 //
-
 #include "stdafx.h"
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -9,6 +8,7 @@
 #include <signal.h>
 #include "Router.hpp"
 #include "OAMConfigurator.hpp"
+#include "HwSimulator.hpp"
 #include <boost/log/trivial.hpp>
 #include <boost/move/utility.hpp>
 #include <boost/log/sources/logger.hpp>
@@ -22,13 +22,15 @@
 namespace logging = boost::log;
 namespace src = boost::log::sources;
 namespace keywords = boost::log::keywords;
-
+HwSimulator* hwSimulatorPtr_;
 
 BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(my_logger, src::logger_mt)
 
 
 void router_thread(Router* router, src::logger_mt lg);
 bool checkSignalFile();
+
+
 
 int main()
 {
@@ -65,21 +67,17 @@ void router_thread(Router* router, src::logger_mt lg)
 {
 	for (;;)
 	{
-		
-			std::fstream file("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_recv.txt", std::ios::in);
-			if (file.good())
-			{
-				std::string content;
-				file >> content;
-				file.close();
-				std::remove("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_recv.txt");
-				BOOST_LOG(lg) << "INFO " << "CAN received signal: " << content;
-				router->receiver(content);
-			
-			}
-		
-		boost::this_thread::sleep(boost::posix_time::millisec(50));
-		
+		//std::fstream file("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_recv.txt", std::ios::in);
+		//if (file.good())
+		//{
+		//	std::string content;
+		//	file >> content;
+		//	file.close();
+			//std::remove("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_recv.txt");
+		//	BOOST_LOG(lg) << "INFO " << "CAN received signal: " << content;
+			router->receiver("");
+		//}
+		boost::this_thread::sleep(boost::posix_time::millisec(500));
 	}
 }
 

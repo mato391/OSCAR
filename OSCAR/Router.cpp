@@ -8,6 +8,7 @@ Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) 
 	mmfPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt";
 	startAutodetection();
 	timeout_ = false;
+	canPtr_ = new CAN(100);
 
 }
 
@@ -15,6 +16,12 @@ Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) 
 Router::~Router()
 {
 }
+
+std::vector<Obj*> Router::getModules()
+{
+	return eqmObj_->modules_;
+}
+
 void Router::startAutodetection()
 {
 	createEQM();
@@ -89,62 +96,104 @@ void Router::startComponent(std::string name, std::string address)
 	}
 }
 
-
 void Router::receiver(std::string data)
 {
 	if (!fabricStartup_)
 	{
-		std::string domain = data.substr(0, 4);
-		std::string modLabel = "";
-		BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
-		if (data.find("BB") != std::string::npos)
+		if (canPtr_->messageAvailable())
 		{
-			std::string mask = data.substr(6, 4);
+			canPtr_->receiveMessage();
+			BOOST_LOG(logger_) << "INF "<< "Router::receiver: MESSAGE AVAILABLE from " << static_cast<int>(canPtr_->messageRx.data[0]);
+			
+			std::string message = canPtr_->convertToHexString();
+			BOOST_LOG(logger_) << "INF " << "Router::receiver: " << message;
+
+			std::string domain = std::to_string(canPtr_->messageRx.data[0]);
+			std::cout << "Router::receiver: message from domain: " << domain << std::endl;
+			if (domain.size() == 1)
+				domain = "0x0" + domain;
+			else
+				domain = "0x" + domain;
+			std::string modLabel = "";
+			//BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
+			if (canPtr_->messageRx.data[1] == 187)
+			{
+				BOOST_LOG(logger_) << "INF " << "Router::receiver: setup message has been received";
+				std::string mask = "";
+				for (int i=2; i < 8; i++)
+				{
+					if (static_cast<int>(canPtr_->messageRx.data[i]) != 0)
+					{
+						std::stringstream stream;
+						stream << std::hex << static_cast<int>(canPtr_->messageRx.data[i]);
+						std::string result(stream.str());
+						mask += result;
+					}
+					else
+					{
+						break;
+					}
+				}
+				
+				
+				
+				BOOST_LOG(logger_) << "INF " << "Router::receiver: Mask calculated: " << mask;
+				for (const auto &mod : eqmObj_->modules_)
+				{
+					auto module = static_cast<MODULE*>(mod);
+					if (module->domain == domain)
+					{
+						module->mask = mask;
+						mIC_ = new ModuleInitialConfigurator(module);
+						for (const auto &mod : eqmObj_->modules_)
+						{
+							auto module = static_cast<MODULE*>(mod);
+							if (module->domain == domain)
+								modLabel = module->label;
+						}
+						BOOST_LOG(logger_) << "DBG " << "Router::receiver modLabel: " << modLabel;
+						for (const auto &component : components_)
+						{
+							BOOST_LOG(logger_) << "DBG " << "Router::receiver component: " << component->name;
+							if (modLabel != "" && modLabel.find(component->name) != std::string::npos)
+							{
+								component->setup(domain);
+							}
+						}
+						return;
+					}
+				}
+			}
 			for (const auto &mod : eqmObj_->modules_)
 			{
 				auto module = static_cast<MODULE*>(mod);
 				if (module->domain == domain)
-				{
-					module->mask = mask;
-					mIC_ = new ModuleInitialConfigurator(module);
-					for (const auto &mod : eqmObj_->modules_)
-					{
-						auto module = static_cast<MODULE*>(mod);
-						if (module->domain == domain)
-							modLabel = module->label;
-					}
-					BOOST_LOG(logger_) << "Router: modLabel: " << modLabel;
-					for (const auto &component : components_)
-					{
-						BOOST_LOG(logger_) << "Router component: " << component->name;
-						if (modLabel != "" && modLabel.find(component->name) != std::string::npos)
-						{
-							component->setup(domain);
-						}
-					}
-					return;
-				}
+					modLabel = module->label;
 			}
-		}
-		for (const auto &mod : eqmObj_->modules_)
-		{
-			auto module = static_cast<MODULE*>(mod);
-			if (module->domain == domain)
-				modLabel = module->label;
-		}
-		for (const auto &component : components_)
-		{
-			//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: " << component->name;
-			//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component configuringState: " << static_cast<int>(component->configuringState);
-			//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: domain " << component->domain;
-			if (modLabel != "" && modLabel.find(component->name) != std::string::npos)
+			for (const auto &component : components_)
 			{
-				BOOST_LOG(logger_) << "INFO " << "Router::receiver: transferring message to " << component->name;
-				component->execute(data);
-				break;
-			}
+				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: " << component->name;
+				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component configuringState: " << static_cast<int>(component->configuringState);
+				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: domain " << component->domain;
+				if (modLabel != "" && modLabel.find(component->name) != std::string::npos)
+				{
+					BOOST_LOG(logger_) << "INFO " << "Router::receiver: transferring message to " << component->name;
+					component->execute(message);
+					canPtr_->messageTx.id = canPtr_->messageRx.data[0];
+					canPtr_->messageTx.data[0] = canPtr_->messageRx.id;
+					canPtr_->messageTx.data[1] = canPtr_->messageRx.data[1];
+					canPtr_->messageTx.data[2] = canPtr_->messageRx.data[2];
+					canPtr_->messageTx.data[3] = canPtr_->messageRx.data[3];
+					canPtr_->messageTx.data[4] = canPtr_->messageRx.data[4];
+					canPtr_->messageTx.data[5] = canPtr_->messageRx.data[5];
+					canPtr_->messageTx.data[6] = canPtr_->messageRx.data[6];
+					canPtr_->messageTx.data[7] = canPtr_->messageRx.data[7];
+					canPtr_->sendMessage();
+					break;
+				}
 
-			BOOST_LOG(logger_) << "INFO " << "Router::receiver: No component found";
+				BOOST_LOG(logger_) << "INFO " << "Router::receiver: No component found";
+			}
 		}
 	}
 }
@@ -168,6 +217,7 @@ void Router::checkResultFromHWPlannerService()
 
 void Router::sender(std::string data)
 {
+
 	while (boost::filesystem::exists("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_send.txt"))
 	{
 		boost::this_thread::sleep(boost::posix_time::millisec(50));

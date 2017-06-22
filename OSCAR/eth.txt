@@ -18,10 +18,9 @@ Ethernet adapter Local Area Connection 2:
    Physical Address. . . . . . . . . : 00-05-9A-3C-7A-00
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
-   Link-local IPv6 Address . . . . . : fe80::b736:52e9:aebb:d169%31(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::3b9a:2429:27f0:34a2%31(Preferred) 
    Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%31(Preferred) 
-   Link-local IPv6 Address . . . . . : fe80::cc23:3d38:aa90:7081%31(Preferred) 
-   IPv4 Address. . . . . . . . . . . : 10.154.79.109(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.154.78.49(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.0.0.0
    Default Gateway . . . . . . . . . : ::
                                        10.0.0.1
@@ -59,8 +58,8 @@ Wireless LAN adapter Wireless Network Connection 4:
    Link-local IPv6 Address . . . . . : fe80::39af:aab1:7b81:831a%21(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Wednesday, June 07, 2017 5:06:22 PM
-   Lease Expires . . . . . . . . . . : Thursday, June 08, 2017 5:06:24 PM
+   Lease Obtained. . . . . . . . . . : Thursday, June 22, 2017 4:09:02 PM
+   Lease Expires . . . . . . . . . . : Friday, June 23, 2017 8:13:38 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283
@@ -115,8 +114,8 @@ Ethernet adapter VMware Network Adapter VMnet1:
    Link-local IPv6 Address . . . . . : fe80::689b:2b7b:fbb6:83de%32(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.114.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Wednesday, June 07, 2017 5:50:08 PM
-   Lease Expires . . . . . . . . . . : Wednesday, June 07, 2017 6:20:16 PM
+   Lease Obtained. . . . . . . . . . : Thursday, June 22, 2017 4:08:54 PM
+   Lease Expires . . . . . . . . . . : Thursday, June 22, 2017 9:49:27 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.114.254
    DHCPv6 IAID . . . . . . . . . . . : 1258311766
@@ -134,8 +133,8 @@ Ethernet adapter VMware Network Adapter VMnet8:
    Link-local IPv6 Address . . . . . : fe80::1dc5:e2f3:9535:2ad8%33(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.242.1(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Wednesday, June 07, 2017 5:50:09 PM
-   Lease Expires . . . . . . . . . . : Wednesday, June 07, 2017 6:20:13 PM
+   Lease Obtained. . . . . . . . . . : Thursday, June 22, 2017 4:08:55 PM
+   Lease Expires . . . . . . . . . . : Thursday, June 22, 2017 9:49:25 PM
    Default Gateway . . . . . . . . . : 
    DHCP Server . . . . . . . . . . . : 192.168.242.254
    DHCPv6 IAID . . . . . . . . . . . : 1275088982
@@ -144,7 +143,7 @@ Ethernet adapter VMware Network Adapter VMnet8:
    Primary WINS Server . . . . . . . : 192.168.242.2
    NetBIOS over Tcpip. . . . . . . . : Enabled
 
-Tunnel adapter isatap.{61D1E12C-7020-46F0-88D3-F82BDA414414}:
+Tunnel adapter isatap.{5CBBF503-9850-4C7D-B176-98EA565AD6F8}:
 
    Media State . . . . . . . . . . . : Media disconnected
    Connection-specific DNS Suffix  . : 
@@ -162,10 +161,10 @@ Tunnel adapter Teredo Tunneling Pseudo-Interface:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.localdomain:
+Tunnel adapter isatap.{61D1E12C-7020-46F0-88D3-F82BDA414414}:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : localdomain
+   Connection-specific DNS Suffix  . : 
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #2
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No
@@ -198,10 +197,10 @@ Tunnel adapter isatap.emea.nsn-net.net:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.{5CBBF503-9850-4C7D-B176-98EA565AD6F8}:
+Tunnel adapter isatap.localdomain:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : 
+   Connection-specific DNS Suffix  . : localdomain
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #7
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No

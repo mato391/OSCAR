@@ -16,7 +16,7 @@ ModuleInitialConfigurator::~ModuleInitialConfigurator()
 
 void ModuleInitialConfigurator::createBinaryMask()
 {
-	std::cout << "MASK: " << std::endl;
+	std::cout << "ModuleInitialConfigurator::createBinaryMask: " << std::endl;
 	int maskSize = module_->mask.size();
 	for (int i = 0; i < maskSize; i++)
 	{
@@ -79,7 +79,7 @@ void ModuleInitialConfigurator::convertToBinary(std::string sign)
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(0);
 	}
-	else if (sign == "2")
+	else if (sign == "7")
 	{
 		binaryMask_.push_back(0);
 		binaryMask_.push_back(1);
@@ -100,42 +100,42 @@ void ModuleInitialConfigurator::convertToBinary(std::string sign)
 		binaryMask_.push_back(0);
 		binaryMask_.push_back(1);
 	}
-	else if (sign == "A")
+	else if (sign == "A" || sign == "a")
 	{
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(0);
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(0);
 	}
-	else if (sign == "B")
+	else if (sign == "B" || sign == "b")
 	{
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(0);
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(1);
 	}
-	else if (sign == "C")
+	else if (sign == "C" || sign == "c")
 	{
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(0);
 		binaryMask_.push_back(0);
 	}
-	else if (sign == "D")
+	else if (sign == "D" || sign == "d")
 	{
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(0);
 		binaryMask_.push_back(1);
 	}
-	else if (sign == "E")
+	else if (sign == "E" || sign == "e")
 	{
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(0);
 	}
-	else if (sign == "F")
+	else if (sign == "F" || sign == "f")
 	{
 		binaryMask_.push_back(1);
 		binaryMask_.push_back(1);
@@ -151,7 +151,7 @@ void ModuleInitialConfigurator::setupConnectors()
 		for (auto &conn : connGr)
 		{
 			auto connector = static_cast<CONNECTOR*>(conn);
-			connector->value = binaryMask_[connector->id];
+			connector->value = binaryMask_[connector->id];	//crash here
 		}
 		for (const auto &conn : connGr)
 		{

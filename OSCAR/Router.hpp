@@ -11,6 +11,7 @@
 #include <boost\log\sources\logger.hpp>
 #include <boost\filesystem.hpp>
 
+#include "HwSimulator.hpp"
 #include "HWPlannerService.hpp"
 #include "HWFService.hpp"
 #include "Objects\Obj.hpp"
@@ -21,6 +22,8 @@
 #include "TASK.hpp"
 #include "EthernetIntrfaceConfigurator.hpp"
 #include "ModuleInitialConfigurator.hpp"
+#include "CAN.h"
+
 class Router
 {
 public:
@@ -30,9 +33,11 @@ public:
 	void receiver(std::string data);
 	void sender(std::string data);
 	void startHWPlanerService();
-	
+	std::vector<Obj*> getModules();
+	void setHwSimulatorIfNeeded(HwSimulator* hwSim) { this->hwSim_ = hwSim; };
 private:
 	HWPlannerService* hwplannerService_;
+	HwSimulator* hwSim_;
 	boost::log::sources::logger_mt logger_;
 	std::vector<Component_ptr> components_;
 	std::vector<std::string> mmfS_;
@@ -47,6 +52,7 @@ private:
 	HWFService* hwfService_;
 	EthernetIntrfaceConfigurator* ethIntConfigurator_;
 	ModuleInitialConfigurator* mIC_;
+	CAN * canPtr_;
 
 	void startAutodetection();
 	void startComponentService();

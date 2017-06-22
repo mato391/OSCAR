@@ -28,11 +28,16 @@ void DoorModule::initialize()
 void DoorModule::setup()
 {
 	BOOST_LOG(logger_) << "DBG " << "DoorModule::setup";
+	std::vector<CONNECTOR*> wrongSetupConnectors;
 	for (const auto &connGr : bdmModuleObj_->connectors_)
 	{
 		for (auto &conn : connGr)
 		{
 			auto connector = static_cast<CONNECTOR*>(conn);
+			if (!commonGNDChecker::checkGNDConnVelue(connector))
+			{
+				wrongSetupConnectors.push_back(connector);
+			}
 			BOOST_LOG(logger_) << "DBG " << "DoorModule::setup: connector::Etype: " << static_cast<int>(connector->type);
 			if (connector->type == CONNECTOR::EType::input)
 				setDoorOpeningInitStatus(static_cast<DOOR::EOpeningState>(connector->value), connector->label);
@@ -41,6 +46,14 @@ void DoorModule::setup()
 				setDoorLockingInitStatus(static_cast<DOOR::ELockingState>(connector->value), connector->label);
 			}
 		}
+	}
+	if (wrongSetupConnectors.size() == 0)
+	{
+		//should be result with status OK
+	}
+	else
+	{
+		//should be result with partial OK and feedback
 	}
 }
 
@@ -252,11 +265,19 @@ void DoorModule::unlockDoors()
 		BOOST_LOG(logger_) << "INFO " << "DoorModule::unlockDoors " << door->label;
 		door->unlockDoor();
 	}
-	doorsObj_->commonLockGND->connectors[0]->value = 1;
 	RESULT* result = new RESULT();
 	result->status = RESULT::EStatus::success;
 	result->applicant = "BDM_DOOR";
-	result->feedback = std::to_string(doorsObj_->commonLockGND->connectors[0]->id) + std::to_string(doorsObj_->commonLockGND->connectors[0]->value);
+	result->feedback = std::to_string(doorsObj_->commonLockGND->connectors[0]->id) +
+		std::to_string(doorsObj_->commonLockGND->connectors[0]->value);
+	if (doorsObj_->commonLockGND->connectors[0]->value != 0)
+	{
+		doorsObj_->commonLockGND->connectors[0]->value = 0;
+		result->feedback += std::to_string(doorsObj_->commonLockGND->connectors[0]->id)
+			+ std::to_string(doorsObj_->commonLockGND->connectors[0]->value);
+	}
+		
+	
 	bdmModuleObj_->children.push_back(result);
 
 }

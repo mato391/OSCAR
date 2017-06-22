@@ -92,7 +92,23 @@ void WCM::execute(std::string message)
 	std::string power;
 	std::string operation;
 	std::string moduleLabel;
-	if (message.find("AA") != std::string::npos)
+	int startPoint = std::string::npos;
+	startPoint = message.find("aa");
+	if (startPoint == std::string::npos)
+	{
+		startPoint = message.find("bb");
+		if (startPoint == std::string::npos)
+		{
+			startPoint = message.find("cc");
+		}
+	}
+	if (startPoint == 1)
+	{
+		domain = "0x0" + message.substr(0, 1);
+		operation = message.substr(1, 2);
+
+	}
+	if (operation == "aa")
 	{
 		BOOST_LOG(logger_) << "INF " << "WCM::execute: " << "Module " << domain << " has been detected";
 		initialize();
