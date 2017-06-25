@@ -17,146 +17,91 @@ ModuleInitialConfigurator::~ModuleInitialConfigurator()
 void ModuleInitialConfigurator::createBinaryMask()
 {
 	std::cout << "ModuleInitialConfigurator::createBinaryMask: " << std::endl;
-	int maskSize = module_->mask.size();
-	for (int i = 0; i < maskSize; i++)
-	{
-		convertToBinary(module_->mask.substr(i, 1));
-	}
-	for (const auto &n : binaryMask_)
-	{
-		std::cout << n;
-	}
+	binaryMask_ = std::bitset<16>(std::stoi(module_->mask));
+
 }
 
-void ModuleInitialConfigurator::convertToBinary(std::string sign)
+int ModuleInitialConfigurator::convertToDec(std::string sign)
 {
 	if (sign == "0")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
+		return 0;
 	}
 	else if (sign == "1")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
+		return 1;
 	}
 	else if (sign == "2")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
+		return 2;
 	}
 	else if (sign == "3")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
+		return 3;
 	}
 	else if (sign == "4")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
+		return 4;
 	}
 	else if (sign == "5")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
+		return 5;
 	}
 	else if (sign == "6")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
+		return 6;
 	}
 	else if (sign == "7")
 	{
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
+		return 7;
 	}
 	else if (sign == "8")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
+		return 8;
 	}
 	else if (sign == "9")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
+		return 9;
 	}
 	else if (sign == "A" || sign == "a")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
+		return 10;
 	}
 	else if (sign == "B" || sign == "b")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
+		return 11;
 	}
 	else if (sign == "C" || sign == "c")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(0);
+		return 12;
 	}
 	else if (sign == "D" || sign == "d")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
-		binaryMask_.push_back(1);
+		return 13;
 	}
 	else if (sign == "E" || sign == "e")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(0);
+		return 14;
 	}
 	else if (sign == "F" || sign == "f")
 	{
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
-		binaryMask_.push_back(1);
+		return 15;
 	}
 }
 
 void ModuleInitialConfigurator::setupConnectors()
 {
+	std::cout << "Mask size is: " << module_->connectors_.size() << std::endl;
 	for (auto &connGr : module_->connectors_)
 	{
+		int i = 0;
 		for (auto &conn : connGr)
 		{
 			auto connector = static_cast<CONNECTOR*>(conn);
-			connector->value = binaryMask_[connector->id];	//crash here
+			connector->value = binaryMask_[i];	//crash here
+			std::cout << "CONNECTOR ID: " << i  << " Connector value: " << connector->value << std::endl;
+			i++;
 		}
-		for (const auto &conn : connGr)
-		{
-			auto connector = static_cast<CONNECTOR*>(conn);
-			std::cout << "CONNECTOR VALUE: " << connector->value << std::endl;
-		}
+		
 	}
 }

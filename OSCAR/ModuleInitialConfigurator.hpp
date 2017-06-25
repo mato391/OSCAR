@@ -3,6 +3,7 @@
 #include "MODULE.hpp"
 #include "CONNECTOR.hpp"
 #include <iostream>
+#include <bitset>
 
 class ModuleInitialConfigurator
 {
@@ -11,10 +12,10 @@ public:
 	~ModuleInitialConfigurator();
 private:
 	MODULE* module_;
-	std::vector<int> binaryMask_;
+	std::bitset<16> binaryMask_;
 
 	void createBinaryMask();
-	void convertToBinary(std::string sign);
+	int convertToDec(std::string sign);
 	void setupConnectors();
 };
 

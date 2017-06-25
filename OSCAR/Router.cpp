@@ -120,23 +120,7 @@ void Router::receiver(std::string data)
 			{
 				BOOST_LOG(logger_) << "INF " << "Router::receiver: setup message has been received";
 				std::string mask = "";
-				for (int i=2; i < 8; i++)
-				{
-					if (static_cast<int>(canPtr_->messageRx.data[i]) != 0)
-					{
-						std::stringstream stream;
-						stream << std::hex << static_cast<int>(canPtr_->messageRx.data[i]);
-						std::string result(stream.str());
-						mask += result;
-					}
-					else
-					{
-						break;
-					}
-				}
-				
-				
-				
+				mask = std::to_string(static_cast<int>(canPtr_->messageRx.data[2]) + static_cast<int>(canPtr_->messageRx.data[3]));
 				BOOST_LOG(logger_) << "INF " << "Router::receiver: Mask calculated: " << mask;
 				for (const auto &mod : eqmObj_->modules_)
 				{
