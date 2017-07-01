@@ -23,6 +23,7 @@
 #include "EthernetIntrfaceConfigurator.hpp"
 #include "ModuleInitialConfigurator.hpp"
 #include "CAN.h"
+#include "ProtocolManager.h"
 
 class Router
 {
@@ -53,7 +54,7 @@ private:
 	EthernetIntrfaceConfigurator* ethIntConfigurator_;
 	ModuleInitialConfigurator* mIC_;
 	CAN * canPtr_;
-
+	ProtocolManager* protoManager_;
 	void startAutodetection();
 	void startComponentService();
 	void startComponent(std::string name, std::string address);

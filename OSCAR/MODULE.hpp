@@ -30,5 +30,15 @@ public:
 		enabled
 	};
 	EOperationalState operationalState;
+	enum class EProtocol
+	{
+		CInitialProtocol,
+		CSimpleMessage,
+		CExtendedMessage,
+		CAuthorizedProtocol,
+		CExtendedAuthorizedProtocol,
+		CBigDataProtocol
+	};
+	EProtocol protocol;
 };
 

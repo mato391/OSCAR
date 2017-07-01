@@ -154,6 +154,7 @@
     <ClInclude Include="BUTTON.hpp" />
     <ClInclude Include="CAN.h" />
     <ClInclude Include="CARD_PORT.hpp" />
+    <ClInclude Include="CMessage.hpp" />
     <ClInclude Include="commonGNDChecker.hpp" />
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="ComponentFactory.hpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="PEDAL.h" />
     <ClInclude Include="PORT.hpp" />
     <ClInclude Include="POWER_GROUP.hpp" />
+    <ClInclude Include="ProtocolManager.h" />
     <ClInclude Include="rcManager.hpp" />
     <ClInclude Include="REMOTE_CONTROLLER.hpp" />
     <ClInclude Include="RESULT.hpp" />
@@ -214,6 +216,7 @@
     <ClCompile Include="CAN.cpp" />
     <ClCompile Include="CARD_PORT.cpp" />
     <ClCompile Include="BDM.cpp" />
+    <ClCompile Include="CMessage.cpp" />
     <ClCompile Include="commonGNDChecker.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
@@ -249,6 +252,7 @@
     <ClCompile Include="PEDAL.cpp" />
     <ClCompile Include="PORT.cpp" />
     <ClCompile Include="POWER_GROUP.cpp" />
+    <ClCompile Include="ProtocolManager.cpp" />
     <ClCompile Include="rcManager.cpp" />
     <ClCompile Include="REMOTE_CONTROLLER.cpp" />
     <ClCompile Include="RESULT.cpp" />

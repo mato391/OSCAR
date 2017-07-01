@@ -234,6 +234,12 @@
     <ClInclude Include="HWSIMMODULE.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProtocolManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CMessage.hpp">
+      <Filter>Header Files\Router</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -408,6 +414,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HWSIMMODULE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProtocolManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CMessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

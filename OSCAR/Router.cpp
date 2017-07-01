@@ -9,7 +9,7 @@ Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) 
 	startAutodetection();
 	timeout_ = false;
 	canPtr_ = new CAN(100);
-
+	protoManager_ = new ProtocolManager();
 }
 
 
@@ -103,6 +103,11 @@ void Router::receiver(std::string data)
 		if (canPtr_->messageAvailable())
 		{
 			canPtr_->receiveMessage();
+			auto msg = protoManager_->createMessage(canPtr_->messageRx);
+			if (msg->protocol == CMESSAGE::CMessage::EProtocol::CInitialProtocol)
+			{
+
+			}
 			BOOST_LOG(logger_) << "INF "<< "Router::receiver: MESSAGE AVAILABLE from " << static_cast<int>(canPtr_->messageRx.data[0]);
 			
 			std::string message = canPtr_->convertToHexString();
