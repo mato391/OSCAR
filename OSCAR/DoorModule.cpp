@@ -23,6 +23,11 @@ void DoorModule::initialize()
 	getBDMModules();
 	prepareTopology();
 	displayTopology();
+	RESULT* res = new RESULT();
+	res->applicant = "DOOR_MODULE";
+	res->feedback = "Initialize";
+	res->status = RESULT::EStatus::success;
+	bdmModuleObj_->children.push_back(res);
 }
 
 void DoorModule::setup()
@@ -47,6 +52,8 @@ void DoorModule::setup()
 			}
 		}
 	}
+	bdmModuleObj_->protocol = MODULE::EProtocol::CSimpleMessage;
+	bdmModuleObj_->operationalState = MODULE::EOperationalState::enabled;
 	if (wrongSetupConnectors.size() == 0)
 	{
 		//should be result with status OK

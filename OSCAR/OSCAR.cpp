@@ -50,14 +50,14 @@ int main()
 	logging::add_common_attributes();
 	logging::record rec = lg.open_record();
 
-	BOOST_LOG(lg) << "INFO " << "Application started";
+	BOOST_LOG(lg) << "INFO " << "OSCAR: " << "Application started";
 
 	OAMConfigurator* oamConfigurator = new OAMConfigurator(lg);
 	auto cachePtr = oamConfigurator->getObjectCachePtr();
 	if (cachePtr == nullptr)
 		BOOST_LOG(lg) << "ERR " << "Cache is empty";
-	std::cout << "MAYBE" << std::endl;
 	Router* router = new Router(cachePtr, lg);
+	BOOST_LOG(lg) << "INF " << "OSCAR: -------------------SYSTEM STARTED---------------------";
 	router_thread(router, lg);
 	
     return 0;
@@ -65,6 +65,7 @@ int main()
 
 void router_thread(Router* router, src::logger_mt lg)
 {
+	BOOST_LOG(lg) << "INF " << "OSCAR: router listening";
 	for (;;)
 	{
 		//std::fstream file("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_recv.txt", std::ios::in);
@@ -79,6 +80,7 @@ void router_thread(Router* router, src::logger_mt lg)
 		//}
 		boost::this_thread::sleep(boost::posix_time::millisec(500));
 	}
+	BOOST_LOG(lg) << "ERR " << "OSCAR: router stoped listening";
 }
 
 bool checkSignalFile()

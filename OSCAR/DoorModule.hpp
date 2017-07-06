@@ -31,6 +31,7 @@ public:
 	void initialize();
 	void setup();
 	void changeConnectorState(std::string connectorId, std::string value);
+	int getModuleProtocol() { return static_cast<int>(bdmModuleObj_->protocol); }
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;

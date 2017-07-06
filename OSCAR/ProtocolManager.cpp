@@ -2,7 +2,7 @@
 #include "ProtocolManager.h"
 
 
-ProtocolManager::ProtocolManager()
+ProtocolManager::ProtocolManager(EQM* eqmPtr) : eqmPtr_(eqmPtr)
 {
 }
 
@@ -19,20 +19,23 @@ CMESSAGE::CMessage::EProtocol ProtocolManager::getProtocol(CAN::messageCAN messa
 CMESSAGE::CMessage* ProtocolManager::createMessage(CAN::messageCAN message)
 {
 	int proto = message.data[0];
+	std::cout << "ProtocolManager::createMessage " << proto << std::endl;
 	switch (proto)
 	{
 	case 0:
-		return static_cast<CMESSAGE::CMessage*>(&CMESSAGE::CInitialMessage(&message));
+		return new CMESSAGE::CInitialMessage(&message);
 	case 1:
-		return static_cast<CMESSAGE::CMessage*>(&CMESSAGE::CSimpleMessage(&message));
+		return new CMESSAGE::CSimpleMessage(&message);
 	case 2:
-		return static_cast<CMESSAGE::CMessage*>(&CMESSAGE::CExtendedMessage(&message));
+		return new CMESSAGE::CExtendedMessage(&message);
 	case 3:
-		return static_cast<CMESSAGE::CMessage*>(&CMESSAGE::CAuthorizedMessage(&message));
+		return new CMESSAGE::CAuthorizedMessage(&message);
 	case 4:
-		return static_cast<CMESSAGE::CMessage*>(&CMESSAGE::CExtendedAuthorizedMessage(&message));
+		return new CMESSAGE::CExtendedAuthorizedMessage(&message);
 	case 5:
-		return static_cast<CMESSAGE::CMessage*>(&(CMESSAGE::CBigDataMessage(&message)));
+		return new CMESSAGE::CBigDataMessage(&message);
+	default:
+		return nullptr;
 	}
 }
 
@@ -42,18 +45,29 @@ CAN::messageCAN ProtocolManager::createMessage(CMESSAGE::CMessage* message)
 	{
 	case CMESSAGE::CMessage::EProtocol::CInitialProtocol:
 		return prepareCANMessageForInitial(message);
+	case CMESSAGE::CMessage::EProtocol::CSimpleProtocol:
+		return prepareCANMessageForSimple(message);
 	}
 }
 
 CAN::messageCAN ProtocolManager::prepareCANMessageForInitial(CMESSAGE::CMessage* message)
 {
+	std::cout << "ProtocolManager::prepareCANMessageForInitial " << std::endl;
 	CMESSAGE::CInitialMessage* msg = static_cast<CMESSAGE::CInitialMessage*>(message);
 	CAN::messageCAN cMsg;
 	cMsg.id = std::stoi(msg->toDomain);
 	cMsg.data[0] = static_cast<int>(msg->protocol);
 	cMsg.data[1] = 100;
 	cMsg.data[2] = msg->header;
-	for (int i = 3; i < 8; i++)
+	if (msg->optional1 != 0)
+		cMsg.data[3] = msg->optional1;
+	else
+		cMsg.data[3] = 0;
+	if (msg->optional2 != 0)
+		cMsg.data[4] = msg->optional1;
+	else
+		cMsg.data[4] = 0;
+	for (int i = 5; i < 8; i++)
 		cMsg.data[i] = 0;
 	return cMsg;
 }
@@ -130,4 +144,16 @@ CAN::messageCAN ProtocolManager::prepareCANMessageForBigData(CMESSAGE::CMessage*
 	cMsg.data[6] = msg->data[2];
 	cMsg.data[7] = msg->data[3];
 	return cMsg;
+}
+
+CAN::messageCAN ProtocolManager::createProtocolNegotatorMessage(int protocol, std::string domain)
+{
+	CMESSAGE::CInitialMessage* initMsg = new CMESSAGE::CInitialMessage();
+	initMsg->protocol = CMESSAGE::CMessage::EProtocol::CInitialProtocol;
+	initMsg->toDomain = domain;
+	initMsg->fromDomain = 100;
+	initMsg->header = BC;
+	initMsg->optional1 = 0;
+	initMsg->optional2 = protocol;
+	return createMessage(initMsg);
 }

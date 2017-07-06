@@ -7,6 +7,10 @@
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>
 #include <boost\log\sources\logger.hpp>
+#include "RESULT.hpp"
+#include "CMessage.hpp"
+
+#define AA 170
 
 class Component
 {
@@ -25,9 +29,11 @@ public:
 	virtual void setCache(std::vector<Obj*>* cache) = 0;
 	virtual void setComponentsCache(std::vector<Component*>* componentCache) = 0;
 	virtual void execute(std::string message) = 0;
+	virtual CMESSAGE::CMessage* execute(CMESSAGE::CMessage* msg) = 0;
 	virtual void execute(INTER_MODULE_OPERATION* imo) = 0;
 	virtual void initialize() = 0;
 	virtual void setup(std::string domain) = 0;
+	virtual RESULT* setup(int domain) = 0;
 	
 	boost::log::sources::logger_mt logger_;
 	

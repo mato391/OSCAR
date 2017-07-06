@@ -2,8 +2,11 @@
 #include "HWFService.hpp"
 
 
-HWFService::HWFService(EQM* eqmObjPtr) : eqmObjPtr_(eqmObjPtr)
+HWFService::HWFService(EQM* eqmObjPtr, boost::log::sources::logger_mt logger) 
+	: eqmObjPtr_(eqmObjPtr),
+	logger_(logger)
 {
+	BOOST_LOG(logger) << "INF " << "HWFService ctor";
 	loadHwf();
 }
 
@@ -14,6 +17,7 @@ HWFService::~HWFService()
 
 void HWFService::loadHwf()
 {
+	BOOST_LOG(logger_) << "INF " << "HWFService::loadHwf: from: " << hwfPath_;
 	std::fstream hwfFile(hwfPath_, std::ios::in);
 	hwfFile >> hwfFileContent_;
 	hwfFile.close();
@@ -21,16 +25,17 @@ void HWFService::loadHwf()
 
 void HWFService::prepareTopology()
 {
-	
+	BOOST_LOG(logger_) << "INF " << "HWFService::prepareTopology";
 	std::vector<std::string> moduleRawData;
 	std::vector<Obj*> modules;
 	boost::split(moduleRawData, hwfFileContent_, boost::is_any_of(";"));
-	std::cout << "HWFService::prepareTopology: modulesSplitted: " << moduleRawData.size() << std::endl;
+	BOOST_LOG(logger_) << "INF " << "HWFService::prepareTopology: modulesSplitted: "
+		<< moduleRawData.size();
 	for (auto &module : moduleRawData)
 	{
 		if (module != "")
 		{
-			std::cout << "prepareTopology: " << module << std::endl;
+			BOOST_LOG(logger_) << "DBG " << "HWFService::prepareTopology: module: " << module;
 			auto moduleObj = createModule(module);
 			createModuleTopology(moduleObj, module);
 			modules.push_back(moduleObj);
@@ -42,19 +47,19 @@ void HWFService::prepareTopology()
 
 MODULE* HWFService::createModule(std::string data)
 {
-	std::cout << "HWFService::createModule: " << data << std::endl;
+	BOOST_LOG(logger_) << "DBG " << "HWFService::createModule: " << data;
 	std::vector<std::string> elementRawData;
 	boost::split(elementRawData, data, boost::is_any_of("|"));
 	std::vector<std::string> moduleInfRawData;
 	boost::split(moduleInfRawData, elementRawData[0], boost::is_any_of(":"));
 	std::vector<std::string> moduleInf;
-	std::cout << "HWFService::createModule: " << moduleInf.size() << std::endl;
+	//BOOST_LOG(logger_) << "DBG " << "HWFService::createModule: moduleInf.size: " << moduleInf.size();
 	boost::split(moduleInf, moduleInfRawData[1], boost::is_any_of(","));
 	MODULE* module = new MODULE();
 	module->serialNumber = moduleInf[0];
 	module->domain = moduleInf[1];
 	module->label = moduleInf[2];
-	std::cout << "HWFService::createModule: " << module->label << std::endl;
+	BOOST_LOG(logger_) << "DBG " << "HWFService::createModule: module->label:" << module->label << std::endl;
 	module->detectionStatus = MODULE::EDetectionStatus::offline;
 	return module;
 }
@@ -68,12 +73,12 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 	{
 		if ((*i).find("Connector:") != std::string::npos)
 		{
-			std::cout << "createModuleTopology in for: " << *i << std::endl;
+			BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology in for: " << *i;
 			std::vector<std::string> connectorRawData;
 			boost::split(connectorRawData, *i, boost::is_any_of(":"));
 			std::vector<std::string> connectorData;
 			boost::split(connectorData, connectorRawData[1], boost::is_any_of(","));
-			std::cout << "createModuleTopology: connectorData size: " << connectorData.size() << std::endl;
+			BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology connectorData.size: " << connectorData.size();
 			CONNECTOR* conn = new CONNECTOR(std::stoi(connectorData[0]));
 			conn->label = connectorData[1];
 			conn->used = true;
@@ -82,12 +87,12 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 		}
 		else if ((*i).find("Antenna") != std::string::npos)
 		{
-			std::cout << "createModuleTopology in for: " << *i << std::endl;
+			BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology in for: " << *i;
 			std::vector<std::string> connectorRawData;
 			boost::split(connectorRawData, *i, boost::is_any_of(":"));
 			std::vector<std::string> connectorData;
 			boost::split(connectorData, connectorRawData[1], boost::is_any_of(","));
-			std::cout << "createModuleTopology: connectorData size: " << connectorData.size() << std::endl;
+			BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology AntennaData.size: " << connectorData.size();
 			ANTENNA* antenna = new ANTENNA();
 			antenna->id = std::stoi(connectorData[0]);
 			antenna->label = connectorData[1];

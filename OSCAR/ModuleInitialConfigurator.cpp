@@ -2,9 +2,11 @@
 #include "ModuleInitialConfigurator.hpp"
 
 
-ModuleInitialConfigurator::ModuleInitialConfigurator(MODULE* mod) :
-	module_(mod)
+ModuleInitialConfigurator::ModuleInitialConfigurator(MODULE* mod, boost::log::sources::logger_mt logger) :
+	module_(mod),
+	logger_(logger)
 {
+	BOOST_LOG(logger) << "INF " << "ModuleInitialConfigurator ctor";
 	createBinaryMask();
 	setupConnectors();
 }
@@ -16,9 +18,9 @@ ModuleInitialConfigurator::~ModuleInitialConfigurator()
 
 void ModuleInitialConfigurator::createBinaryMask()
 {
-	std::cout << "ModuleInitialConfigurator::createBinaryMask: " << std::endl;
+	BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::createBinaryMask: for module: " << module_->domain << " dec: "
+		<< module_->mask<< std::endl;
 	binaryMask_ = std::bitset<16>(std::stoi(module_->mask));
-
 }
 
 int ModuleInitialConfigurator::convertToDec(std::string sign)
@@ -91,7 +93,7 @@ int ModuleInitialConfigurator::convertToDec(std::string sign)
 
 void ModuleInitialConfigurator::setupConnectors()
 {
-	std::cout << "Mask size is: " << module_->connectors_.size() << std::endl;
+	BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: Mask size is: " << module_->connectors_.size();
 	for (auto &connGr : module_->connectors_)
 	{
 		int i = 0;
@@ -99,7 +101,11 @@ void ModuleInitialConfigurator::setupConnectors()
 		{
 			auto connector = static_cast<CONNECTOR*>(conn);
 			connector->value = binaryMask_[i];	//crash here
-			std::cout << "CONNECTOR ID: " << i  << " Connector value: " << connector->value << std::endl;
+			BOOST_LOG(logger_) << "INF "
+				<< "ModuleInitialConfigurator::setupConnectors: CONNECTOR ID: "
+				<< i
+				<< " Connector value: "
+				<< connector->value;
 			i++;
 		}
 		

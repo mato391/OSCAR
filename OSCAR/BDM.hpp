@@ -9,8 +9,12 @@
 #include <boost\thread.hpp>
 #include "RESULT.hpp"
 #include "MODULE.hpp"
+#include "CMessage.hpp"
 #include <vector>
 
+#define OWNID 100
+#define DD 221
+#define EE 238
 
 
 class BDM : public Component
@@ -20,11 +24,13 @@ public:
 	~BDM();
 	void execute(std::string message);
 	void execute(INTER_MODULE_OPERATION* imo);
+	CMESSAGE::CMessage* execute(CMESSAGE::CMessage* msg);
 	void initialize();
 	void setCache(std::vector<Obj*>* cache) { cache_ = cache; }
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
 	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
-	void setup(std::string domain);
+	RESULT* setup(int domain);
+	void setup(std::string domain) {};
 	void unlockDoors();
 	void lockDoors();
 	void setConfiguringStateIfNeeded();
@@ -43,5 +49,7 @@ private:
 	void setConnector(std::string connId, std::string value);
 	void blinkersRun(int times, int interval);
 	void getResultAndSendToRouter(std::string moduleLabel);
+	CMESSAGE::CMessage* convertResultToCMessage(RESULT* res);
+	std::string getDomainFor(std::string label);
 };
 

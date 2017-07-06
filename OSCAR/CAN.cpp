@@ -13,11 +13,13 @@ CAN::~CAN()
 
 void CAN::sendMessage()
 {
+	std::cout << "_____________________________SENDING MESSAGE____________________________________" << std::endl;
 	std::fstream can_recv("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\CAN_recv.txt", std::ios::in);
 	std::string isEmpty;
 	can_recv >> isEmpty;
 	can_recv.close();
 	std::cout << "registerMessage::precondition: register is: " << isEmpty << " | " << isEmpty.size() << std::endl;
+	std::cout << "MESSAGE ID: " << messageTx.id << std::endl;
 	if (isEmpty.size() == 0)
 	{
 		std::bitset<8> id(static_cast<int>(messageTx.id));
@@ -40,6 +42,8 @@ void CAN::sendMessage()
 		boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
 		sendMessage();
 	}
+	std::cout << "___________________________________________________________________________________" << std::endl;
+	
 }
 
 bool CAN::messageAvailable()
@@ -67,8 +71,7 @@ bool CAN::messageAvailable()
 
 void CAN::receiveMessage()
 {
-	clear();
-	int id = 0;
+	unsigned int id = 0;
 	for (int i = 0; i < 8; i++)
 	{
 		id += std::stoi(buffer_.substr(i, 1)) * std::pow(2, (7 - i));
@@ -89,6 +92,7 @@ void CAN::receiveMessage()
 		std::cout << "Data[" << i - 1 << "] = " << tmp << std::endl;
 	}
 	buffer_ = "";
+	clear();
 }
 
 void CAN::clear()

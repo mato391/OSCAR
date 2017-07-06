@@ -25,6 +25,9 @@
 #include "CAN.h"
 #include "ProtocolManager.h"
 
+#define BB 187
+#define BC 188
+
 class Router
 {
 public:
@@ -55,12 +58,14 @@ private:
 	ModuleInitialConfigurator* mIC_;
 	CAN * canPtr_;
 	ProtocolManager* protoManager_;
+	std::string modLabel_;
+
 	void startAutodetection();
 	void startComponentService();
 	void startComponent(std::string name, std::string address);
 	void checkIfMMFExists();
 	void createEQM();
-	void setupModule(Obj* mod);
+	void setupModule(std::string domain, int mask);
 	void createConnectors(MODULE* mod);
 	void displayModulesTopology();
 	void setupTimer();

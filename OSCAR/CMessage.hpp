@@ -1,6 +1,7 @@
 #pragma once
 #include "CAN.h"
 #include <string>
+#include <iostream>
 
 namespace CMESSAGE
 {
@@ -27,15 +28,24 @@ namespace CMESSAGE
 		public CMessage
 	{
 	public:
+		CInitialMessage() {};
 		CInitialMessage(CAN::messageCAN* msg)
 		{
+			std::cout << "CInitialMessage: toDomain " << static_cast<int>(msg->id) << std::endl;
+			std::cout << "CInitialMessage: header: " << static_cast<int>(msg->data[2]) << std::endl;
+			
 			protocol = CMessage::EProtocol::CInitialProtocol;
 			std::stringstream hexa;
-			hexa << std::hex << msg->data[1];
-			fromDomain = hexa.str();
-			toDomain = msg->id;
-			header = msg->data[2];
+			hexa << std::hex << static_cast<int>(msg->data[1]);
+			std::cout << "CInitialMessage: fromDomain: " << hexa.str() << std::endl;
+			fromDomain = (hexa.str().size() == 1) ? "0x0" + hexa.str() : "0x"+hexa.str();
+			toDomain = std::to_string(static_cast<int>(msg->id));
+			header = static_cast<int>(msg->data[2]);
+			optional1 = msg->data[3];
+			optional2 = msg->data[4];
 		}
+		int optional1;
+		int optional2;
 		EProtocol getProtocol() { return protocol; }
 	};
 
@@ -48,9 +58,9 @@ namespace CMESSAGE
 			protocol = CMessage::EProtocol::CSimpleProtocol;
 			std::stringstream hexa;
 			hexa << std::hex << msg->data[1];
-			fromDomain = hexa.str();
-			toDomain = msg->id;
-			header = msg->data[2];
+			fromDomain = (hexa.str().size() == 1) ? "0x0" + hexa.str() : "0x" + hexa.str();
+			toDomain = std::to_string(static_cast<int>(msg->id));
+			header = static_cast<int>(msg->data[2]);
 			port = msg->data[3];
 			value = msg->data[4];
 		}

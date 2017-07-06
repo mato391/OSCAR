@@ -4,14 +4,15 @@
 
 Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) : logger_(logger)
 {
+	BOOST_LOG(logger) << "INF " << "Router ctor";
 	cache_ = cache;
+	modLabel_ = "";
 	mmfPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt";
 	startAutodetection();
 	timeout_ = false;
 	canPtr_ = new CAN(100);
-	protoManager_ = new ProtocolManager();
+	protoManager_ = new ProtocolManager(eqmObj_);
 }
-
 
 Router::~Router()
 {
@@ -24,17 +25,17 @@ std::vector<Obj*> Router::getModules()
 
 void Router::startAutodetection()
 {
+	BOOST_LOG(logger_) << "INF " << "Router::startAutodetection";
 	createEQM();
 	checkIfMMFExists();
 	if (!fabricStartup_)
 	{
-		hwfService_ = new HWFService(eqmObj_);
+		hwfService_ = new HWFService(eqmObj_, logger_);
 		hwfService_->prepareTopology();
 	}
 	startComponentService();
-	BOOST_LOG(logger_) << "INF " << "startAutodetection hwfTopologyDone. Waiting for hardware";
+	BOOST_LOG(logger_) << "INF " << "Router::startAutodetection hwfTopologyDone. Waiting for hardware";
 }
-
 
 void Router::startComponentService()
 {
@@ -48,7 +49,7 @@ void Router::startComponentService()
 		
 		BOOST_LOG(logger_) << "INFO " << "Router::StartComponentService: mmf: " << mmf_;
 		boost::split(mmfS_, mmf_, boost::is_any_of(";"));
-		BOOST_LOG(logger_) << "DEBUG " << "Router::StartComponentService: mmf size: " << mmfS_[0];
+		BOOST_LOG(logger_) << "DEBUG " << "Router::StartComponentService: mmf size: " << mmfS_.size();
 		for (const auto &line : mmfS_)
 		{
 			if (line != "")
@@ -69,17 +70,18 @@ void Router::startComponentService()
 
 void Router::createEQM()
 {
+	BOOST_LOG(logger_) << "DBG " << "Router::createEQM";
 	eqmObj_ = new EQM();
 	cache_->push_back(eqmObj_);
 }
 
 void Router::startComponent(std::string name, std::string address)
 {
-	BOOST_LOG(logger_) << "INF " << "startComponent " << name << " " << address;
+	BOOST_LOG(logger_) << "INF " << "Router::startComponent: name " << name << " address: " << address;
 	bool exist = false;
 	for (auto &component : components_)
 	{
-		//BOOST_LOG(logger_) << "DBG " << " startComponent found: " << component->name;
+		BOOST_LOG(logger_) << "DBG " << " Router::startComponent: found: " << component->name;
 		if (name.find(component->name) != std::string::npos)
 		{
 			exist = true;
@@ -88,11 +90,12 @@ void Router::startComponent(std::string name, std::string address)
 	}
 	if (!exist)
 	{
+		BOOST_LOG(logger_) << "INF " << "Router::startComponent: new component should be started " << name << " address: " << address;
 		components_.push_back(ComponentFactory::createComponent(name, address, logger_));
 		components_.back()->setCache(cache_);
 		components_.back()->setComponentsCache(&components_);
 		components_.back()->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
-		//components_.back()->initialize();
+		components_.back()->initialize();
 	}
 }
 
@@ -104,84 +107,50 @@ void Router::receiver(std::string data)
 		{
 			canPtr_->receiveMessage();
 			auto msg = protoManager_->createMessage(canPtr_->messageRx);
-			if (msg->protocol == CMESSAGE::CMessage::EProtocol::CInitialProtocol)
-			{
 
-			}
-			BOOST_LOG(logger_) << "INF "<< "Router::receiver: MESSAGE AVAILABLE from " << static_cast<int>(canPtr_->messageRx.data[0]);
-			
-			std::string message = canPtr_->convertToHexString();
-			BOOST_LOG(logger_) << "INF " << "Router::receiver: " << message;
-
-			std::string domain = std::to_string(canPtr_->messageRx.data[0]);
-			std::cout << "Router::receiver: message from domain: " << domain << std::endl;
-			if (domain.size() == 1)
-				domain = "0x0" + domain;
-			else
-				domain = "0x" + domain;
-			std::string modLabel = "";
+			//std::cout << "Router::receiver: message from domain: " << domain << std::endl;
+			BOOST_LOG(logger_) << "INF " << "Router::receiver: msg available from: " << msg->fromDomain
+				<< ", for: " << msg->toDomain << ", hdr " << msg->header << ", proto: " << static_cast<int>(msg->protocol);
 			//BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
-			if (canPtr_->messageRx.data[1] == 187)
+			if (msg->header == BB)
 			{
+				auto initMsg = static_cast<CMESSAGE::CInitialMessage*>(msg);
 				BOOST_LOG(logger_) << "INF " << "Router::receiver: setup message has been received";
-				std::string mask = "";
-				mask = std::to_string(static_cast<int>(canPtr_->messageRx.data[2]) + static_cast<int>(canPtr_->messageRx.data[3]));
-				BOOST_LOG(logger_) << "INF " << "Router::receiver: Mask calculated: " << mask;
+				setupModule(initMsg->fromDomain, initMsg->optional1 + initMsg->optional2);
+				return;
+			}
+			if (modLabel_ == "")
+			{
 				for (const auto &mod : eqmObj_->modules_)
 				{
 					auto module = static_cast<MODULE*>(mod);
-					if (module->domain == domain)
+					if (module->domain == msg->fromDomain)
 					{
-						module->mask = mask;
-						mIC_ = new ModuleInitialConfigurator(module);
-						for (const auto &mod : eqmObj_->modules_)
-						{
-							auto module = static_cast<MODULE*>(mod);
-							if (module->domain == domain)
-								modLabel = module->label;
-						}
-						BOOST_LOG(logger_) << "DBG " << "Router::receiver modLabel: " << modLabel;
-						for (const auto &component : components_)
-						{
-							BOOST_LOG(logger_) << "DBG " << "Router::receiver component: " << component->name;
-							if (modLabel != "" && modLabel.find(component->name) != std::string::npos)
-							{
-								component->setup(domain);
-							}
-						}
-						return;
+						modLabel_ = module->label;
+						break;
 					}
 				}
 			}
-			for (const auto &mod : eqmObj_->modules_)
-			{
-				auto module = static_cast<MODULE*>(mod);
-				if (module->domain == domain)
-					modLabel = module->label;
-			}
 			for (const auto &component : components_)
 			{
-				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: " << component->name;
+				BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: " << component->name;
 				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component configuringState: " << static_cast<int>(component->configuringState);
 				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: domain " << component->domain;
-				if (modLabel != "" && modLabel.find(component->name) != std::string::npos)
+				if (modLabel_ != "" && modLabel_.find(component->name) != std::string::npos)
 				{
-					BOOST_LOG(logger_) << "INFO " << "Router::receiver: transferring message to " << component->name;
-					component->execute(message);
-					canPtr_->messageTx.id = canPtr_->messageRx.data[0];
-					canPtr_->messageTx.data[0] = canPtr_->messageRx.id;
-					canPtr_->messageTx.data[1] = canPtr_->messageRx.data[1];
-					canPtr_->messageTx.data[2] = canPtr_->messageRx.data[2];
-					canPtr_->messageTx.data[3] = canPtr_->messageRx.data[3];
-					canPtr_->messageTx.data[4] = canPtr_->messageRx.data[4];
-					canPtr_->messageTx.data[5] = canPtr_->messageRx.data[5];
-					canPtr_->messageTx.data[6] = canPtr_->messageRx.data[6];
-					canPtr_->messageTx.data[7] = canPtr_->messageRx.data[7];
-					canPtr_->sendMessage();
-					break;
+					auto result = component->execute(msg);
+					if (result != nullptr)
+					{
+						BOOST_LOG(logger_) << "INF " << "Router::receiver: transferring message to " << component->name;
+						canPtr_->messageTx = protoManager_->createMessage(result);
+						canPtr_->sendMessage();
+						return;
+					}
+					else
+						BOOST_LOG(logger_) << "ERR " << "Router::receiver: No result found";
 				}
-
-				BOOST_LOG(logger_) << "INFO " << "Router::receiver: No component found";
+				else
+					BOOST_LOG(logger_) << "ERR " << "Router::receiver: No component found" << modLabel_;
 			}
 		}
 	}
@@ -225,16 +194,18 @@ void Router::sender(std::string data)
 
 void Router::checkIfMMFExists()
 {
+	BOOST_LOG(logger_) << "INF " << "Router::checkIfMMFExists";
 	if (boost::filesystem::exists(mmfPath_))
 	{
 		fabricStartup_ = false;
 		eqmObj_->configuringState = EQM::EConfiguringState::naked;
-		return;
+		BOOST_LOG(logger_) << "INF " << "Router::checkIfMMFExists: fabricStartup_: false";
 	}
 	else
 	{
 		eqmObj_->configuringState = EQM::EConfiguringState::configured;
 		fabricStartup_ = true;
+		BOOST_LOG(logger_) << "INF " << "Router::checkIfMMFExists: fabricStartup_: true";
 	}
 }
 
@@ -295,24 +266,49 @@ void Router::displayModulesTopology()
 	}
 }
 
-void Router::setupModule(Obj* mod)
+void Router::setupModule(std::string domain, int mask)
 {
-	auto module = static_cast<MODULE*>(mod);
-	int group = module->mask.size() / 2;
-	std::vector<int> masks;
-	for (int i = 0; i < group; i++)
+	BOOST_LOG(logger_) << "INF " << "Router::setupModule: " << domain << " mask: " << mask;
+	for (const auto &mod : eqmObj_->modules_)
 	{
-		masks.push_back(std::stoi(module->mask.substr(i * 2, 2)));
-	}
-	for (int i = 0; i < masks.size(); i++)
-	{
-		BOOST_LOG(logger_) << "DBG " << "Router::setupModule: mask: " << i << " " << masks[i];
-		for (int j = 0; j < masks[i]; j++)
+		auto module = static_cast<MODULE*>(mod);
+		if (module->domain == domain)
 		{
-			static_cast<CONNECTOR*>(module->connectors_[i][j])->used = true;
+			//BOOST_LOG(logger_) << "DBG " << domain << " is wanted. " << module->domain << " found";
+			module->mask = std::to_string(mask);
+			//BOOST_LOG(logger_) << "DBG " << module->mask;
+			mIC_ = new ModuleInitialConfigurator(module, logger_);
+			for (const auto &mod : eqmObj_->modules_)
+			{
+				auto module = static_cast<MODULE*>(mod);
+				if (module->domain == domain)
+					modLabel_ = module->label;
+			}
+			//BOOST_LOG(logger_) << "DBG " << "Router::receiver modLabel: " << modLabel_;
+			for (const auto &component : components_)
+			{
+				BOOST_LOG(logger_) << "DBG " << "Router::setupModule component: " << component->name;
+				if (modLabel_ != "" && modLabel_.find(component->name) != std::string::npos)
+				{
+					int idomain = std::stoi(module->domain.substr(2, 2));
+					auto result = component->setup(idomain);
+					BOOST_LOG(logger_) << "INF " << "Router::setupModule: Component setup "
+						<< component->name << " done, with status: "
+						<< static_cast<int>(result->status) << " | domain: " << idomain;
+					if (result->status == RESULT::EStatus::success)
+					{
+						BOOST_LOG(logger_) << "INF " << "Router::setupModule: " << "Sending Protocol setup message";
+						canPtr_->messageTx = protoManager_->createProtocolNegotatorMessage(std::stoi(result->feedback), std::to_string(idomain));
+						canPtr_->sendMessage();
+						BOOST_LOG(logger_) << "INF " << "Router::setupModule: Message sent";
+						//assert(1 != 1);
+					}
+				}
+			}
+			BOOST_LOG(logger_) << "INF " << "Router::setupModule: done";
+			return;
 		}
 	}
-	displayModulesTopology();
 }
 
 void Router::createMMFFromEQM()

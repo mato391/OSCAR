@@ -9,25 +9,114 @@ BDM::BDM(std::string domain, boost::log::sources::logger_mt logger)
 	BOOST_LOG(logger_) << "DEBUG " << "BDM ctor";
 	this->domain = domain;
 	name = "BDM";
-	
 }
 
 BDM::~BDM()
 {
 }
 
-void BDM::setup(std::string domain)
+RESULT* BDM::setup(int domain)
 {
 	BOOST_LOG(logger_) << "INF " << "BDM::setup: " << domain;
-	if (domain == "0x05")
+	std::string sdomain = (domain < 10 ) ? "0x0"+std::to_string(domain) : "0x" + std::to_string(domain);
+	if (sdomain == "0x05")
 	{
 		doorModule_->setup();
+		RESULT* result = new RESULT();
+		result->applicant = "BDM";
+		result->feedback = std::to_string(doorModule_->getModuleProtocol());
+		result->status = RESULT::EStatus::success;
+		return result;
+
 	}
-	else if (domain == "0x06")
+	else if (sdomain == "0x06")
 	{
 		lightModule_->setup();
+		RESULT* result = new RESULT();
+		result->applicant = "BDM";
+		result->feedback = std::to_string(doorModule_->getModuleProtocol());
+		result->status = RESULT::EStatus::success;
+		return result;
 	}
+	return nullptr;
 	//getResultAndSendToRouter();
+}
+
+CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
+{
+	BOOST_LOG(logger_) << "INF " << "BDM::execute " << msg;
+	RESULT* res;
+	CMESSAGE::CMessage* messg = nullptr;
+	std::string domain =  msg->fromDomain;
+	getBDMObjectIfNeeded();
+	if (msg->getProtocol() == CMESSAGE::CMessage::EProtocol::CInitialProtocol
+		&& msg->header == AA)
+	{
+		BOOST_LOG(logger_) << "INF " << "BDM::execute: " 
+			<< "initial message detected from domain " 
+			<< domain
+			<< " bdmModules size: "
+			<< bdmModules_.size();
+		std::string moduleLabel;
+		for (auto &module : bdmModules_)
+		{
+			BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << module.second->domain << " has been found";
+			if (module.second->domain == domain)
+			{
+				module.second->detectionStatus = MODULE::EDetectionStatus::online;
+				moduleLabel = module.first;
+				BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << moduleLabel << " has been set";
+				break;
+			}
+		}
+		CMESSAGE::CInitialMessage* mesg = new CMESSAGE::CInitialMessage();
+		mesg->header = AA;
+		mesg->protocol = CMESSAGE::CMessage::EProtocol::CInitialProtocol;
+		mesg->fromDomain = OWNID;
+		mesg->toDomain = domain.substr(2, 2);
+		mesg->optional1 = 0;
+		mesg->optional2 = 0;
+		return mesg;
+	}
+	else if (msg->getProtocol() == CMESSAGE::CMessage::EProtocol::CSimpleProtocol)
+	{
+		BOOST_LOG(logger_) << "INF " << "CSimpleProtocol";
+	}
+	return nullptr;
+}
+
+CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
+{
+	if (res->applicant == "DOOR_MODULE")
+	{
+		CMESSAGE::CInitialMessage* msg = new CMESSAGE::CInitialMessage();
+		std::string tmpdomain = getDomainFor("BDM_DOOR");
+		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
+		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
+		
+		msg->fromDomain = OWNID;
+		if (res->feedback == "Initialize")
+		{
+			msg->header = AA;
+			msg->optional1 = 0;
+			msg->optional2 = 0;
+			msg->protocol = CMESSAGE::CMessage::EProtocol::CInitialProtocol;
+			return msg;
+		}
+	}
+	
+}
+
+std::string BDM::getDomainFor(std::string label)
+{
+	for (const auto &mod : bdmModules_)
+	{
+		if (mod.second->label == label)
+		{
+			return mod.second->domain;
+		}
+	}
+	return "";
 }
 
 void BDM::execute(std::string message)
@@ -155,6 +244,7 @@ void BDM::lockDoors()
 
 void BDM::initialize()
 {
+	doorModule_ = new DoorModule(cache_, logger_);
 	doorModule_->initialize();
 	lightModule_ = new LightModule(cache_, logger_);
 	lightModule_->initialize();
