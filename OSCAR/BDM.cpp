@@ -80,6 +80,15 @@ CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
 	}
 	else if (msg->getProtocol() == CMESSAGE::CMessage::EProtocol::CSimpleProtocol)
 	{
+		auto messg = static_cast<CMESSAGE::CSimpleMessage*>(msg);
+		if (messg->fromDomain == "0x05" && messg->header == 204)
+		{
+			doorModule_->changeConnectorState(std::to_string(messg->port), std::to_string(messg->value));
+			return new CMESSAGE::CEmpty();
+	
+		}
+			
+
 		BOOST_LOG(logger_) << "INF " << "CSimpleProtocol";
 	}
 	return nullptr;

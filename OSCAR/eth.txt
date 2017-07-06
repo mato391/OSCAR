@@ -58,7 +58,7 @@ Wireless LAN adapter Wireless Network Connection 4:
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Lease Obtained. . . . . . . . . . : Thursday, July 06, 2017 4:15:05 PM
-   Lease Expires . . . . . . . . . . : Friday, July 07, 2017 5:28:00 PM
+   Lease Expires . . . . . . . . . . : Friday, July 07, 2017 8:07:22 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283

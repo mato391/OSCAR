@@ -119,16 +119,13 @@ void Router::receiver(std::string data)
 				setupModule(initMsg->fromDomain, initMsg->optional1 + initMsg->optional2);
 				return;
 			}
-			if (modLabel_ == "")
+			for (const auto &mod : eqmObj_->modules_)
 			{
-				for (const auto &mod : eqmObj_->modules_)
+				auto module = static_cast<MODULE*>(mod);
+				if (module->domain == msg->fromDomain)
 				{
-					auto module = static_cast<MODULE*>(mod);
-					if (module->domain == msg->fromDomain)
-					{
-						modLabel_ = module->label;
-						break;
-					}
+					modLabel_ = module->label;
+					break;
 				}
 			}
 			for (const auto &component : components_)
@@ -136,22 +133,26 @@ void Router::receiver(std::string data)
 				BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: " << component->name;
 				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component configuringState: " << static_cast<int>(component->configuringState);
 				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: domain " << component->domain;
+				BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component to find: " << modLabel_;
 				if (modLabel_ != "" && modLabel_.find(component->name) != std::string::npos)
 				{
 					auto result = component->execute(msg);
-					if (result != nullptr)
+					if (result != nullptr && result->getProtocol() != CMESSAGE::CMessage::EProtocol::CEmpty)
 					{
 						BOOST_LOG(logger_) << "INF " << "Router::receiver: transferring message to " << component->name;
 						canPtr_->messageTx = protoManager_->createMessage(result);
 						canPtr_->sendMessage();
 						return;
 					}
+					else if (result != nullptr && result->getProtocol() == CMESSAGE::CMessage::EProtocol::CEmpty)
+					{
+						BOOST_LOG(logger_) << "ERR " << "Router::receiver: Resutl has been found - CEmpty: not require response";
+					}
 					else
 						BOOST_LOG(logger_) << "ERR " << "Router::receiver: No result found";
 				}
-				else
-					BOOST_LOG(logger_) << "ERR " << "Router::receiver: No component found" << modLabel_;
 			}
+			BOOST_LOG(logger_) << "ERR " << "Router::receiver: No component found" << modLabel_;
 		}
 	}
 }

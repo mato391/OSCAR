@@ -15,7 +15,8 @@ namespace CMESSAGE
 			CExtendedProtocol,
 			CAuthorizedProtocol,
 			CExtendedAuthorizedProtocol,
-			CBigDataProtocol
+			CBigDataProtocol,
+			CEmpty
 		};
 		EProtocol protocol;
 		std::string fromDomain;
@@ -57,7 +58,7 @@ namespace CMESSAGE
 		{
 			protocol = CMessage::EProtocol::CSimpleProtocol;
 			std::stringstream hexa;
-			hexa << std::hex << msg->data[1];
+			hexa << std::hex << static_cast<int>(msg->data[1]);
 			fromDomain = (hexa.str().size() == 1) ? "0x0" + hexa.str() : "0x" + hexa.str();
 			toDomain = std::to_string(static_cast<int>(msg->id));
 			header = static_cast<int>(msg->data[2]);
@@ -155,6 +156,17 @@ namespace CMESSAGE
 		};
 		int wordSize;
 		std::vector<int> data;
+		EProtocol getProtocol() { return protocol; }
+	};
+
+	class CEmpty :
+		public CMessage
+	{
+	public:
+		CEmpty()
+		{
+			protocol = CMessage::EProtocol::CEmpty;
+		};
 		EProtocol getProtocol() { return protocol; }
 	};
 
