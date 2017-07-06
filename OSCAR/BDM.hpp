@@ -51,5 +51,6 @@ private:
 	void getResultAndSendToRouter(std::string moduleLabel);
 	CMESSAGE::CMessage* convertResultToCMessage(RESULT* res);
 	std::string getDomainFor(std::string label);
+	void action(boost::optional<std::string> impuls);
 };
 

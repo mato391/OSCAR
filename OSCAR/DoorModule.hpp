@@ -16,6 +16,7 @@
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>
 #include <boost\log\sources\logger.hpp>
+#include <boost\optional.hpp>
 
 class DoorModule 
 {
@@ -30,7 +31,7 @@ public:
 	void unlockWindow();
 	void initialize();
 	void setup();
-	void changeConnectorState(std::string connectorId, std::string value);
+	boost::optional<std::string> changeConnectorState(std::string connectorId, std::string value);
 	int getModuleProtocol() { return static_cast<int>(bdmModuleObj_->protocol); }
 private:
 	boost::log::sources::logger_mt logger_;

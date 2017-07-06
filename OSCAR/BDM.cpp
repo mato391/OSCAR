@@ -83,15 +83,23 @@ CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
 		auto messg = static_cast<CMESSAGE::CSimpleMessage*>(msg);
 		if (messg->fromDomain == "0x05" && messg->header == 204)
 		{
-			doorModule_->changeConnectorState(std::to_string(messg->port), std::to_string(messg->value));
+			auto reaction = doorModule_->changeConnectorState(std::to_string(messg->port), std::to_string(messg->value));
+			action(reaction);
 			return new CMESSAGE::CEmpty();
-	
 		}
 			
 
 		BOOST_LOG(logger_) << "INF " << "CSimpleProtocol";
 	}
 	return nullptr;
+}
+
+void BDM::action(boost::optional<std::string> impuls)
+{
+	if (impuls.value_or("") == "UNLOCK_DOORS")
+	{
+		lightModule_->blink(2);
+	}
 }
 
 CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)

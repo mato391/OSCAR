@@ -417,7 +417,7 @@ void DoorModule::unlockWindow()
 	}
 }
 
-void DoorModule::changeConnectorState(std::string connectorId, std::string value)
+boost::optional<std::string> DoorModule::changeConnectorState(std::string connectorId, std::string value)
 {
 	BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState";
 	for (const auto &door : doorsObj_->container_)
@@ -432,7 +432,7 @@ void DoorModule::changeConnectorState(std::string connectorId, std::string value
 						<< " on port" << port->label << " connector ID: " << conn->id << " to value " << std::stoi(value);
 					door->changeConnectorState(std::stoi(connectorId), std::stoi(value));
 					changeDOORSOpeningStateIfNeeded(std::stoi(value));
-					return;
+					return boost::none;
 				}
 					
 
@@ -443,9 +443,9 @@ void DoorModule::changeConnectorState(std::string connectorId, std::string value
 	{
 		if (conn->id == std::stoi(connectorId))
 		{
-			BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: GND connector " << conn->id;
+			BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: GND connector " << conn->id << " to value " << value;
 			doorsObj_->setLockingState(std::stoi(value));
-
+			return (std::stoi(value) == 0) ? "LOCK_DOORS" : "UNLOCK_DOORS";
 		}
 	}
 }
