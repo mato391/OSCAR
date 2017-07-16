@@ -78,7 +78,7 @@ void router_thread(Router* router, src::logger_mt lg)
 		//	BOOST_LOG(lg) << "INFO " << "CAN received signal: " << content;
 			router->receiver("");
 		//}
-		boost::this_thread::sleep(boost::posix_time::millisec(500));
+		boost::this_thread::sleep(boost::posix_time::millisec(100));
 	}
 	BOOST_LOG(lg) << "ERR " << "OSCAR: router stoped listening";
 }

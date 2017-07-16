@@ -119,13 +119,14 @@ void BDM::doTasks()
 			BOOST_LOG(logger_) << "BDM::doTasks : creating LIGHT_GOODBYE_TASK";
 			lightMod->tasks.push_back(new LIGHT_GOODBYE_TASK());
 		}
-		lightModule_->handleTask();
+		
 	}
 	if (lightMod->tasks.empty())
 	{
 		BOOST_LOG(logger_) << "INF " << "BDM::doTasks : lightMod has no task :(";
 		return;
 	}
+	lightModule_->handleTask();
 	if (lightMod->tasks.size() > 0)
 	{
 		auto result = lightMod->tasks[0]->getResult();

@@ -82,22 +82,52 @@ void LightModule::handleTask()
 {
 	if (!bdmModuleObj_->tasks.empty())
 	{
+		bdmModuleObj_->tasks[0]->result = new RESULT();
+		bdmModuleObj_->tasks[0]->result->applicant = "LIGHT_MODULE";
 		if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::LIGHT_WELCOMING_TASK)
 		{
 			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_WELCOMING_TASK";
-			bdmModuleObj_->tasks[0]->result = new RESULT();
-			bdmModuleObj_->tasks[0]->result->applicant = "LIGHT_MODULE";
-			bdmModuleObj_->tasks[0]->result->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "5002";
+			
+			bdmModuleObj_->tasks[0]->result->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "15";
 			bdmModuleObj_->tasks[0]->result->status = RESULT::EStatus::success;
 			bdmModuleObj_->tasks[0]->result->type = RESULT::EType::executive;
 		}
 		else if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::LIGHT_GOODBYE_TASK)
 		{
 			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_GOODBYE_TASK";
+			bdmModuleObj_->tasks[0]->result->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "25";
+			bdmModuleObj_->tasks[0]->result->status = RESULT::EStatus::success;
+			bdmModuleObj_->tasks[0]->result->type = RESULT::EType::executive;
+		}
+		else if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
+		{
+			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: CHANGE_CONNECTOR_STATE_TASK";
+			changeConnectorStateHandler(static_cast<CHANGE_CONNECTOR_STATE_TASK*>(bdmModuleObj_->tasks[0]));
 		}
 	}
 	else
 		BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: no task to handle";
+}
+
+void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
+{
+	BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler";
+	std::string pgLabel;
+	for (auto &pg : lightes_->powerGroups_)
+	{
+		if (pg->commonGND->id == task->port)
+		{
+			pg->commonGND->value = task->value;
+			pgLabel = pg->label;
+			break;
+		}
+	}
+	if (pgLabel.find("BLINKER") != std::string::npos)
+	{
+		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers has been changed to: " << task->value;
+	}
+	else
+		BOOST_LOG(logger_) << "ERR " << "LightModule::changeConnectorStateHandler: No pg found :(";
 }
 
 void LightModule::getCP()
@@ -266,8 +296,6 @@ void LightModule::createLightObjs()
 	displayTopology();
 }
 
-
-
 LIGHT* LightModule::lightFactory(std::string label, LIGHT::EType type)
 {
 	LIGHT* light = new LIGHT();
@@ -307,7 +335,6 @@ std::string LightModule::getCommonGndConnectorId(std::string label)
 	}
 			
 }
-
 
 void LightModule::displayTopology()
 {

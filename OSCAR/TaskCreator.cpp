@@ -25,6 +25,12 @@ void TaskCreator::convertAndPushTask(CMESSAGE::CMessage* msg)
 		modTask = new CHANGE_CONNECTOR_STATE_TASK(sMsg->port, sMsg->value);
 		BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : creating CHANGE_CONNECTOR_STATE_TASK with values " << sMsg->port << ", " << sMsg->value;
 	}
+	else if (msg->protocol == CMESSAGE::CMessage::EProtocol::CExtendedProtocol)
+	{
+		CMESSAGE::CSimpleMessage * sMsg = static_cast<CMESSAGE::CSimpleMessage*>(msg);
+		modTask = new CHANGE_CONNECTOR_STATE_TASK(sMsg->port, sMsg->value);
+		BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : creating CHANGE_CONNECTOR_STATE_TASK with values " << sMsg->port << ", " << sMsg->value;
+	}
 	for (auto &module : *bdmModules_)
 	{
 		if (module.second->domain == msg->fromDomain)

@@ -12,6 +12,7 @@
 #include "POWER_GROUP.hpp"
 #include "RESULT.hpp"
 #include "MODULE_TASK.hpp"
+#include "CHANGE_CONNECTOR_STATE_TASK.h"
 
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
@@ -50,6 +51,7 @@ private:
 	void displayTopology();
 	std::vector<CONNECTOR*> conns;
 	std::string getCommonGndConnectorId(std::string label);
+	void changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task);
 	
 	
 };
