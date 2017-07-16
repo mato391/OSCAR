@@ -51,5 +51,7 @@ private:
 	bool checkDoesDoorExist(std::string label);
 	void changeDOORSOpeningStateIfNeeded(int value);
 	void runTask(MODULE_TASK* task);
+	void onOpen();
+	void onClose();
 };
 

@@ -169,10 +169,10 @@
     <ClInclude Include="EthernetIntrfaceConfigurator.hpp" />
     <ClInclude Include="HWFService.hpp" />
     <ClInclude Include="HWPlannerService.hpp" />
-    <ClInclude Include="HWSIMMODULE.hpp" />
-    <ClInclude Include="HwSimulator.hpp" />
+    <ClInclude Include="IDM.hpp" />
     <ClInclude Include="INTER_MODULE_OPERATION.h" />
     <ClInclude Include="LIGHTES.hpp" />
+    <ClInclude Include="LightingModule.hpp" />
     <ClInclude Include="LightModule.h" />
     <ClInclude Include="LIGHT_GOODBYE_TASK.h" />
     <ClInclude Include="LIGHT_WELCOMING_TASK.h" />
@@ -236,10 +236,10 @@
     <ClCompile Include="HANGE_CONNECTOR_STATE_TASK.cpp" />
     <ClCompile Include="HWFService.cpp" />
     <ClCompile Include="HWPlannerService.cpp" />
-    <ClCompile Include="HWSIMMODULE.cpp" />
-    <ClCompile Include="HwSimulator.cpp" />
+    <ClCompile Include="IDM.cpp" />
     <ClCompile Include="INTER_MODULE_OPERATION.cpp" />
     <ClCompile Include="LIGHTES.cpp" />
+    <ClCompile Include="LightingModule.cpp" />
     <ClCompile Include="LightModule.cpp" />
     <ClCompile Include="LIGHT_GOODBYE_TASK.cpp" />
     <ClCompile Include="LIGHT_WELCOMING_TASK.cpp" />

@@ -406,7 +406,19 @@ void DoorModule::changeDOORSOpeningStateIfNeeded(int value)
 			diff = true;
 	}
 	if (!diff && doorsObj_->openingState != static_cast<DOORS::EOpeningState>(value))
+	{
 		doorsObj_->openingState = static_cast<DOORS::EOpeningState>(value);
+		onOpen();
+	}
+}
+
+void DoorModule::onOpen()
+{
+
+}
+
+void DoorModule::onClose()
+{
 
 }
 

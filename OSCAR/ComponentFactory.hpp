@@ -11,6 +11,7 @@
 #include "UCM.hpp"
 #include "EDM.hpp"
 #include "UIA.hpp"
+#include "IDM.hpp"
 
 class ComponentFactory
 {

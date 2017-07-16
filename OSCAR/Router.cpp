@@ -242,7 +242,7 @@ void Router::setupModule(std::string domain, int mask)
 					BOOST_LOG(logger_) << "INF " << "Router::setupModule: Component setup "
 						<< component->name << " done, with status: "
 						<< static_cast<int>(result->status) << " | domain: " << idomain;
-					if (result->status == RESULT::EStatus::success)
+					if (result != nullptr && result->status == RESULT::EStatus::success)
 					{
 						BOOST_LOG(logger_) << "INF " << "Router::setupModule: " << "Sending Protocol setup message";
 						canPtr_->messageTx = protoManager_->createProtocolNegotatorMessage(std::stoi(result->feedback), std::to_string(idomain));

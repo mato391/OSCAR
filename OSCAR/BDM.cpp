@@ -119,6 +119,14 @@ void BDM::doTasks()
 			BOOST_LOG(logger_) << "BDM::doTasks : creating LIGHT_GOODBYE_TASK";
 			lightMod->tasks.push_back(new LIGHT_GOODBYE_TASK());
 		}
+		else if (taskResult->feedback == "OPENED_DOORS")
+		{
+			BOOST_LOG(logger_) << "BDM::doTasks : onOpened. Shoudl be INTER_MODULE_OPERATION called on IDM";
+		}
+		else if (taskResult->feedback == "CLOSED_DOORS")
+		{
+			BOOST_LOG(logger_) << "BDM::doTasks : onClose. Shoudl be INTER_MODULE_OPERATION called on IDM";
+		}
 		
 	}
 	if (lightMod->tasks.empty())

@@ -55,6 +55,12 @@
     <Filter Include="Source Files\Router">
       <UniqueIdentifier>{4dc6e087-0ad7-4cf2-b158-0da9fb0b1638}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\IDM">
+      <UniqueIdentifier>{9260dcd6-2590-4dc8-8a01-508c8f6eca2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IDM">
+      <UniqueIdentifier>{5165840e-7423-4f86-b382-590e0fd7b942}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -219,26 +225,14 @@
     <ClInclude Include="ModuleInitialConfigurator.hpp">
       <Filter>Header Files\Router</Filter>
     </ClInclude>
-    <ClInclude Include="commonGNDChecker.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CAN.h">
       <Filter>Header Files\Router</Filter>
-    </ClInclude>
-    <ClInclude Include="HwSimulator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HWSIMMODULE.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CMessage.hpp">
       <Filter>Header Files\Router</Filter>
     </ClInclude>
     <ClInclude Include="ProtocolManager.h">
       <Filter>Header Files\Router</Filter>
-    </ClInclude>
-    <ClInclude Include="TaskCreator.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MODULE_TASK.hpp">
       <Filter>Header Files\Objects</Filter>
@@ -254,6 +248,18 @@
     </ClInclude>
     <ClInclude Include="POWER_GROUP.hpp">
       <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="commonGNDChecker.hpp">
+      <Filter>Header Files\BDM</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskCreator.hpp">
+      <Filter>Header Files\BDM</Filter>
+    </ClInclude>
+    <ClInclude Include="IDM.hpp">
+      <Filter>Header Files\IDM</Filter>
+    </ClInclude>
+    <ClInclude Include="LightingModule.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -410,20 +416,8 @@
     <ClCompile Include="ModuleInitialConfigurator.cpp">
       <Filter>Source Files\Router</Filter>
     </ClCompile>
-    <ClCompile Include="commonGNDChecker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CAN.cpp">
       <Filter>Source Files\Router</Filter>
-    </ClCompile>
-    <ClCompile Include="HwSimulator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HWSIMMODULE.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CMessage.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ProtocolManager.cpp">
       <Filter>Source Files\Router</Filter>
@@ -451,6 +445,18 @@
     </ClCompile>
     <ClCompile Include="TaskCreator.cpp">
       <Filter>Source Files\BDM</Filter>
+    </ClCompile>
+    <ClCompile Include="commonGNDChecker.cpp">
+      <Filter>Source Files\BDM</Filter>
+    </ClCompile>
+    <ClCompile Include="CMessage.cpp">
+      <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="IDM.cpp">
+      <Filter>Source Files\IDM</Filter>
+    </ClCompile>
+    <ClCompile Include="LightingModule.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

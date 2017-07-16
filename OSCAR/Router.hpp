@@ -11,7 +11,6 @@
 #include <boost\log\sources\logger.hpp>
 #include <boost\filesystem.hpp>
 
-#include "HwSimulator.hpp"
 #include "HWPlannerService.hpp"
 #include "HWFService.hpp"
 #include "Objects\Obj.hpp"

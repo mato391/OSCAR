@@ -7,7 +7,7 @@ Component* ComponentFactory::createComponent(std::string name, std::string domai
 	std::cout << "ComponentFactory " << name << " " << domain << std::endl;
 	if (name.find("BDM") != std::string::npos)
 	{
-		std::cout << "ComponentFactory returning new BDM"<<  std::endl;
+		std::cout << "ComponentFactory returning new BDM" << std::endl;
 		return new BDM(domain, logger);
 	}
 	else if (name == "WCM")
@@ -24,5 +24,7 @@ Component* ComponentFactory::createComponent(std::string name, std::string domai
 	}
 	else if (name == "UIA")
 		return new UIA(domain, logger);
+	else if (name == "IDM")
+		return new IDM(domain, logger);
 
 }
