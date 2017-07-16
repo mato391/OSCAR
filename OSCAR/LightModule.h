@@ -22,34 +22,33 @@
 class LightModule
 {
 public:
+	std::vector<MODULE_TASK*>* tasks;
+
 	LightModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger);
 	~LightModule();
 	void initialize();
 	void blink(int count);
 	void changeConnectorStateIndication(std::string connectorId, std::string value);
 	void setup();
-	std::vector<MODULE_TASK*>* tasks;
 	void handleTask();
 	int getModuleProtocol() { return static_cast<int>(bdmModuleObj_->protocol); }
 private:
 	boost::log::sources::logger_mt logger_;
-	CP* cpObj_;
+	
 	EQM* eqmObjPtr_;
 	std::vector<Obj*>* cache_;
 	LIGHTES* lightes_;
 	MODULE* bdmModuleObj_;
 	std::map<std::string, std::vector<CONNECTOR*>> lampsConnectorsMap_;
+	std::vector<CONNECTOR*> conns;
 
-	void getCP();
 	void getBDMModules();
 	void createLightsTopology();
 	void createLightsObj();
 	void createLightObjs();
 	void changeLightProceduralState(std::string label, int value);
 	std::string getShortLabelForPowerGroup(std::string label);
-	LIGHT* lightFactory(std::string label, LIGHT::EType type);
 	void displayTopology();
-	std::vector<CONNECTOR*> conns;
 	std::string getCommonGndConnectorId(std::string label);
 	void changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task);
 	

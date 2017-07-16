@@ -28,10 +28,6 @@ public:
 	~DoorModule();
 	void unlockDoors();
 	void lockDoors();
-	void openWindow(std::string port);
-	void closeWindow(std::string port);
-	void lockWindow();
-	void unlockWindow();
 	void initialize();
 	void setup();
 	std::vector<MODULE_TASK*>* tasks;
@@ -40,19 +36,14 @@ public:
 	void checkAndExecuteTask();
 private:
 	boost::log::sources::logger_mt logger_;
-	CP* cpObj_;
 	MODULE* bdmModuleObj_;
 	std::vector<Obj*>* cache_;
 	DOORS* doorsObj_;
-	std::vector<std::string> door6Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "BACK_LEFT", "BACK_RIGHT", "MASK", "BOOT" };
-	std::vector<std::string> door5Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "MASK", "BOOT" ,"ROOF" };
-	std::vector<std::string> door4Labels_ = { "FRONT_LEFT", "FRONT_RIGHT", "MASK", "BOOT" };
+	void getBDMModules();
+	void prepareTopology();
 	void setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label);
 	void setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::string label);
-	void getCP();
-	void getBDMModules();
-	MODULE* getLightModule();
-	void prepareTopology();
+	
 	void displayTopology();
 	std::string* checkIfDoorsAreClosed();
 	bool checkIfBateryAlarmRaised();

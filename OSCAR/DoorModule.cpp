@@ -19,7 +19,6 @@ DoorModule::~DoorModule()
 void DoorModule::initialize()
 {
 	BOOST_LOG(logger_) << "INFO " << "DoorModule::initialize";
-	getCP();
 	getBDMModules();
 	prepareTopology();
 	displayTopology();
@@ -138,18 +137,6 @@ void DoorModule::setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::st
 		doorsObj_->openingState = DOORS::EOpeningState::opened;	
 }
 
-void DoorModule::getCP()
-{
-	for (const auto &obj : (*cache_))
-	{
-		if (obj->name == "CP")
-		{
-			cpObj_ = static_cast<CP*>(obj);
-			return;
-		}
-	}
-	BOOST_LOG(logger_) << "ERROR " << "DoorModule::getCP: There is no CP in cache";
-}
 
 void DoorModule::getBDMModules()
 {
@@ -172,25 +159,6 @@ void DoorModule::getBDMModules()
 	BOOST_LOG(logger_) << "ERR " << "DoorModule::getBDMModule: MODULE not found";
 }
 
-MODULE* DoorModule::getLightModule()
-{
-	for (const auto &obj : *cache_)
-	{
-		if (obj->name == "EQM")
-		{
-			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
-			{
-				if (static_cast<MODULE*>(mod)->label.find("BDM_LIGHT") != std::string::npos)
-				{
-					BOOST_LOG(logger_) << "INF " << "DoorModule::getLightModule: MODULE found";
-					return static_cast<MODULE*>(mod);;
-				}
-
-			}
-		}
-	}
-	return nullptr;
-}
 
 void DoorModule::prepareTopology()
 {
@@ -345,11 +313,6 @@ void DoorModule::lockDoors()
 		{
 			BOOST_LOG(logger_) << "INFO " << "DoorModule::lockDoors " << door->label;
 			door->lockDoor();
-			if (cpObj_->autoClosingWindow && door->window->opened)
-			{
-				BOOST_LOG(logger_) << "INFO " << "DoorModule::lockDoors auto-closing window: " << door->label;
-				door->window->close();
-			}
 		}
 		return;
 	}
@@ -400,68 +363,6 @@ bool DoorModule::checkIfBateryAlarmRaised()
 	return false;
 }
 
-void DoorModule::openWindow(std::string port)
-{
-	if (doorsObj_->container_.size() == 6)
-	{
-		//displayTopology();
-		for (auto &door : doorsObj_->container_)
-		{
-
-			if (door->label == door6Labels_[std::stoi(port) - 6])
-			{
-				BOOST_LOG(logger_) << "INFO " << "DoorModule::openWindow: " << door->label;
-				door->window->open();
-				break;
-			}
-
-		}
-	}
-}
-
-void DoorModule::closeWindow(std::string port)
-{
-	if (doorsObj_->container_.at(0)->window->lockingState != WINDOW::ELockingState::locked)
-	{
-		if (doorsObj_->container_.size() == 6)
-		{
-			//displayTopology();
-			for (auto &door : doorsObj_->container_)
-			{
-
-				if (door->label == door6Labels_[std::stoi(port) - 6])
-				{
-					BOOST_LOG(logger_) << "INFO " << "DoorModule::closeWindow: " << door->label;
-					door->window->close();
-					break;
-				}
-			}
-		}
-	}
-	else
-	{
-		BOOST_LOG(logger_) << "INFO " << "DoorModule::closeWindow: cannot close window because is locked";
-	}
-	
-}
-
-void DoorModule::lockWindow()
-{
-	BOOST_LOG(logger_) << "INFO " << "DoorModule::lockWindow";
-	for (auto &door : doorsObj_->container_)
-	{
-		door->window->lockingState = WINDOW::ELockingState::locked;
-	}
-}
-
-void DoorModule::unlockWindow()
-{
-	BOOST_LOG(logger_) << "INFO " << "DoorModule::unlockWindow";
-	for (auto &door : doorsObj_->container_)
-	{
-		door->window->lockingState = WINDOW::ELockingState::unlocked;
-	}
-}
 
 boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, int value)
 {
@@ -492,6 +393,8 @@ boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, i
 			return (value == 0) ? "LOCK_DOORS" : "UNLOCK_DOORS";
 		}
 	}
+	BOOST_LOG(logger_) << "ERR " << "DoorModule::changeConnectorState: Connector not found...";
+	return boost::none;
 }
 
 void DoorModule::changeDOORSOpeningStateIfNeeded(int value)

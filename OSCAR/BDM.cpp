@@ -45,7 +45,7 @@ RESULT* BDM::setup(int domain)
 CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
 {
 	BOOST_LOG(logger_) << "INF " << "BDM::execute " << msg;
-	RESULT* res;
+	RESULT* res = new RESULT();
 	CMESSAGE::CMessage* messg = nullptr;
 	std::string domain =  msg->fromDomain;
 	getBDMObjectIfNeeded();
@@ -145,7 +145,6 @@ void BDM::doTasks()
 	
 }
 
-
 CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 {
 	if (res->applicant == "DOOR_MODULE")
@@ -154,7 +153,6 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 		std::string tmpdomain = getDomainFor("BDM_DOOR");
 		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
 		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
-		
 		msg->fromDomain = OWNID;
 		if (res->feedback == "Initialize")
 		{
@@ -186,10 +184,8 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 			<< " \nMSG->port " << msg->port
 			<< " \nMSG->value " << msg->value
 			<< " \nMSG->additional " << msg->additional;
-			
 		return msg;
 	}
-	
 }
 
 std::string BDM::getDomainFor(std::string label)
@@ -218,7 +214,7 @@ MODULE* BDM::getModuleWithDomain(std::string domain)
 
 void BDM::execute(std::string message)
 {
-	//0x01012
+	/*//0x01012
 	std::string domain;
 	std::string data;
 	std::string port;
@@ -293,12 +289,10 @@ void BDM::execute(std::string message)
 			lightModule_->changeConnectorStateIndication(port, operation);
 		}
 	}
+	*/
 }
 
-void BDM::setConnector(std::string connId, std::string value)
-{
-	doorModule_->changeConnectorState(std::stoi(connId), std::stoi(value));
-}
+
 
 void BDM::execute(INTER_MODULE_OPERATION* imo)
 {
@@ -308,15 +302,11 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 		{
 			doorModule_->unlockDoors();
 			lightModule_->blink(1);
-			//getResultAndSendToRouter("BDM_DOOR");
-			//getResultAndSendToRouter("BDM_LIGHT");
 		}
 		else if (imo->details == "01")
 		{
 			doorModule_->lockDoors();
 			lightModule_->blink(2);
-			//getResultAndSendToRouter("BDM_DOOR");
-			//getResultAndSendToRouter("BDM_LIGHT");
 		}
 	}
 	if (imo->operation == "GET_MIRROR_POS")
@@ -331,7 +321,6 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 void BDM::unlockDoors()
 {
 	doorModule_->unlockDoors();
-	//getResultAndSendToRouter("BDM_DOOR");
 }
 
 void BDM::lockDoors()
@@ -381,46 +370,3 @@ void BDM::setConfiguringStateIfNeeded()
 		configuringState = EConfiguringState::configured;
 	}
 }
-
-void BDM::blinkersRun(int times, int interval)
-{
-	for (int i = 0; i < times; i++)
-	{
-		//lightModule_->blink();
-		boost::this_thread::sleep(boost::posix_time::millisec(interval));
-	}
-	
-}
-
-void BDM::getResultAndSendToRouter(std::string moduleLabel)
-{
-	RESULT* result = new RESULT();
-	std::string domain;
-	std::vector<Obj*>::iterator iter;
-	for (const auto &mod : bdmModules_)
-	{
-		if (mod.second->label == moduleLabel)
-		{
-			domain = mod.second->domain;
-			for (iter = mod.second->children.begin(); iter != mod.second->children.end(); iter++)
-			{
-				if ((*iter)->name == "RESULT")
-				{
-					result = static_cast<RESULT*>(*iter);
-					if (result->applicant == moduleLabel)
-						break;
-				}
-					
-			}
-		}
-	}
-	if (!result->feedback.empty())
-	{
-		std::string msg = domain + result->feedback;
-		//send(msg);
-	}
-	else
-		BOOST_LOG(logger_) << "ERR " << "RESULT object does not exist";
-	
-}
-

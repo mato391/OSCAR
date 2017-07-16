@@ -28,7 +28,7 @@ class BDM : public Component
 public:
 	BDM(std::string domain, boost::log::sources::logger_mt logger);
 	~BDM();
-	void execute(std::string message);
+	void execute(std::string message);	//TO BE DELETED WHEN ALL COMPONENTS WILL USING CMESSAGE
 	void execute(INTER_MODULE_OPERATION* imo);
 	CMESSAGE::CMessage* execute(CMESSAGE::CMessage* msg);
 	void initialize();
@@ -36,14 +36,11 @@ public:
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
 	void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) { send = func; }
 	RESULT* setup(int domain);
-	void setup(std::string domain) {};
+	void setup(std::string domain) {};//TO BE DELETED WHEN ALL COMPONENTS WILL USING RESULTS
+	
 	void unlockDoors();
 	void lockDoors();
 	void setConfiguringStateIfNeeded();
-	void openWindow(std::string port);
-	void closeWindow(std::string port);
-	void lockWindow();
-	void unlockWindow();
 private:
 	DoorModule* doorModule_;
 	LightModule* lightModule_;
@@ -54,9 +51,6 @@ private:
 	TaskCreator* taskCreator_;
 
 	void getBDMObjectIfNeeded();
-	void setConnector(std::string connId, std::string value);
-	void blinkersRun(int times, int interval);
-	void getResultAndSendToRouter(std::string moduleLabel);
 	CMESSAGE::CMessage* convertResultToCMessage(RESULT* res);
 	std::string getDomainFor(std::string label);
 	MODULE* getModuleWithDomain(std::string domain);
