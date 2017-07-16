@@ -18,10 +18,7 @@ Router::~Router()
 {
 }
 
-std::vector<Obj*> Router::getModules()
-{
-	return eqmObj_->modules_;
-}
+
 
 void Router::startAutodetection()
 {
@@ -157,22 +154,6 @@ void Router::receiver(std::string data)
 	}
 }
 
-void Router::checkResultFromHWPlannerService()
-{
-	//BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService";
-	for (auto &obj : *cache_)//crash
-	{
-		//BOOST_LOG(logger_) << "DBG " << "Router::checkResultFromHWPlannerService: " << obj->name;
-		if (obj->name == "RESULT" && static_cast<RESULT*>(obj)->applicant == "HWPlannerService" && static_cast<RESULT*>(obj)->feedback == "CONFIGURATION_DONE")
-		{
-			BOOST_LOG(logger_) << "INF " << "Router::checkResultFromHWPlannerService: Configuration done.Starting with hw";
-			fabricStartup_ = false;
-			createMMFFromEQM();
-			startComponentService();
-			break;
-		}
-	}
-}
 
 /*
 void Router::sender(std::string data)
@@ -218,14 +199,7 @@ void Router::checkIfMMFExists()
 	}
 }
 
-void Router::setupTimer()
-{
-	BOOST_LOG(logger_) << "INF " << "Router::setupTimer";
-	bool timeout = false;
-	timer_ = new TIMER(25, "detectionTimeout");
-	boost::thread t(std::bind(&TIMER::start, timer_, std::placeholders::_1), &timeout_);
-}
-
+/*	HWPLANNE SERVICE CURRENTLY NOT SUPPORTED
 void Router::startHWPlanerService()
 {
 	if (hwplannerService_ == nullptr)
@@ -237,43 +211,7 @@ void Router::startHWPlanerService()
 	else
 		BOOST_LOG(logger_) << "INF " << "Router::startHWPlanerService: hwPlanner has been started";
 }
-
-void Router::createConnectors(MODULE* mod)
-{
-	BOOST_LOG(logger_) << "INF " << "Router::createConnectors: for " << mod->productNumber;
-	int group = mod->productNumber.size() / 2;
-	BOOST_LOG(logger_) << "INF " << "Router::createConnectors: groups:  " << group;
-	std::vector<int> connectorsInGroups;
-	for (int i = 0; i < group; i++)
-	{
-		BOOST_LOG(logger_) << "INF " << "Router::createConnectors: group:  " << std::stoi(mod->productNumber.substr(i * 2, 2));
-		connectorsInGroups.push_back(std::stoi(mod->productNumber.substr(i * 2, 2)));
-	}
-	for (const auto &conn : connectorsInGroups)
-	{
-		mod->addConnector(conn);
-	}
-}
-
-void Router::displayModulesTopology()
-{
-	for (const auto &mod : eqmObj_->modules_)
-	{
-		auto module = static_cast<MODULE*>(mod);
-		BOOST_LOG(logger_) << "DBG " << "MODULE: " << module->domain;
-		int i = 0;
-		for (const auto &group : module->connectors_)
-		{
-			BOOST_LOG(logger_) << "DBG " << "CONNECTORS_GROUP: " << i;
-			for (const auto &conn : group)
-			{
-				BOOST_LOG(logger_) << "DBG " << "CONNECTOR: " << static_cast<CONNECTOR*>(conn)->id
-					<< " used " << static_cast<CONNECTOR*>(conn)->used;
-			}
-			i++;
-		}
-	}
-}
+*/
 
 void Router::setupModule(std::string domain, int mask)
 {
@@ -320,14 +258,3 @@ void Router::setupModule(std::string domain, int mask)
 	}
 }
 
-void Router::createMMFFromEQM()
-{
-	std::fstream mmfh("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt", std::ios::app);
-	for (const auto &mod : eqmObj_->modules_)
-	{
-		auto module = static_cast<MODULE*>(mod);
-		std::string msg = module->label + ":" + module->domain + ";";
-		mmfh << msg;
-	}
-	mmfh.close();
-}
