@@ -42,7 +42,7 @@ void EDM::execute(std::string message)
 	*/
 	if (message == "0x0300")
 	{
-		send("0x0301");
+		//send("0x0301");
 		engineObj_->detectionState = ENGINE::EDetectionState::connecting;
 		return;
 	}
@@ -90,7 +90,7 @@ void EDM::execute(INTER_MODULE_OPERATION* imo)
 			rpmMonitorStart = boost::thread(std::bind(&RpmMonitor::start, rpmMonitor_));
 			rpmMonitorStart.detach();
 			
-			send("0x0302");
+			//send("0x0302");
 		}
 		
 		else if (result.status == RESULT::EStatus::success && result.feedback == "0x0303")
@@ -98,7 +98,7 @@ void EDM::execute(INTER_MODULE_OPERATION* imo)
 			rpmMonitor_->interupt = true;
 			BOOST_LOG(logger_) << "INFO " << "EDM::execute: stop engine procedure";
 			engineObj_->proceduralState = ENGINE::EProceduralState::turnedOff;
-			send("0x0303");
+			//send("0x0303");
 			delete rpmMonitor_;	//TO TEST
 		}
 	}
@@ -108,7 +108,7 @@ void EDM::execute(INTER_MODULE_OPERATION* imo)
 	}
 	else if (imo->operation == "ACCELERATE_PERCENT_CHANGE")
 	{
-		send("0x0305" + imo->details);
+		//send("0x0305" + imo->details);
 	}
 }
 
@@ -174,6 +174,6 @@ void EDM::startDetection()
 void EDM::loadEngineMaps(int pos)
 {
 	BOOST_LOG(logger_) << "INF " << "EDM::loadEngineMaps: " << pos;
-	send("0x0304" + std::to_string(pos));
+	//send("0x0304" + std::to_string(pos));
 }
 

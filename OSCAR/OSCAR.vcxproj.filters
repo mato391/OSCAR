@@ -216,9 +216,6 @@
     <ClInclude Include="NET_INTERFACE.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="POWER_GROUP.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleInitialConfigurator.hpp">
       <Filter>Header Files\Router</Filter>
     </ClInclude>
@@ -239,6 +236,24 @@
     </ClInclude>
     <ClInclude Include="ProtocolManager.h">
       <Filter>Header Files\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskCreator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MODULE_TASK.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="CHANGE_CONNECTOR_STATE_TASK.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="LIGHT_GOODBYE_TASK.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="LIGHT_WELCOMING_TASK.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="POWER_GROUP.hpp">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -386,17 +401,8 @@
     <ClCompile Include="HWFService.cpp">
       <Filter>Source Files\Router</Filter>
     </ClCompile>
-    <ClCompile Include="POWER_GROUP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EthernetIntrfaceConfigurator.cpp">
       <Filter>Source Files\WCM</Filter>
-    </ClCompile>
-    <ClCompile Include="NET_INTERFACE.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ANTENNA.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rcManager.cpp">
       <Filter>Source Files\WCM</Filter>
@@ -421,6 +427,30 @@
     </ClCompile>
     <ClCompile Include="ProtocolManager.cpp">
       <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="HANGE_CONNECTOR_STATE_TASK.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="LIGHT_GOODBYE_TASK.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="NET_INTERFACE.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="MODULE_TASK.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="LIGHT_WELCOMING_TASK.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="POWER_GROUP.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ANTENNA.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskCreator.cpp">
+      <Filter>Source Files\BDM</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

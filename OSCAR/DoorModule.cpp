@@ -64,6 +64,35 @@ void DoorModule::setup()
 	}
 }
 
+void DoorModule::checkAndExecuteTask()
+{
+	std::vector<MODULE_TASK*> tasks;
+	if (!bdmModuleObj_->tasks.empty())
+	{
+		for (auto &task : bdmModuleObj_->tasks)
+		{
+			runTask(task);
+		}
+	}
+}
+
+void DoorModule::runTask(MODULE_TASK* task)
+{
+	if (task->name == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
+	{
+		auto ccst = static_cast<CHANGE_CONNECTOR_STATE_TASK*>(task);
+		auto feedback = changeConnectorState(ccst->port, ccst->value);
+		if (feedback != boost::none)
+		{
+			ccst->result = new RESULT();
+			ccst->result->applicant = "DoorModule";
+			ccst->result->feedback = feedback.value();
+			ccst->result->status = RESULT::EStatus::success;
+			BOOST_LOG(logger_) << "INF " << "DoorModule::runTask: feedback: " << ccst->result->feedback;
+		}
+	}
+}
+
 void DoorModule::setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label)
 {
 	BOOST_LOG(logger_) << "INF " << "DoorModule::setDoorLockingInitStatus " << label << " " << static_cast<int>(lockState);
@@ -141,6 +170,26 @@ void DoorModule::getBDMModules()
 		}
 	}
 	BOOST_LOG(logger_) << "ERR " << "DoorModule::getBDMModule: MODULE not found";
+}
+
+MODULE* DoorModule::getLightModule()
+{
+	for (const auto &obj : *cache_)
+	{
+		if (obj->name == "EQM")
+		{
+			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
+			{
+				if (static_cast<MODULE*>(mod)->label.find("BDM_LIGHT") != std::string::npos)
+				{
+					BOOST_LOG(logger_) << "INF " << "DoorModule::getLightModule: MODULE found";
+					return static_cast<MODULE*>(mod);;
+				}
+
+			}
+		}
+	}
+	return nullptr;
 }
 
 void DoorModule::prepareTopology()
@@ -283,10 +332,7 @@ void DoorModule::unlockDoors()
 		result->feedback += std::to_string(doorsObj_->commonLockGND->connectors[0]->id)
 			+ std::to_string(doorsObj_->commonLockGND->connectors[0]->value);
 	}
-		
-	
 	bdmModuleObj_->children.push_back(result);
-
 }
 
 void DoorModule::lockDoors()
@@ -417,35 +463,33 @@ void DoorModule::unlockWindow()
 	}
 }
 
-boost::optional<std::string> DoorModule::changeConnectorState(std::string connectorId, std::string value)
+boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, int value)
 {
 	BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState";
-	for (const auto &door : doorsObj_->container_)
+	for (const auto &door : doorsObj_->container_)		//refactor 3 fory?!
 	{
 		for (const auto &port : door->ports)
 		{
 			for ( auto &conn : port->connectors)
 			{
-				if (conn->id == std::stoi(connectorId))
+				if (conn->id == connectorId)
 				{
 					BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: on door: " << door->label
-						<< " on port" << port->label << " connector ID: " << conn->id << " to value " << std::stoi(value);
-					door->changeConnectorState(std::stoi(connectorId), std::stoi(value));
-					changeDOORSOpeningStateIfNeeded(std::stoi(value));
+						<< " on port" << port->label << " connector ID: " << conn->id << " to value " << value;
+					door->changeConnectorState(connectorId, value);
+					changeDOORSOpeningStateIfNeeded(value);
 					return boost::none;
 				}
-					
-
 			}
 		}
 	}
 	for (auto &conn : doorsObj_->commonLockGND->connectors)
 	{
-		if (conn->id == std::stoi(connectorId))
+		if (conn->id == connectorId)
 		{
 			BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: GND connector " << conn->id << " to value " << value;
-			doorsObj_->setLockingState(std::stoi(value));
-			return (std::stoi(value) == 0) ? "LOCK_DOORS" : "UNLOCK_DOORS";
+			doorsObj_->setLockingState(value);
+			return (value == 0) ? "LOCK_DOORS" : "UNLOCK_DOORS";
 		}
 	}
 }

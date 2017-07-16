@@ -22,7 +22,7 @@ public:
 	CMESSAGE::CMessage* execute(CMESSAGE::CMessage* msg) { return nullptr; };
 	void setCache(std::vector<Obj*>* cache) { cache_ = cache; }
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
-	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
+	void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) { send = func; }
 	void setup(std::string domain) {};
 	RESULT* setup(int domain) { return new RESULT(); }
 	void initialize();

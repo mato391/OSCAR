@@ -34,7 +34,7 @@ RESULT* BDM::setup(int domain)
 		lightModule_->setup();
 		RESULT* result = new RESULT();
 		result->applicant = "BDM";
-		result->feedback = std::to_string(doorModule_->getModuleProtocol());
+		result->feedback = std::to_string(lightModule_->getModuleProtocol());
 		result->status = RESULT::EStatus::success;
 		return result;
 	}
@@ -78,29 +78,72 @@ CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
 		mesg->optional2 = 0;
 		return mesg;
 	}
-	else if (msg->getProtocol() == CMESSAGE::CMessage::EProtocol::CSimpleProtocol)
+	else if (msg->getProtocol() != CMESSAGE::CMessage::EProtocol::CInitialProtocol)
 	{
-		auto messg = static_cast<CMESSAGE::CSimpleMessage*>(msg);
-		if (messg->fromDomain == "0x05" && messg->header == 204)
+		BOOST_LOG(logger_) << "INF " << "BDM::execute: creating task";
+		if (taskCreator_ == nullptr)
 		{
-			auto reaction = doorModule_->changeConnectorState(std::to_string(messg->port), std::to_string(messg->value));
-			action(reaction);
-			return new CMESSAGE::CEmpty();
+			taskCreator_ = new TaskCreator(&bdmModules_, logger_);
 		}
-			
-
-		BOOST_LOG(logger_) << "INF " << "CSimpleProtocol";
+		else
+		{
+			BOOST_LOG(logger_) << "INF " << "TaskCreator constructed earlier";
+		}
+		taskCreator_->convertAndPushTask(msg);
+		doTasks();
 	}
 	return nullptr;
 }
 
-void BDM::action(boost::optional<std::string> impuls)
+void BDM::doTasks()
 {
-	if (impuls.value_or("") == "UNLOCK_DOORS")
+	doorModule_->checkAndExecuteTask();
+	auto mod = getModuleWithDomain(getDomainFor("BDM_DOOR"));
+	auto lightMod = getModuleWithDomain(getDomainFor("BDM_LIGHT"));
+	if (lightMod == nullptr)
 	{
-		lightModule_->blink(2);
+		BOOST_LOG(logger_) << "ERR " << "BDM::doTasks: lightModule does not exists";
+		return;
 	}
+	if (mod != nullptr && mod->tasks.size() > 0)
+	{
+		auto taskResult = mod->tasks[0]->getResult();
+		BOOST_LOG(logger_) << "INF " << "BDM::doTasks:tasks size: " << mod->tasks.size();
+		if (taskResult->feedback == "UNLOCK_DOORS")
+		{
+			BOOST_LOG(logger_) << "BDM::doTasks : creating LIGHT_WELCOME_TASK";
+			lightMod->tasks.push_back(new LIGHT_WELCOMING_TASK());
+		}
+		else if (taskResult->feedback == "LOCK_DOORS")
+		{
+			BOOST_LOG(logger_) << "BDM::doTasks : creating LIGHT_GOODBYE_TASK";
+			lightMod->tasks.push_back(new LIGHT_GOODBYE_TASK());
+		}
+		lightModule_->handleTask();
+	}
+	if (lightMod->tasks.empty())
+	{
+		BOOST_LOG(logger_) << "INF " << "BDM::doTasks : lightMod has no task :(";
+		return;
+	}
+	if (lightMod->tasks.size() > 0)
+	{
+		auto result = lightMod->tasks[0]->getResult();
+		if (result != nullptr)
+		{
+			if (result->type == RESULT::EType::executive)
+			{
+				auto cmsg = convertResultToCMessage(result);
+				send(cmsg);
+			}
+		}
+
+	}
+	mod->tasks.clear();
+	lightMod->tasks.clear();
+	
 }
+
 
 CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 {
@@ -121,6 +164,30 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 			return msg;
 		}
 	}
+	else if (res->applicant == "LIGHT_MODULE")
+	{
+		CMESSAGE::CExtendedMessage* msg = new CMESSAGE::CExtendedMessage();
+		std::string tmpdomain = getDomainFor("BDM_LIGHT");
+		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
+		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
+		msg->fromDomain = OWNID;
+		msg->header = CC;
+		std::vector<std::string> tmp;
+		boost::split(tmp, res->feedback, boost::is_any_of(":"));
+		msg->port = std::stoi(tmp[0]);
+		msg->value = std::stoi(tmp[1]);
+		msg->additional = std::stoi(tmp[2]);
+		msg->protocol = CMESSAGE::CMessage::EProtocol::CExtendedProtocol;
+		BOOST_LOG(logger_) << "DBG " << "BDM::convertResultToCMessage: "
+			<< " MSG->protocol " << static_cast<int>(msg->protocol)
+			<< " \nMSG->fromDomain " << msg->fromDomain
+			<< " \nMSG->header " << msg->header
+			<< " \nMSG->port " << msg->port
+			<< " \nMSG->value " << msg->value
+			<< " \nMSG->additional " << msg->additional;
+			
+		return msg;
+	}
 	
 }
 
@@ -134,6 +201,18 @@ std::string BDM::getDomainFor(std::string label)
 		}
 	}
 	return "";
+}
+
+MODULE* BDM::getModuleWithDomain(std::string domain)
+{
+	for (const auto &mod : bdmModules_)
+	{
+		if (mod.second->domain == domain)
+		{
+			return mod.second;
+		}
+	}
+	return nullptr;
 }
 
 void BDM::execute(std::string message)
@@ -206,7 +285,7 @@ void BDM::execute(std::string message)
 		}
 		if (moduleLabel == "BDM_DOOR")
 		{
-			doorModule_->changeConnectorState(port, operation);
+			doorModule_->changeConnectorState(std::stoi(port), std::stoi(operation));
 		}
 		else if (moduleLabel == "BDM_LIGHT")
 		{
@@ -217,7 +296,7 @@ void BDM::execute(std::string message)
 
 void BDM::setConnector(std::string connId, std::string value)
 {
-	doorModule_->changeConnectorState(connId, value);
+	doorModule_->changeConnectorState(std::stoi(connId), std::stoi(value));
 }
 
 void BDM::execute(INTER_MODULE_OPERATION* imo)
@@ -228,15 +307,15 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 		{
 			doorModule_->unlockDoors();
 			lightModule_->blink(1);
-			getResultAndSendToRouter("BDM_DOOR");
-			getResultAndSendToRouter("BDM_LIGHT");
+			//getResultAndSendToRouter("BDM_DOOR");
+			//getResultAndSendToRouter("BDM_LIGHT");
 		}
 		else if (imo->details == "01")
 		{
 			doorModule_->lockDoors();
 			lightModule_->blink(2);
-			getResultAndSendToRouter("BDM_DOOR");
-			getResultAndSendToRouter("BDM_LIGHT");
+			//getResultAndSendToRouter("BDM_DOOR");
+			//getResultAndSendToRouter("BDM_LIGHT");
 		}
 	}
 	if (imo->operation == "GET_MIRROR_POS")
@@ -251,7 +330,7 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 void BDM::unlockDoors()
 {
 	doorModule_->unlockDoors();
-	getResultAndSendToRouter("BDM_DOOR");
+	//getResultAndSendToRouter("BDM_DOOR");
 }
 
 void BDM::lockDoors()
@@ -337,7 +416,7 @@ void BDM::getResultAndSendToRouter(std::string moduleLabel)
 	if (!result->feedback.empty())
 	{
 		std::string msg = domain + result->feedback;
-		send(msg);
+		//send(msg);
 	}
 	else
 		BOOST_LOG(logger_) << "ERR " << "RESULT object does not exist";

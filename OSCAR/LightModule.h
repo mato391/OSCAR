@@ -11,6 +11,7 @@
 #include "EQM.hpp"
 #include "POWER_GROUP.hpp"
 #include "RESULT.hpp"
+#include "MODULE_TASK.hpp"
 
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
@@ -26,6 +27,9 @@ public:
 	void blink(int count);
 	void changeConnectorStateIndication(std::string connectorId, std::string value);
 	void setup();
+	std::vector<MODULE_TASK*>* tasks;
+	void handleTask();
+	int getModuleProtocol() { return static_cast<int>(bdmModuleObj_->protocol); }
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;
@@ -45,6 +49,8 @@ private:
 	LIGHT* lightFactory(std::string label, LIGHT::EType type);
 	void displayTopology();
 	std::vector<CONNECTOR*> conns;
+	std::string getCommonGndConnectorId(std::string label);
+	
 	
 };
 

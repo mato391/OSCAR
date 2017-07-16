@@ -2,6 +2,7 @@
 #include "Objects\Obj.hpp"
 #include "CONNECTOR.hpp"
 #include <vector>
+#include "MODULE_TASK.hpp"
 class MODULE :
 	public Obj
 {
@@ -40,5 +41,6 @@ public:
 		CBigDataProtocol
 	};
 	EProtocol protocol;
+	std::vector<MODULE_TASK*> tasks;
 };
 

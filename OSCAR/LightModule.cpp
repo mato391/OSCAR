@@ -78,6 +78,28 @@ void LightModule::changeConnectorStateIndication(std::string connectorId, std::s
 	
 }
 
+void LightModule::handleTask()
+{
+	if (!bdmModuleObj_->tasks.empty())
+	{
+		if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::LIGHT_WELCOMING_TASK)
+		{
+			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_WELCOMING_TASK";
+			bdmModuleObj_->tasks[0]->result = new RESULT();
+			bdmModuleObj_->tasks[0]->result->applicant = "LIGHT_MODULE";
+			bdmModuleObj_->tasks[0]->result->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "5002";
+			bdmModuleObj_->tasks[0]->result->status = RESULT::EStatus::success;
+			bdmModuleObj_->tasks[0]->result->type = RESULT::EType::executive;
+		}
+		else if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::LIGHT_GOODBYE_TASK)
+		{
+			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_GOODBYE_TASK";
+		}
+	}
+	else
+		BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: no task to handle";
+}
+
 void LightModule::getCP()
 {
 	for (const auto &obj : *cache_)
@@ -272,6 +294,18 @@ void LightModule::blink(int count)
 	result->status = RESULT::EStatus::success;
 	result->feedback = commonGNDs[0]->id + commonGNDs[1]->id;
 	bdmModuleObj_->children.push_back(result);
+}
+
+std::string LightModule::getCommonGndConnectorId(std::string label)
+{
+	for (const auto &pg : lightes_->powerGroups_)
+	{
+		if (pg->label.find(label) != std::string::npos)
+		{
+			return std::to_string(pg->commonGND->id);
+		}
+	}
+			
 }
 
 

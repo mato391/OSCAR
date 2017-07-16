@@ -11,6 +11,9 @@
 #include "EQM.hpp"
 #include "CONNECTOR.hpp"
 #include "RESULT.hpp"
+#include "MODULE_TASK.hpp"
+#include "CHANGE_CONNECTOR_STATE_TASK.h"
+
 #include "commonGNDChecker.hpp"
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
@@ -31,8 +34,10 @@ public:
 	void unlockWindow();
 	void initialize();
 	void setup();
-	boost::optional<std::string> changeConnectorState(std::string connectorId, std::string value);
+	std::vector<MODULE_TASK*>* tasks;
+	boost::optional<std::string> changeConnectorState(int connectorId, int value);
 	int getModuleProtocol() { return static_cast<int>(bdmModuleObj_->protocol); }
+	void checkAndExecuteTask();
 private:
 	boost::log::sources::logger_mt logger_;
 	CP* cpObj_;
@@ -46,6 +51,7 @@ private:
 	void setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::string label);
 	void getCP();
 	void getBDMModules();
+	MODULE* getLightModule();
 	void prepareTopology();
 	void displayTopology();
 	std::string* checkIfDoorsAreClosed();
@@ -53,7 +59,6 @@ private:
 	void createDoors(std::vector<CONNECTOR*> connectors);
 	bool checkDoesDoorExist(std::string label);
 	void changeDOORSOpeningStateIfNeeded(int value);
-	
-	
+	void runTask(MODULE_TASK* task);
 };
 

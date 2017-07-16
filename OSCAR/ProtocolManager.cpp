@@ -47,6 +47,8 @@ CAN::messageCAN ProtocolManager::createMessage(CMESSAGE::CMessage* message)
 		return prepareCANMessageForInitial(message);
 	case CMESSAGE::CMessage::EProtocol::CSimpleProtocol:
 		return prepareCANMessageForSimple(message);
+	case CMESSAGE::CMessage::EProtocol::CExtendedProtocol:
+		return prepareCANMessageForExtended(message);
 	}
 }
 

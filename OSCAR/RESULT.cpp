@@ -5,6 +5,7 @@
 RESULT::RESULT()
 {
 	name = "RESULT";
+	type = EType::none;
 }
 
 

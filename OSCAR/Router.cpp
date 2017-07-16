@@ -174,6 +174,7 @@ void Router::checkResultFromHWPlannerService()
 	}
 }
 
+/*
 void Router::sender(std::string data)
 {
 
@@ -191,6 +192,13 @@ void Router::sender(std::string data)
 		BOOST_LOG(logger_) << "INFO " << "Router::sender: CAN sending signal: " << data;
 		//router->receiver(content);
 	}
+}
+*/
+void Router::sender(CMESSAGE::CMessage* msg)
+{
+	auto can_msg = protoManager_->createMessage(msg);
+	canPtr_->messageTx = can_msg;
+	canPtr_->sendMessage();
 }
 
 void Router::checkIfMMFExists()

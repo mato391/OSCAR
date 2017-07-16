@@ -14,5 +14,12 @@ public:
 		success
 	};
 	EStatus status;
+	enum class EType
+	{
+		none,
+		executive
+	};
+	EType type;
 };
+
 

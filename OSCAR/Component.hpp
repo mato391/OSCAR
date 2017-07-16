@@ -24,8 +24,8 @@ public:
 		configured
 	};
 	EConfiguringState configuringState;
-	std::function<void(std::string)> send;
-	virtual void setSenderPtr(std::function<void(std::string)> func) = 0;
+	std::function<void(CMESSAGE::CMessage*)> send;
+	virtual void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) = 0;
 	virtual void setCache(std::vector<Obj*>* cache) = 0;
 	virtual void setComponentsCache(std::vector<Component*>* componentCache) = 0;
 	virtual void execute(std::string message) = 0;

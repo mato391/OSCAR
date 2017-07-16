@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <iostream>
 #include "Component.hpp"
 #include "DoorModule.hpp"
@@ -10,11 +11,16 @@
 #include "RESULT.hpp"
 #include "MODULE.hpp"
 #include "CMessage.hpp"
-#include <vector>
+#include "TaskCreator.hpp"
+#include "LIGHT_WELCOMING_TASK.h"
+#include "LIGHT_GOODBYE_TASK.h"
+
+
 
 #define OWNID 100
 #define DD 221
 #define EE 238
+#define CC 204
 
 
 class BDM : public Component
@@ -28,7 +34,7 @@ public:
 	void initialize();
 	void setCache(std::vector<Obj*>* cache) { cache_ = cache; }
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
-	void setSenderPtr(std::function<void(std::string)> func) { send = func; }
+	void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) { send = func; }
 	RESULT* setup(int domain);
 	void setup(std::string domain) {};
 	void unlockDoors();
@@ -45,12 +51,15 @@ private:
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
 	std::map<std::string, MODULE*> bdmModules_;
+	TaskCreator* taskCreator_;
+
 	void getBDMObjectIfNeeded();
 	void setConnector(std::string connId, std::string value);
 	void blinkersRun(int times, int interval);
 	void getResultAndSendToRouter(std::string moduleLabel);
 	CMESSAGE::CMessage* convertResultToCMessage(RESULT* res);
 	std::string getDomainFor(std::string label);
-	void action(boost::optional<std::string> impuls);
+	MODULE* getModuleWithDomain(std::string domain);
+	void doTasks();
 };
 

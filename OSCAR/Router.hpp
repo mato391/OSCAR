@@ -35,7 +35,8 @@ public:
 	Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger);
 	~Router();
 	void receiver(std::string data);
-	void sender(std::string data);
+	//void sender(std::string data);
+	void sender(CMESSAGE::CMessage* msg);
 	void startHWPlanerService();
 	std::vector<Obj*> getModules();
 	void setHwSimulatorIfNeeded(HwSimulator* hwSim) { this->hwSim_ = hwSim; };

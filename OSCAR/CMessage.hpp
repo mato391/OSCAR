@@ -74,14 +74,15 @@ namespace CMESSAGE
 		public CMessage
 	{
 	public:
+		CExtendedMessage() {};
 		CExtendedMessage(CAN::messageCAN* msg)
 		{
 			protocol = CMessage::EProtocol::CExtendedProtocol;
 			std::stringstream hexa;
-			hexa << std::hex << msg->data[1];
-			fromDomain = hexa.str();
-			toDomain = msg->id;
-			header = msg->data[2];
+			hexa << std::hex << static_cast<int>(msg->data[1]);
+			fromDomain = (hexa.str().size() == 1) ? "0x0" + hexa.str() : "0x" + hexa.str();
+			toDomain = std::to_string(static_cast<int>(msg->id));
+			header = static_cast<int>(msg->data[2]);
 			port = msg->data[3];
 			value = msg->data[4];
 			additional = msg->data[5];
