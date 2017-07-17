@@ -47,7 +47,7 @@ int main()
 	auto cachePtr = oamConfigurator->getObjectCachePtr();
 	if (cachePtr == nullptr)
 		BOOST_LOG(lg) << "ERR " << "Cache is empty";
-	Router* router = new Router(cachePtr, lg);
+	Router* router = new Router(cachePtr, lg, oamConfigurator->getCachePtr());
 	BOOST_LOG(lg) << "INF " << "OSCAR: -------------------SYSTEM STARTED---------------------";
 	router_thread(router, lg);
 	

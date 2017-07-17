@@ -23,6 +23,7 @@ public:
 	void setComponentsCache(std::vector<Component*>* cache) { componentCache_ = cache; }
 	void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) { send = func; }
 	void setup(std::string domain) {};
+	int runtime() {};
 	RESULT* setup(int domain) { return new RESULT(); };
 private:
 	ENGINE* engineObj_;

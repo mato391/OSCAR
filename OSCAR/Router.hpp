@@ -10,7 +10,7 @@
 #include <boost\move\utility.hpp>
 #include <boost\log\sources\logger.hpp>
 #include <boost\filesystem.hpp>
-
+#include <boost\thread\thread.hpp>
 #include "HWPlannerService.hpp"
 #include "HWFService.hpp"
 #include "Objects\Obj.hpp"
@@ -19,6 +19,7 @@
 #include "CONNECTOR.hpp"
 #include "TIMER.hpp"
 #include "TASK.hpp"
+#include "Cache.hpp"
 #include "EthernetIntrfaceConfigurator.hpp"
 #include "ModuleInitialConfigurator.hpp"
 #include "CAN.h"
@@ -31,7 +32,7 @@ class Router
 {
 public:
 	typedef Component* Component_ptr;
-	Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger);
+	Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger, Cache* cachePtr);
 	~Router();
 	void receiver(std::string data);
 	void sender(CMESSAGE::CMessage* msg);
@@ -45,7 +46,7 @@ private:
 	std::vector<std::string> mmfS_;
 	std::string mmfPath_;
 	std::vector<Obj*>* cache_;
-
+	Cache* cachePtr_;
 	bool fabricStartup_;
 	EQM* eqmObj_;
 	bool timeout_;
@@ -62,5 +63,6 @@ private:
 	void checkIfMMFExists();
 	void createEQM();
 	void setupModule(std::string domain, int mask);
+	boost::thread_group componentsThreadGroup_;
 };
 

@@ -11,12 +11,3 @@ LightingModule::~LightingModule()
 {
 }
 
-
-LightingModule::LightingModule()
-{
-}
-
-
-LightingModule::~LightingModule()
-{
-}

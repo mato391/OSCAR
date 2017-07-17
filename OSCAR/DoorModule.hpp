@@ -13,6 +13,7 @@
 #include "RESULT.hpp"
 #include "MODULE_TASK.hpp"
 #include "CHANGE_CONNECTOR_STATE_TASK.h"
+#include "Cache.hpp"
 
 #include "commonGNDChecker.hpp"
 #include <boost\algorithm\string.hpp>
@@ -24,7 +25,7 @@
 class DoorModule 
 {
 public:
-	DoorModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger);
+	DoorModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger, Cache* cachePtr);
 	~DoorModule();
 	void unlockDoors();
 	void lockDoors();
@@ -38,6 +39,7 @@ private:
 	boost::log::sources::logger_mt logger_;
 	MODULE* bdmModuleObj_;
 	std::vector<Obj*>* cache_;
+	Cache* cachePtr_;
 	DOORS* doorsObj_;
 	void getBDMModules();
 	void prepareTopology();

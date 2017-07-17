@@ -2,9 +2,10 @@
 #include "HWFService.hpp"
 
 
-HWFService::HWFService(EQM* eqmObjPtr, boost::log::sources::logger_mt logger) 
+HWFService::HWFService(EQM* eqmObjPtr, boost::log::sources::logger_mt logger, Cache* cachePtr)
 	: eqmObjPtr_(eqmObjPtr),
-	logger_(logger)
+	logger_(logger),
+	cachePtr_(cachePtr)
 {
 	BOOST_LOG(logger) << "INF " << "HWFService ctor";
 	loadHwf();
@@ -43,6 +44,12 @@ void HWFService::prepareTopology()
 		
 	}
 	eqmObjPtr_->modules_ = modules;
+	//NEW CACHE
+	for (const auto &module : modules)
+	{
+		eqmObjPtr_->children.push_back(module);
+	}
+	//*************
 }
 
 MODULE* HWFService::createModule(std::string data)

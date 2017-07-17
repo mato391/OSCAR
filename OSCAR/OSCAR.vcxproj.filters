@@ -261,6 +261,9 @@
     <ClInclude Include="LightingModule.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Cache.hpp">
+      <Filter>Header Files\Router</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -457,6 +460,9 @@
     </ClCompile>
     <ClCompile Include="LightingModule.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cache.cpp">
+      <Filter>Source Files\Router</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

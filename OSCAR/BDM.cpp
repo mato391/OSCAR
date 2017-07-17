@@ -194,6 +194,7 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 			<< " \nMSG->additional " << msg->additional;
 		return msg;
 	}
+	return nullptr;
 }
 
 std::string BDM::getDomainFor(std::string label)
@@ -338,8 +339,11 @@ void BDM::lockDoors()
 
 void BDM::initialize()
 {
-	doorModule_ = new DoorModule(cache_, logger_);
+	doorModule_ = new DoorModule(cache_, logger_, cachePtr);
 	doorModule_->initialize();
+	RESULT* result = new RESULT();
+	cachePtr->addObject(result);
+	cachePtr->addObject(result);
 	lightModule_ = new LightModule(cache_, logger_);
 	lightModule_->initialize();
 	setConfiguringStateIfNeeded();
@@ -351,19 +355,16 @@ void BDM::getBDMObjectIfNeeded()
 {
 	if (bdmModules_.empty() || bdmModules_.size() < 2)
 	{
-		for (const auto &obj : *cache_)
+		auto eqmObj = static_cast<EQM*>(cachePtr->getUniqueObject("EQM"));
+		if (eqmObj != nullptr)
 		{
-			if (obj->name == "EQM")
+			for (const auto &mod : eqmObj->modules_)
 			{
-				auto eqmObj = static_cast<EQM*>(obj);
-				for (const auto &mod : eqmObj->modules_)
+				auto module = static_cast<MODULE*>(mod);
+				if (module->label.find("BDM") != std::string::npos)
 				{
-					auto module = static_cast<MODULE*>(mod);
-					if (module->label.find("BDM") != std::string::npos)
-					{
-						BOOST_LOG(logger_) << "INF " << "BDM::getBDMObjectIfNeeded: setting module " << module->label;
-						bdmModules_[module->label] = module;
-					}
+					BOOST_LOG(logger_) << "INF " << "BDM::getBDMObjectIfNeeded: setting module " << module->label;
+					bdmModules_[module->label] = module;
 				}
 			}
 		}

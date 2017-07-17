@@ -9,7 +9,7 @@
 #include <boost\log\sources\logger.hpp>
 #include "RESULT.hpp"
 #include "CMessage.hpp"
-
+#include "Cache.hpp"
 #define AA 170
 
 class Component
@@ -17,6 +17,7 @@ class Component
 public:
 	std::string domain;
 	std::string name;
+	Cache* cachePtr;
 	enum class EConfiguringState
 	{
 		online,
@@ -27,6 +28,7 @@ public:
 	std::function<void(CMESSAGE::CMessage*)> send;
 	virtual void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) = 0;
 	virtual void setCache(std::vector<Obj*>* cache) = 0;
+	void setCache(Cache* cache) { cachePtr = cache; };
 	virtual void setComponentsCache(std::vector<Component*>* componentCache) = 0;
 	virtual void execute(std::string message) = 0;
 	virtual CMESSAGE::CMessage* execute(CMESSAGE::CMessage* msg) = 0;
@@ -34,7 +36,7 @@ public:
 	virtual void initialize() = 0;
 	virtual void setup(std::string domain) = 0;
 	virtual RESULT* setup(int domain) = 0;
-	
+	//virtual int runtime() = 0;
 	boost::log::sources::logger_mt logger_;
 	
 };

@@ -2,10 +2,11 @@
 #include "Router.hpp"
 #include "ComponentFactory.hpp"
 
-Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger) : logger_(logger)
+Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger, Cache* cachePtr) : logger_(logger)
 {
 	BOOST_LOG(logger) << "INF " << "Router ctor";
 	cache_ = cache;
+	cachePtr_ = cachePtr;
 	modLabel_ = "";
 	mmfPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\config\\MMF.txt";
 	startAutodetection();
@@ -18,8 +19,6 @@ Router::~Router()
 {
 }
 
-
-
 void Router::startAutodetection()
 {
 	BOOST_LOG(logger_) << "INF " << "Router::startAutodetection";
@@ -27,7 +26,7 @@ void Router::startAutodetection()
 	checkIfMMFExists();
 	if (!fabricStartup_)
 	{
-		hwfService_ = new HWFService(eqmObj_, logger_);
+		hwfService_ = new HWFService(eqmObj_, logger_, cachePtr_);
 		hwfService_->prepareTopology();
 	}
 	startComponentService();
@@ -70,6 +69,7 @@ void Router::createEQM()
 	BOOST_LOG(logger_) << "DBG " << "Router::createEQM";
 	eqmObj_ = new EQM();
 	cache_->push_back(eqmObj_);
+	cachePtr_->addObject(eqmObj_);
 }
 
 void Router::startComponent(std::string name, std::string address)
@@ -88,11 +88,16 @@ void Router::startComponent(std::string name, std::string address)
 	if (!exist)
 	{
 		BOOST_LOG(logger_) << "INF " << "Router::startComponent: new component should be started " << name << " address: " << address;
+		//componentsThreadGroup_.create_thread(std::bind(&ComponentFactory::createComponent, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 		components_.push_back(ComponentFactory::createComponent(name, address, logger_));
 		components_.back()->setCache(cache_);
+		if (name.find("BDM") != std::string::npos)
+			components_.back()->setCache(cachePtr_);
 		components_.back()->setComponentsCache(&components_);
 		components_.back()->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
 		components_.back()->initialize();
+		
+		//tutaj powinien pójsc runtime() componentsThreadGroup_.create_thread(std::bind(&Component::runtime, components_.back()));
 	}
 }
 

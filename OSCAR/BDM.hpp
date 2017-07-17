@@ -37,7 +37,7 @@ public:
 	void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) { send = func; }
 	RESULT* setup(int domain);
 	void setup(std::string domain) {};//TO BE DELETED WHEN ALL COMPONENTS WILL USING RESULTS
-	
+	int runtime() {};
 	void unlockDoors();
 	void lockDoors();
 	void setConfiguringStateIfNeeded();

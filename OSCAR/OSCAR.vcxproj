@@ -152,6 +152,7 @@
     <ClInclude Include="ANTENNA.h" />
     <ClInclude Include="BDM.hpp" />
     <ClInclude Include="BUTTON.hpp" />
+    <ClInclude Include="Cache.hpp" />
     <ClInclude Include="CAN.h" />
     <ClInclude Include="CARD_PORT.hpp" />
     <ClInclude Include="CHANGE_CONNECTOR_STATE_TASK.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="ALARM.cpp" />
     <ClCompile Include="ANTENNA.cpp" />
     <ClCompile Include="BUTTON.cpp" />
+    <ClCompile Include="Cache.cpp" />
     <ClCompile Include="CAN.cpp" />
     <ClCompile Include="CARD_PORT.cpp" />
     <ClCompile Include="BDM.cpp" />

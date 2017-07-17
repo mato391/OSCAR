@@ -2,10 +2,11 @@
 #include "DoorModule.hpp"
 
 
-DoorModule::DoorModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger)
+DoorModule::DoorModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger, Cache* cachePtr)
 {
 	logger_ = logger;
 	cache_ = cache;
+	cachePtr_ = cachePtr;
 	BOOST_LOG(logger_) << "DEBUG " << "DoorModule ctor";
 	if (cache_ == nullptr)
 		BOOST_LOG(logger_) << "ERROR " << "Cache cannot be setup ";
@@ -140,19 +141,17 @@ void DoorModule::setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::st
 
 void DoorModule::getBDMModules()
 {
-	for (const auto &obj : *cache_)
+	auto moduleVec = cachePtr_->getAllObjectsFromChildren("EQM", "MODULE");
+	if (!moduleVec.empty())
 	{
-		if (obj->name == "EQM")
+		BOOST_LOG(logger_) << "INF " << "DoorModule::getBDMModules " << "EQM object found";
+		for (const auto &mod : moduleVec)
 		{
-			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
+			if (static_cast<MODULE*>(mod)->label.find("BDM_DOOR") != std::string::npos)
 			{
-				if (static_cast<MODULE*>(mod)->label.find("BDM_DOOR") != std::string::npos)
-				{
-					BOOST_LOG(logger_) << "INF " << "DoorModule::getBDMModule: MODULE found";
-					bdmModuleObj_ = static_cast<MODULE*>(mod);
-					return;
-				}
-					
+				BOOST_LOG(logger_) << "INF " << "DoorModule::getBDMModule: MODULE found";
+				bdmModuleObj_ = static_cast<MODULE*>(mod);
+				return;
 			}
 		}
 	}
