@@ -4,6 +4,9 @@
 
 Cache::Cache(boost::log::sources::logger_mt logger) : logger_(logger)
 {
+	std::fstream file("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\Logs\\CacheDump.txt", std::ios::out);
+	file << "";
+	file.close();
 }
 
 
@@ -23,6 +26,7 @@ int Cache::addObject(Obj* obj)
 		}
 	}
 	cache_.push_back(obj);	
+	checkAndRunSubscription(obj);
 	return 0;
 }
 
@@ -40,14 +44,38 @@ int Cache::removeObj(Obj* obj)
 	if (iterForObjToRemove != cache_.end() + 1)
 	{
 		cache_.erase(iterForObjToRemove);
+		checkAndRunSubscription(obj);
 		return 0;
 	}
 	BOOST_LOG(logger_) << "WRN " << "Cache::removeObj: object " << obj << " does not exist";
 	return 1;
 }
 
+int Cache::addToChildren(Obj* parent, Obj* child)
+{
+	BOOST_LOG(logger_) << "INF " << "Cache::addToChildren: adding child " << child << " " << child->name << " to " << parent << " " << parent->name;
+	for (const auto &childObj : parent->children)
+	{
+		if (childObj == child)
+		{
+			BOOST_LOG(logger_) << "WRN " << "Cache::addToChildren: Child exists " << childObj << " " << childObj->name;
+			return 1;
+		}
+	}
+	parent->children.push_back(child);
+	checkAndRunSubscription(child);
+	return 0;
+}
+
+void Cache::commitChanges(std::string name)
+{
+	checkAndRunSubscription(name);
+}
+
+
 std::vector<Obj*> Cache::getAllObjects(std::string name)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::getAllObjects " << name;
 	std::vector<Obj*> objVec;
 	for (const auto &obj : cache_)
 	{
@@ -61,6 +89,7 @@ std::vector<Obj*> Cache::getAllObjects(std::string name)
 
 Obj* Cache::getUniqueObject(std::string name)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::getUniqueObject " << name;
 	for (const auto &obj : cache_)
 	{
 		if (obj->name == name)
@@ -73,6 +102,7 @@ Obj* Cache::getUniqueObject(std::string name)
 
 Obj* Cache::getUniqueObjectFromChildren(std::string parentName, std::string childName)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::getUniqueObjectFromChildren parentName: " << parentName << " childName " << childName;
 	auto obj = getUniqueObject(parentName);
 	if (obj != nullptr)
 	{
@@ -89,6 +119,7 @@ Obj* Cache::getUniqueObjectFromChildren(std::string parentName, std::string chil
 
 Obj* Cache::getUniqueObjectFromGrandChildren(std::string grandName, std::string parentName, std::string childName)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::getUniqueObjectFromGrandChildren grandName: " << grandName << " parentName: " << parentName << " childName " << childName;
 	auto obj = getUniqueObjectFromChildren(grandName, parentName);
 	if (obj != nullptr)
 	{
@@ -105,6 +136,7 @@ Obj* Cache::getUniqueObjectFromGrandChildren(std::string grandName, std::string 
 
 std::vector<Obj*> Cache::getAllObjectsFromChildren(std::string parentName, std::string name)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::getAllObjectsFromChildren parentName: " << parentName << " childName " << name;
 	auto object = getUniqueObject(parentName);
 	std::vector<Obj*> objVec;
 	if (object != nullptr && !object->children.empty())
@@ -123,6 +155,7 @@ std::vector<Obj*> Cache::getAllObjectsFromChildren(std::string parentName, std::
 
 std::vector<Obj*> Cache::getAllObjectsFromGrandChildren(std::string grandName, std::string parentName, std::string name)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::getAllObjectsFromGrandChildren grandName: " << grandName << " parentName: " << parentName << " childName " << name;
 	auto object = getUniqueObjectFromChildren(grandName, parentName);
 	std::vector<Obj*> objVec;
 	if (object != nullptr && !object->children.empty())
@@ -137,4 +170,59 @@ std::vector<Obj*> Cache::getAllObjectsFromGrandChildren(std::string grandName, s
 		return objVec;
 	}
 	return {};
+}
+
+int Cache::subscribe(std::string name, std::function<void(Obj*)> func)
+{
+	auto sub = new CACHE::Subscription(name, func);
+	boost::random::uniform_int_distribution<> dist(1, 10000);
+	sub->subscriptionId = dist(gen_);
+	subrsciptions_.push_back(sub);
+	BOOST_LOG(logger_) << "INF " << "Cache::subscribe: subscribed to: " << name << " id " << sub->subscriptionId;
+	checkAndRunSubscription(name);
+	return sub->subscriptionId;
+}
+
+void Cache::dumpObject(std::string serialized)
+{
+	std::fstream file("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\Logs\\CacheDump.txt", std::ios::app);
+	file << serialized << std::endl;
+	file.close();
+}
+
+void Cache::checkAndRunSubscription(Obj* obj)
+{
+	for (const auto &sub : subrsciptions_)
+	{
+		if (sub->name == obj->name)
+		{
+			sub->func(obj);
+		}
+	}
+}
+
+void Cache::checkAndRunSubscription(std::string name)
+{
+	for (const auto &sub : subrsciptions_)
+	{
+		if (sub->name == name)
+		{
+			sub->func(getUniqueObject(name));
+		}
+	}
+}
+
+void Cache::unsubscribe(int subscriptionId)
+{
+	std::vector<CACHE::Subscription*>::iterator iter;
+	for (iter = subrsciptions_.begin(); iter != subrsciptions_.end(); iter++)
+	{
+		if ((*iter)->subscriptionId == subscriptionId)
+		{
+			BOOST_LOG(logger_) << "INF " << "Cache::unsubscribe: unsubscribed to: " << (*iter)->name << " id " << (*iter)->subscriptionId;
+			break;
+		}
+	}
+	subrsciptions_.erase(iter);
+	
 }

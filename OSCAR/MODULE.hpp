@@ -17,7 +17,6 @@ public:
 	std::string serialNumber;
 	std::string productNumber;
 	std::string label;
-	std::vector<Obj*> children;
 	enum class EDetectionStatus
 	{
 		offline,

@@ -41,6 +41,7 @@ public:
 	void unlockDoors();
 	void lockDoors();
 	void setConfiguringStateIfNeeded();
+	void getSubscription(Obj* obj);
 private:
 	DoorModule* doorModule_;
 	LightModule* lightModule_;

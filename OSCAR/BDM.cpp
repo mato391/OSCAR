@@ -347,8 +347,19 @@ void BDM::initialize()
 	lightModule_ = new LightModule(cache_, logger_);
 	lightModule_->initialize();
 	setConfiguringStateIfNeeded();
+	int subscriptionId = cachePtr->subscribe("RESULT", std::bind(&BDM::getSubscription, this, std::placeholders::_1));
+	if (subscriptionId)
+	{
+		cachePtr->unsubscribe(subscriptionId);
+	}
 	//mirrorModule_ = new MirrorModule(cache_, logger_);
 	//mirrorModule_->initialize();
+}
+
+void BDM::getSubscription(Obj* obj)
+{
+	BOOST_LOG(logger_) << "SUBSCRIPTION DONE for " << obj;
+	
 }
 
 void BDM::getBDMObjectIfNeeded()

@@ -91,6 +91,8 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 			conn->used = true;
 			conn->type = static_cast<CONNECTOR::EType>(std::stoi(connectorData[2]));
 			connectorsGroup.push_back(conn);
+			//cachePtr_->addToChildren(moduleObj, conn);	//NEW CACHE
+			
 		}
 		else if ((*i).find("Antenna") != std::string::npos)
 		{
@@ -104,8 +106,16 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 			antenna->id = std::stoi(connectorData[0]);
 			antenna->label = connectorData[1];
 			connectorsGroup.push_back(antenna);
+			//cachePtr_->addToChildren(moduleObj, antenna);
 		}
 	}
-	moduleObj->connectors_.push_back(connectorsGroup);
+	BOOST_LOG(logger_) << "~!!!" << "SIZE of connectorGroups " << connectorsGroup.size();
+	for (const auto &conn : connectorsGroup)
+	{
+		BOOST_LOG(logger_) << "!!!!" << cachePtr_->addToChildren(moduleObj, conn);
+	}
+	BOOST_LOG(logger_) << "~!!!" << moduleObj->label << " size children " << moduleObj->children.size();
+
+	moduleObj->connectors_.push_back(connectorsGroup);	//should be deleted when all modules have CACHE
 }
 

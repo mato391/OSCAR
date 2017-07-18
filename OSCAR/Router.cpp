@@ -59,9 +59,7 @@ void Router::startComponentService()
 	else
 	{
 		BOOST_LOG(logger_) << "INFO " << "ROUTER:StartComponentService: fabric startup with naked sw";
-	}
-	
-	
+	}	
 }
 
 void Router::createEQM()
@@ -254,6 +252,7 @@ void Router::setupModule(std::string domain, int mask)
 						canPtr_->sendMessage();
 						BOOST_LOG(logger_) << "INF " << "Router::setupModule: Message sent";
 						//assert(1 != 1);
+						delete result;	//POSSIBLE CRASH
 					}
 				}
 			}
