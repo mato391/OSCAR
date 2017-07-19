@@ -9,6 +9,7 @@ BDM::BDM(std::string domain, boost::log::sources::logger_mt logger)
 	BOOST_LOG(logger_) << "DEBUG " << "BDM ctor";
 	this->domain = domain;
 	name = "BDM";
+	resultSubId_ = 0;
 }
 
 BDM::~BDM()
@@ -17,6 +18,8 @@ BDM::~BDM()
 
 RESULT* BDM::setup(int domain)
 {
+	if (resultSubId_ == 0)
+		resultSubId_ = cachePtr->subscribe("RESULT", std::bind(&BDM::handleOperationResult, this, std::placeholders::_1));
 	BOOST_LOG(logger_) << "INF " << "BDM::setup: " << domain;
 	std::string sdomain = (domain < 10 ) ? "0x0"+std::to_string(domain) : "0x" + std::to_string(domain);
 	if (sdomain == "0x05")
@@ -42,62 +45,86 @@ RESULT* BDM::setup(int domain)
 	//getResultAndSendToRouter();
 }
 
+void BDM::handleOperationResult(Obj* obj)
+{
+	auto doorMod = getModuleWithDomain(getDomainFor("BDM_DOOR"));
+	auto lightMod = getModuleWithDomain(getDomainFor("BDM_LIGHT"));
+	auto moduleTaskResult = static_cast<RESULT*>(obj);
+	BOOST_LOG(logger_) << "INF " << "BDM::handleOperationResult " << moduleTaskResult->applicant;
+	if (moduleTaskResult->feedback != "")
+	{
+		CMESSAGE::CMessage* msg = convertResultToCMessage(moduleTaskResult);
+		send(msg);
+	}
+	if (moduleTaskResult->applicant == "LIGHT_MODULE" && lightMod != nullptr)
+	{
+		cachePtr->removeFromChild(lightMod, moduleTaskResult);
+	}
+	else
+	{
+		cachePtr->removeFromChild(doorMod, moduleTaskResult);
+	}
+}
+
+CMESSAGE::CInitialMessage* BDM::initialProtocolMessageHandler(CMESSAGE::CMessage* msg)
+{
+	BOOST_LOG(logger_) << "INF " << "BDM::execute: "
+		<< "initial message detected from domain "
+		<< msg->fromDomain
+		<< " bdmModules size: "
+		<< bdmModules_.size();
+	std::string moduleLabel;
+	for (auto &module : bdmModules_)
+	{
+		BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << module.second->domain << " has been found";
+		if (module.second->domain == msg->fromDomain)
+		{
+			module.second->detectionStatus = MODULE::EDetectionStatus::online;
+			moduleLabel = module.first;
+			BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << moduleLabel << " has been set";
+			break;
+		}
+	}
+	CMESSAGE::CInitialMessage* mesg = new CMESSAGE::CInitialMessage();
+	mesg->header = AA;
+	mesg->protocol = CMESSAGE::CMessage::EProtocol::CInitialProtocol;
+	mesg->fromDomain = OWNID;
+	mesg->toDomain = msg->fromDomain.substr(2, 2);
+	mesg->optional1 = 0;
+	mesg->optional2 = 0;
+	return mesg;
+}
+
 CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
 {
-	BOOST_LOG(logger_) << "INF " << "BDM::execute " << msg;
-	RESULT* res = new RESULT();
-	CMESSAGE::CMessage* messg = nullptr;
-	std::string domain =  msg->fromDomain;
+	BOOST_LOG(logger_) << "INF " << "BDM::execute " << msg->header;
 	getBDMObjectIfNeeded();
 	if (msg->getProtocol() == CMESSAGE::CMessage::EProtocol::CInitialProtocol
 		&& msg->header == AA)
 	{
-		BOOST_LOG(logger_) << "INF " << "BDM::execute: " 
-			<< "initial message detected from domain " 
-			<< domain
-			<< " bdmModules size: "
-			<< bdmModules_.size();
-		std::string moduleLabel;
-		for (auto &module : bdmModules_)
-		{
-			BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << module.second->domain << " has been found";
-			if (module.second->domain == domain)
-			{
-				module.second->detectionStatus = MODULE::EDetectionStatus::online;
-				moduleLabel = module.first;
-				BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << moduleLabel << " has been set";
-				break;
-			}
-		}
-		CMESSAGE::CInitialMessage* mesg = new CMESSAGE::CInitialMessage();
-		mesg->header = AA;
-		mesg->protocol = CMESSAGE::CMessage::EProtocol::CInitialProtocol;
-		mesg->fromDomain = OWNID;
-		mesg->toDomain = domain.substr(2, 2);
-		mesg->optional1 = 0;
-		mesg->optional2 = 0;
-		return mesg;
+		return initialProtocolMessageHandler(msg);
 	}
 	else if (msg->getProtocol() != CMESSAGE::CMessage::EProtocol::CInitialProtocol)
 	{
 		BOOST_LOG(logger_) << "INF " << "BDM::execute: creating task";
 		if (taskCreator_ == nullptr)
 		{
-			taskCreator_ = new TaskCreator(&bdmModules_, logger_);
+			taskCreator_ = new TaskCreator(&bdmModules_, logger_, cachePtr);
 		}
 		else
 		{
 			BOOST_LOG(logger_) << "INF " << "TaskCreator constructed earlier";
 		}
 		taskCreator_->convertAndPushTask(msg);
-		doTasks();
+		//doTasks();	//to remove
 	}
 	return nullptr;
 }
 
-void BDM::doTasks()
+void BDM::doTasks()	//cale to do zmiany na subskrypcje
 {
-	doorModule_->checkAndExecuteTask();
+	//doorModule_->checkAndExecuteTask();
+	/*
 	auto mod = getModuleWithDomain(getDomainFor("BDM_DOOR"));
 	auto lightMod = getModuleWithDomain(getDomainFor("BDM_LIGHT"));
 	if (lightMod == nullptr)
@@ -109,35 +136,14 @@ void BDM::doTasks()
 	{
 		auto taskResult = mod->tasks[0]->getResult();
 		BOOST_LOG(logger_) << "INF " << "BDM::doTasks:tasks size: " << mod->tasks.size();
-		if (taskResult->feedback == "UNLOCK_DOORS")
-		{
-			BOOST_LOG(logger_) << "BDM::doTasks : creating LIGHT_WELCOME_TASK";
-			lightMod->tasks.push_back(new LIGHT_WELCOMING_TASK());
-		}
-		else if (taskResult->feedback == "LOCK_DOORS")
-		{
-			BOOST_LOG(logger_) << "BDM::doTasks : creating LIGHT_GOODBYE_TASK";
-			lightMod->tasks.push_back(new LIGHT_GOODBYE_TASK());
-		}
-		else if (taskResult->feedback == "OPENED_DOORS")
-		{
-			BOOST_LOG(logger_) << "BDM::doTasks : onOpened. Shoudl be INTER_MODULE_OPERATION called on IDM";
-		}
-		else if (taskResult->feedback == "CLOSED_DOORS")
-		{
-			BOOST_LOG(logger_) << "BDM::doTasks : onClose. Shoudl be INTER_MODULE_OPERATION called on IDM";
-		}
+		
 		
 	}
-	if (lightMod->tasks.empty())
-	{
-		BOOST_LOG(logger_) << "INF " << "BDM::doTasks : lightMod has no task :(";
-		return;
-	}
-	lightModule_->handleTask();
+	//cachePtr->subscribe("RESULT", ) Here we shoul
 	if (lightMod->tasks.size() > 0)
 	{
-		auto result = lightMod->tasks[0]->getResult();
+		auto objsVec = cachePtr->getAllObjectsUnder(lightMod, "MODULE_TASK");
+		auto result = static_cast<RESULT*>(cachePtr->getUniqueObjectUnder((objsVec[0]), "RESULT"));
 		if (result != nullptr)
 		{
 			if (result->type == RESULT::EType::executive)
@@ -150,7 +156,7 @@ void BDM::doTasks()
 	}
 	mod->tasks.clear();
 	lightMod->tasks.clear();
-	
+	*/
 }
 
 CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
@@ -344,22 +350,11 @@ void BDM::initialize()
 	RESULT* result = new RESULT();
 	cachePtr->addObject(result);
 	cachePtr->addObject(result);
-	lightModule_ = new LightModule(cache_, logger_);
+	lightModule_ = new LightModule(cache_, logger_, cachePtr);
 	lightModule_->initialize();
 	setConfiguringStateIfNeeded();
-	int subscriptionId = cachePtr->subscribe("RESULT", std::bind(&BDM::getSubscription, this, std::placeholders::_1));
-	if (subscriptionId)
-	{
-		cachePtr->unsubscribe(subscriptionId);
-	}
 	//mirrorModule_ = new MirrorModule(cache_, logger_);
 	//mirrorModule_->initialize();
-}
-
-void BDM::getSubscription(Obj* obj)
-{
-	BOOST_LOG(logger_) << "SUBSCRIPTION DONE for " << obj;
-	
 }
 
 void BDM::getBDMObjectIfNeeded()

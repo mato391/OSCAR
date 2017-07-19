@@ -4,6 +4,7 @@
 
 MODULE_TASK::MODULE_TASK()
 {
+	name = "MODULE_TASK";
 }
 
 

@@ -51,6 +51,27 @@ int Cache::removeObj(Obj* obj)
 	return 1;
 }
 
+void Cache::removeFromChild(Obj* parent, Obj* child)
+{
+	BOOST_LOG(logger_) << "INF " << "Cache::removeObj: removing child " << child << " name: " << child->name;
+	std::vector<Obj*>::iterator iter = parent->children.end();
+	for(std::vector<Obj*>::iterator i = parent->children.begin(); i != parent->children.end(); i++)
+	{
+		if ((*i) == child)
+		{
+			iter = i;
+			break;
+		}
+	}
+	if (iter != parent->children.end())
+	{
+		parent->children.erase(iter);
+		return;
+	}
+	BOOST_LOG(logger_) << "WRN " << "Cache::removeObj: object " << child->name << " does not exist";
+		
+}
+
 int Cache::addToChildren(Obj* parent, Obj* child)
 {
 	BOOST_LOG(logger_) << "INF " << "Cache::addToChildren: adding child " << child << " " << child->name << " to " << parent << " " << parent->name;
@@ -69,6 +90,7 @@ int Cache::addToChildren(Obj* parent, Obj* child)
 
 void Cache::commitChanges(std::string name)
 {
+	BOOST_LOG(logger_) << "DBG " << "Cache::commitChanges " << name;
 	checkAndRunSubscription(name);
 }
 
@@ -95,6 +117,18 @@ Obj* Cache::getUniqueObject(std::string name)
 		if (obj->name == name)
 		{
 			return obj;
+		}
+	}
+	return nullptr;
+}
+
+Obj* Cache::getUniqueObjectUnder(Obj* obj, std::string name)
+{
+	for (const auto &child : obj->children)
+	{
+		if (child->name == name)
+		{
+			return child;
 		}
 	}
 	return nullptr;
@@ -153,6 +187,20 @@ std::vector<Obj*> Cache::getAllObjectsFromChildren(std::string parentName, std::
 	return{};
 }
 
+std::vector<Obj*> Cache::getAllObjectsUnder(Obj* object, std::string name)
+{
+	BOOST_LOG(logger_) << "INF " << "Cache::getAllObjectsFromChildren parentName: " << object << " name " << object->name << " childName " << name;
+	std::vector<Obj*> objVec;
+	for (const auto &obj : object->children)
+	{
+		if (obj->name == name)
+		{
+			objVec.push_back(obj);
+		}
+	}
+	return objVec;
+}
+
 std::vector<Obj*> Cache::getAllObjectsFromGrandChildren(std::string grandName, std::string parentName, std::string name)
 {
 	BOOST_LOG(logger_) << "INF " << "Cache::getAllObjectsFromGrandChildren grandName: " << grandName << " parentName: " << parentName << " childName " << name;
@@ -192,10 +240,13 @@ void Cache::dumpObject(std::string serialized)
 
 void Cache::checkAndRunSubscription(Obj* obj)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::checkAndRunSubscription: for object: " << obj->name;
+	BOOST_LOG(logger_) << "DBG " << "Cache::checkAndRunSubscription: run sub.size(): " << subrsciptions_.size();
 	for (const auto &sub : subrsciptions_)
 	{
 		if (sub->name == obj->name)
 		{
+			BOOST_LOG(logger_) << "INF " << "Cache::checkAndRunSubscription: run sub: " << sub->subscriptionId;
 			sub->func(obj);
 		}
 	}
@@ -203,11 +254,14 @@ void Cache::checkAndRunSubscription(Obj* obj)
 
 void Cache::checkAndRunSubscription(std::string name)
 {
+	BOOST_LOG(logger_) << "INF " << "Cache::checkAndRunSubscription: for object: " << name;
+	auto obj = getUniqueObject(name);
 	for (const auto &sub : subrsciptions_)
 	{
-		if (sub->name == name)
+		if (sub->name == name && obj != nullptr)
 		{
-			sub->func(getUniqueObject(name));
+			BOOST_LOG(logger_) << "INF " << "Cache::checkAndRunSubscription: run sub: " << sub->subscriptionId;
+			sub->func(obj);
 		}
 	}
 }

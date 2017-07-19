@@ -31,12 +31,15 @@ public:
 	~Cache();
 	int addObject(Obj* obj);
 	int removeObj(Obj* obj);
+	void removeFromChild(Obj* parent, Obj* child);
 	int addToChildren(Obj* parent, Obj* child);
 	void commitChanges(std::string name);
 	std::vector<Obj*> getAllObjects(std::string name);
 	std::vector<Obj*> getAllObjectsFromChildren(std::string parentName, std::string name);
+	std::vector<Obj*> getAllObjectsUnder(Obj* object, std::string name);
 	std::vector<Obj*> getAllObjectsFromGrandChildren(std::string grandName, std::string parentName, std::string name);
 	Obj* getUniqueObject(std::string name);
+	Obj* getUniqueObjectUnder(Obj* obj, std::string);
 	Obj* getUniqueObjectFromChildren(std::string parentName, std::string childName);
 	Obj* getUniqueObjectFromGrandChildren(std::string grandName, std::string parentName, std::string childName);
 	int subscribe(std::string name, std::function<void(Obj*)> func);

@@ -13,9 +13,10 @@ public:
 		LIGHT_WELCOMING_TASK,
 		LIGHT_GOODBYE_TASK
 	};
-	EName name;
+	EName type;
 	RESULT* result;
 	RESULT* getResult() { return result; }
+	std::string taskFor;
 
 };
 

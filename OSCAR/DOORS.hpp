@@ -19,5 +19,11 @@ public:
 		opened
 	};
 	EOpeningState openingState;
+	enum class ELockingState
+	{
+		locked,
+		unlocked
+	};
+	ELockingState lockingState;
 };
 

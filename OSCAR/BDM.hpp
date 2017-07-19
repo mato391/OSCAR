@@ -41,7 +41,7 @@ public:
 	void unlockDoors();
 	void lockDoors();
 	void setConfiguringStateIfNeeded();
-	void getSubscription(Obj* obj);
+	void handleOperationResult(Obj* obj);
 private:
 	DoorModule* doorModule_;
 	LightModule* lightModule_;
@@ -50,7 +50,8 @@ private:
 	std::vector<Component*>* componentCache_;
 	std::map<std::string, MODULE*> bdmModules_;
 	TaskCreator* taskCreator_;
-
+	int resultSubId_;
+	CMESSAGE::CInitialMessage* initialProtocolMessageHandler(CMESSAGE::CMessage* msg);
 	void getBDMObjectIfNeeded();
 	CMESSAGE::CMessage* convertResultToCMessage(RESULT* res);
 	std::string getDomainFor(std::string label);

@@ -130,10 +130,10 @@ void Router::receiver(std::string data)
 			}
 			for (const auto &component : components_)
 			{
-				BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: " << component->name;
+				BOOST_LOG(logger_) << "DBG " << "Router::receiver: Component: " << component->name;
 				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component configuringState: " << static_cast<int>(component->configuringState);
 				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: domain " << component->domain;
-				BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component to find: " << modLabel_;
+				BOOST_LOG(logger_) << "DBG " << "Router::receiver: Component to find: " << modLabel_;
 				if (modLabel_ != "" && modLabel_.find(component->name) != std::string::npos)
 				{
 					auto result = component->execute(msg);
@@ -180,6 +180,8 @@ void Router::sender(std::string data)
 */
 void Router::sender(CMESSAGE::CMessage* msg)
 {
+	BOOST_LOG(logger_) << "INF " << "Router::sender: msg sending to: " << msg->toDomain
+		<< ", from: " << msg->fromDomain << ", hdr " << msg->header << ", proto: " << static_cast<int>(msg->protocol);
 	auto can_msg = protoManager_->createMessage(msg);
 	canPtr_->messageTx = can_msg;
 	canPtr_->sendMessage();

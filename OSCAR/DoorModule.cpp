@@ -33,6 +33,7 @@ void DoorModule::initialize()
 void DoorModule::setup()
 {
 	BOOST_LOG(logger_) << "DBG " << "DoorModule::setup";
+	cachePtr_->subscribe("MODULE_TASK", std::bind(&DoorModule::checkAndExecuteTask, this, std::placeholders::_1));
 	std::vector<CONNECTOR*> wrongSetupConnectors;
 	for (const auto &connGr : bdmModuleObj_->connectors_)
 	{
@@ -64,33 +65,31 @@ void DoorModule::setup()
 	}
 }
 
-void DoorModule::checkAndExecuteTask()
+void DoorModule::checkAndExecuteTask(Obj* obj)
 {
-	std::vector<MODULE_TASK*> tasks;
-	if (!bdmModuleObj_->tasks.empty())
-	{
-		for (auto &task : bdmModuleObj_->tasks)
-		{
-			runTask(task);
-		}
-	}
+	runTask(static_cast<MODULE_TASK*>(obj));
+	cachePtr_->removeFromChild(bdmModuleObj_, obj);
 }
 
 void DoorModule::runTask(MODULE_TASK* task)
 {
-	if (task->name == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
+	if (task->type == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK && task->taskFor == bdmModuleObj_->domain)
 	{
 		auto ccst = static_cast<CHANGE_CONNECTOR_STATE_TASK*>(task);
 		auto feedback = changeConnectorState(ccst->port, ccst->value);
-		if (feedback != boost::none)
+
+		/*if (feedback != boost::none)
 		{
-			ccst->result = new RESULT();
-			ccst->result->applicant = "DoorModule";
-			ccst->result->feedback = feedback.value();
-			ccst->result->status = RESULT::EStatus::success;
-			BOOST_LOG(logger_) << "INF " << "DoorModule::runTask: feedback: " << ccst->result->feedback;
-		}
+			auto result = new RESULT();
+			result->applicant = "DoorModule";
+			result->feedback = feedback.value();
+			result->status = RESULT::EStatus::success;
+			cachePtr_->addToChildren(task, result);
+			BOOST_LOG(logger_) << "INF " << "DoorModule::runTask: feedback: " << result->feedback;
+		}*/
 	}
+	else
+		BOOST_LOG(logger_) << "INF " << "DoorModule::runTask " << "This task is not for DoorModule or type is unknown " << task->taskFor << " != " << bdmModuleObj_->domain;
 }
 
 void DoorModule::setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label)

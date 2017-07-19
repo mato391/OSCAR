@@ -4,7 +4,7 @@
 
 LIGHT_WELCOMING_TASK::LIGHT_WELCOMING_TASK()
 {
-	this->name = EName::LIGHT_WELCOMING_TASK;
+	this->type = EName::LIGHT_WELCOMING_TASK;
 }
 
 

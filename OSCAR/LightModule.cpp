@@ -2,10 +2,12 @@
 #include "LightModule.h"
 
 
-LightModule::LightModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger)
+LightModule::LightModule(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger, Cache* cachePtr)
 {
+	cachePtr_ = cachePtr;
 	logger_ = logger;
 	cache_ = cache;
+	doorsObj_ = DOORS();
 	BOOST_LOG(logger_) << "DEBUG " << "LightModule ctor";
 }
 
@@ -23,6 +25,38 @@ void LightModule::setup()
 			auto connector = (static_cast<CONNECTOR*>(conn));
 			changeLightProceduralState(connector->label, connector->value);
 		}
+	}
+	welcomeTaskSubscrId_ = cachePtr_->subscribe("MODULE_TASK", std::bind(&LightModule::handleTask, this, std::placeholders::_1));
+	int doorsChangeSubscId = cachePtr_->subscribe("DOORS", std::bind(&LightModule::handleDoorsStateChange, this, std::placeholders::_1));
+}
+
+void LightModule::handleDoorsStateChange(Obj* obj)
+{
+	if (doorsObj_.children.empty())
+		doorsObj_ = *(static_cast<DOORS*>(obj));
+	else
+	{
+		compareStates(obj);
+		doorsObj_ = *(static_cast<DOORS*>(obj));
+	}
+}
+
+void LightModule::compareStates(Obj* obj)
+{
+	auto doorsObj = static_cast<DOORS*>(obj);
+	if (doorsObj_.openingState != doorsObj->openingState)
+	{
+		BOOST_LOG(logger_) << "INF " << "LightModule::compareStates " << "openingState has been changed";
+	}
+	else if (doorsObj_.lockingState != doorsObj->lockingState)
+	{
+		BOOST_LOG(logger_) << "INF " << "LightModule::compareStates " << "lockingState has been changed";
+		auto res = new RESULT();
+		res->applicant = "LIGHT_MODULE";
+		res->feedback = getCommonGndConnectorId("BLINKER") + ":" + std::to_string(static_cast<int>(doorsObj->lockingState) + 1) + ":" "15";
+		res->status = RESULT::EStatus::success;
+		res->type = RESULT::EType::executive;
+		cachePtr_->addToChildren(bdmModuleObj_, res);
 	}
 }
 
@@ -77,35 +111,39 @@ void LightModule::changeConnectorStateIndication(std::string connectorId, std::s
 	
 }
 
-void LightModule::handleTask()
+void LightModule::handleTask(Obj* obj)
 {
-	if (!bdmModuleObj_->tasks.empty())
+	auto res = new RESULT();
+	res->applicant = "LIGHT_MODULE";
+	auto moduleTask = static_cast<MODULE_TASK*>(obj);
+	if (moduleTask->taskFor == bdmModuleObj_->domain)
 	{
-		bdmModuleObj_->tasks[0]->result = new RESULT();
-		bdmModuleObj_->tasks[0]->result->applicant = "LIGHT_MODULE";
-		if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::LIGHT_WELCOMING_TASK)
+		if (moduleTask->type == MODULE_TASK::EName::LIGHT_WELCOMING_TASK)
 		{
 			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_WELCOMING_TASK";
-			
-			bdmModuleObj_->tasks[0]->result->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "15";
-			bdmModuleObj_->tasks[0]->result->status = RESULT::EStatus::success;
-			bdmModuleObj_->tasks[0]->result->type = RESULT::EType::executive;
+
+			res->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "15";
+			res->status = RESULT::EStatus::success;
+			res->type = RESULT::EType::executive;
+
 		}
-		else if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::LIGHT_GOODBYE_TASK)
+		else if (moduleTask->type == MODULE_TASK::EName::LIGHT_GOODBYE_TASK)
 		{
 			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_GOODBYE_TASK";
-			bdmModuleObj_->tasks[0]->result->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "25";
-			bdmModuleObj_->tasks[0]->result->status = RESULT::EStatus::success;
-			bdmModuleObj_->tasks[0]->result->type = RESULT::EType::executive;
+			res->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "25";
+			res->status = RESULT::EStatus::success;
+			res->type = RESULT::EType::executive;
 		}
-		else if (bdmModuleObj_->tasks[0]->name == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
+		else if (moduleTask->type == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
 		{
 			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: CHANGE_CONNECTOR_STATE_TASK";
-			changeConnectorStateHandler(static_cast<CHANGE_CONNECTOR_STATE_TASK*>(bdmModuleObj_->tasks[0]));
+			changeConnectorStateHandler(static_cast<CHANGE_CONNECTOR_STATE_TASK*>(moduleTask));
 		}
+		cachePtr_->addToChildren(moduleTask, res);
 	}
 	else
-		BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: no task to handle";
+		BOOST_LOG(logger_) << "INF " << "LightModule::handleTask " << "This task is not for LightModule or type is unknown " << moduleTask->taskFor << " != " << bdmModuleObj_->domain;
+	
 }
 
 void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
@@ -132,20 +170,14 @@ void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
 
 void LightModule::getBDMModules()
 {
-	for (const auto &obj : *cache_)
+	auto bdmModules = cachePtr_->getAllObjectsFromChildren("EQM", "MODULE");
+	for (const auto &obj : bdmModules)
 	{
-		if (obj->name == "EQM")
+		if (static_cast<MODULE*>(obj)->label == "BDM_LIGHT")
 		{
-			for (const auto &mod : static_cast<EQM*>(obj)->modules_)
-			{
-				if (static_cast<MODULE*>(mod)->label == "BDM_LIGHT")
-				{
-					BOOST_LOG(logger_) << "INF " << "LightModule::getBDMModule: MODULE found";
-					bdmModuleObj_ = static_cast<MODULE*>(mod);
-					return;
-				}
-
-			}
+			BOOST_LOG(logger_) << "INF " << "LightModule::getBDMModule: MODULE found";
+			bdmModuleObj_ = static_cast<MODULE*>(obj);
+			return;
 		}
 	}
 	BOOST_LOG(logger_) << "ERR " << "LightModule::getBDMModule: MODULE not found";
@@ -154,23 +186,22 @@ void LightModule::getBDMModules()
 void LightModule::createLightsObj()
 {
 	lightes_ = new LIGHTES();
+	cachePtr_->addToChildren(bdmModuleObj_, lightes_);
 }
 
 void LightModule::createLightsTopology()
 {
 	BOOST_LOG(logger_) << "INFO " << "LightModule::createLightsTopology";
 	std::vector<std::string> labels;
-	for (const auto &vec : bdmModuleObj_->connectors_)
+	auto connsVec = cachePtr_->getAllObjectsUnder(bdmModuleObj_, "CONNECTOR");
+	for (const auto &obj : connsVec)
 	{
-		for (const auto &obj : vec)
+		auto conn = static_cast<CONNECTOR*>(obj);
+		BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology for connector: " << conn->id << " " << conn->label;
+		if (conn->label.find("LIGHT") != std::string::npos)
 		{
-			auto conn = static_cast<CONNECTOR*>(obj);
-			BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology for connector: " << conn->id << " " << conn->label;
-			if (conn->label.find("LIGHT") != std::string::npos)
-			{
-				conns.push_back(conn);
-				BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology adding conn: " << conn->id << " " << conn->label;
-			}
+			conns.push_back(conn);
+			BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology adding conn: " << conn->id << " " << conn->label;
 		}
 	}
 	for (auto &conn : conns)
@@ -293,7 +324,8 @@ void LightModule::blink(int count)
 	result->applicant = bdmModuleObj_->label;
 	result->status = RESULT::EStatus::success;
 	result->feedback = commonGNDs[0]->id + commonGNDs[1]->id;
-	bdmModuleObj_->children.push_back(result);
+	cachePtr_->addToChildren(bdmModuleObj_, result);
+	//bdmModuleObj_->children.push_back(result);
 }
 
 std::string LightModule::getCommonGndConnectorId(std::string label)

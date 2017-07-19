@@ -34,7 +34,7 @@ public:
 	std::vector<MODULE_TASK*>* tasks;
 	boost::optional<std::string> changeConnectorState(int connectorId, int value);
 	int getModuleProtocol() { return static_cast<int>(bdmModuleObj_->protocol); }
-	void checkAndExecuteTask();
+	void checkAndExecuteTask(Obj* obj);
 private:
 	boost::log::sources::logger_mt logger_;
 	MODULE* bdmModuleObj_;

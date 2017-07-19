@@ -9,17 +9,19 @@
 #include "CMessage.hpp"
 #include "MODULE_TASK.hpp"
 #include "CHANGE_CONNECTOR_STATE_TASK.h"
+#include "Cache.hpp"
 
 
 class TaskCreator
 {
 public:
 	TaskCreator(std::map<std::string, MODULE*>* bdmModules,
-		boost::log::sources::logger_mt logger);
+		boost::log::sources::logger_mt logger, Cache* cache);
 	~TaskCreator();
 	void convertAndPushTask(CMESSAGE::CMessage* msg);
 private:
 	std::map<std::string, MODULE*>* bdmModules_;
 	boost::log::sources::logger_mt logger_;
+	Cache* cache_;
 };
 
