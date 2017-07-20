@@ -21,6 +21,7 @@
 #include <boost\move\utility.hpp>
 #include <boost\log\sources\logger.hpp>
 #include <boost\optional.hpp>
+#include "swconfig.hpp"
 
 class DoorModule 
 {

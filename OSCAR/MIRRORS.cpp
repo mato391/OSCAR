@@ -5,6 +5,7 @@
 MIRRORS::MIRRORS()
 {
 	name = "MIRRORS";
+	openingState = EOpeningState::closed;
 }
 
 

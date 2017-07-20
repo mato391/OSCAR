@@ -204,6 +204,7 @@
     <ClInclude Include="StartStopEngineButtonAgent.hpp" />
     <ClInclude Include="StartStopEngineProcedure.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="swconfig.hpp" />
     <ClInclude Include="SWITCH_TOPOLOGY.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TASK.hpp" />

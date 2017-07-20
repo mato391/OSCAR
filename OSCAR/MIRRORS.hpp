@@ -1,6 +1,7 @@
 #pragma once
 #include "Objects\Obj.hpp"
 #include "MIRROR.hpp"
+#include "CONNECTOR.hpp"
 #include <vector>
 class MIRRORS :
 	public Obj
@@ -8,6 +9,12 @@ class MIRRORS :
 public:
 	MIRRORS();
 	~MIRRORS();
-	std::vector<MIRROR*> children_;
+	CONNECTOR* commonOutGND;
+	enum class EOpeningState
+	{
+		closed,
+		opened
+	};
+	EOpeningState openingState;
 };
 

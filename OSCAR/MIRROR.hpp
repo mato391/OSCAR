@@ -6,16 +6,9 @@ class MIRROR :
 public:
 	MIRROR();
 	~MIRROR();
-	enum class ELabel
-	{
-		left,
-		inside,
-		right
-	};
-	ELabel label;
+	std::string label;
 	int x;
 	int y;
-	int z;
 	enum class EOpeningState
 	{
 		closed,

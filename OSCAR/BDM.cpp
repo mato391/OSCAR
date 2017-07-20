@@ -41,6 +41,15 @@ RESULT* BDM::setup(int domain)
 		result->status = RESULT::EStatus::success;
 		return result;
 	}
+	else if (sdomain == "0x09")
+	{
+		mirrorModule_->setup();
+		RESULT* result = new RESULT();
+		result->applicant = "BDM";
+		result->feedback = std::to_string(mirrorModule_->getModuleProtocol());
+		result->status = RESULT::EStatus::success;
+		return result;
+	}
 	return nullptr;
 	//getResultAndSendToRouter();
 }
@@ -191,13 +200,32 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 		msg->value = std::stoi(tmp[1]);
 		msg->additional = std::stoi(tmp[2]);
 		msg->protocol = CMESSAGE::CMessage::EProtocol::CExtendedProtocol;
-		BOOST_LOG(logger_) << "DBG " << "BDM::convertResultToCMessage: "
-			<< " MSG->protocol " << static_cast<int>(msg->protocol)
-			<< " \nMSG->fromDomain " << msg->fromDomain
-			<< " \nMSG->header " << msg->header
-			<< " \nMSG->port " << msg->port
-			<< " \nMSG->value " << msg->value
-			<< " \nMSG->additional " << msg->additional;
+		if (BDM_DBG)
+		{
+			BOOST_LOG(logger_) << "DBG " << "BDM::convertResultToCMessage: "
+				<< " MSG->protocol " << static_cast<int>(msg->protocol)
+				<< " \nMSG->fromDomain " << msg->fromDomain
+				<< " \nMSG->header " << msg->header
+				<< " \nMSG->port " << msg->port
+				<< " \nMSG->value " << msg->value
+				<< " \nMSG->additional " << msg->additional;
+		}
+		
+		return msg;
+	}
+	else if (res->applicant == "MIRROR_MODULE")
+	{
+		CMESSAGE::CSimpleMessage* msg = new CMESSAGE::CSimpleMessage();
+		std::string tmpdomain = getDomainFor("BDM_MIRROR");
+		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
+		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
+		msg->fromDomain = OWNID;
+		msg->header = CC;
+		std::vector<std::string> tmp;
+		boost::split(tmp, res->feedback, boost::is_any_of(":"));
+		msg->port = std::stoi(tmp[0]);
+		msg->value = std::stoi(tmp[1]);
+		msg->protocol = CMESSAGE::CMessage::EProtocol::CSimpleProtocol;
 		return msg;
 	}
 	return nullptr;
@@ -326,7 +354,7 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 	}
 	if (imo->operation == "GET_MIRROR_POS")
 	{
-		mirrorModule_->getMirrorPosition(std::stoi(imo->details));
+		//mirrorModule_->getMirrorPosition(std::stoi(imo->details));
 		//IMO_RESULT should be created 
 		
 		
@@ -347,14 +375,12 @@ void BDM::initialize()
 {
 	doorModule_ = new DoorModule(cache_, logger_, cachePtr);
 	doorModule_->initialize();
-	RESULT* result = new RESULT();
-	cachePtr->addObject(result);
-	cachePtr->addObject(result);
 	lightModule_ = new LightModule(cache_, logger_, cachePtr);
 	lightModule_->initialize();
 	setConfiguringStateIfNeeded();
-	//mirrorModule_ = new MirrorModule(cache_, logger_);
-	//mirrorModule_->initialize();
+	mirrorModule_ = new MirrorModule(cache_, logger_, cachePtr);
+	mirrorModule_->initialize();
+	setConfiguringStateIfNeeded();
 }
 
 void BDM::getBDMObjectIfNeeded()
@@ -379,7 +405,7 @@ void BDM::getBDMObjectIfNeeded()
 
 void BDM::setConfiguringStateIfNeeded()
 {
-	if (/*lightModule_ != nullptr &&*/ doorModule_ != nullptr /* && mirrorModule_ != nullptr*/)	//comments should be deleted
+	if (lightModule_ != nullptr && doorModule_ != nullptr && mirrorModule_ != nullptr)	//comments should be deleted
 	{
 		BOOST_LOG(logger_) << "INF " << "BDM::setConfiguringStateIfNeeded: " << "OK";
 		configuringState = EConfiguringState::configured;

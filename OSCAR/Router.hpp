@@ -24,6 +24,8 @@
 #include "ModuleInitialConfigurator.hpp"
 #include "CAN.h"
 #include "ProtocolManager.h"
+#include "swconfig.hpp"
+
 
 #define BB 187
 #define BC 188

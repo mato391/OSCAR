@@ -185,7 +185,7 @@ void Router::sender(CMESSAGE::CMessage* msg)
 		<< ", from: " << msg->fromDomain << ", hdr " << msg->header << ", proto: " << static_cast<int>(msg->protocol);
 	auto can_msg = protoManager_->createMessage(msg);
 	canPtr_->messageTx = can_msg;
-	if (DEBUG)
+	if (ROUTER_DBG)
 	{
 		BOOST_LOG(logger_) << "DBG " << "Router::sender: messageCAN: data[0]" << static_cast<int>(canPtr_->messageTx.data[0])
 			<< " data[1] " << static_cast<int>(canPtr_->messageTx.data[1])

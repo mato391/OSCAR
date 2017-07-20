@@ -54,6 +54,7 @@ namespace CMESSAGE
 		public CMessage
 	{
 	public:
+		CSimpleMessage() {};
 		CSimpleMessage(CAN::messageCAN* msg)
 		{
 			protocol = CMessage::EProtocol::CSimpleProtocol;
