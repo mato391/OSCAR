@@ -53,7 +53,7 @@ void LightModule::compareStates(Obj* obj)
 		BOOST_LOG(logger_) << "INF " << "LightModule::compareStates " << "lockingState has been changed";
 		auto res = new RESULT();
 		res->applicant = "LIGHT_MODULE";
-		res->feedback = getCommonGndConnectorId("BLINKER") + ":" + std::to_string(static_cast<int>(doorsObj->lockingState) + 1) + ":" "15";
+		res->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1:" + std::to_string(static_cast<int>(doorsObj->lockingState) + 1) + "5";
 		res->status = RESULT::EStatus::success;
 		res->type = RESULT::EType::executive;
 		cachePtr_->addToChildren(bdmModuleObj_, res);

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Router.hpp"
 #include "ComponentFactory.hpp"
+#define DEBUG true
 
 Router::Router(std::vector<Obj*>* cache, boost::log::sources::logger_mt logger, Cache* cachePtr) : logger_(logger)
 {
@@ -184,6 +185,18 @@ void Router::sender(CMESSAGE::CMessage* msg)
 		<< ", from: " << msg->fromDomain << ", hdr " << msg->header << ", proto: " << static_cast<int>(msg->protocol);
 	auto can_msg = protoManager_->createMessage(msg);
 	canPtr_->messageTx = can_msg;
+	if (DEBUG)
+	{
+		BOOST_LOG(logger_) << "DBG " << "Router::sender: messageCAN: data[0]" << static_cast<int>(canPtr_->messageTx.data[0])
+			<< " data[1] " << static_cast<int>(canPtr_->messageTx.data[1])
+			<< " data[2] " << static_cast<int>(canPtr_->messageTx.data[2])
+			<< " data[3] " << static_cast<int>(canPtr_->messageTx.data[3])
+			<< " data[4] " << static_cast<int>(canPtr_->messageTx.data[4])
+			<< " data[5] " << static_cast<int>(canPtr_->messageTx.data[5])
+			<< " data[6] " << static_cast<int>(canPtr_->messageTx.data[6])
+			<< " data[7] " << static_cast<int>(canPtr_->messageTx.data[7]);
+	}
+	
 	canPtr_->sendMessage();
 }
 

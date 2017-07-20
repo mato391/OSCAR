@@ -1,1 +1,1 @@
-NAME:EthernetadapterLocalAreaConnection2;IP:10.154.74.138;MASK:255.0.0.0;DHCP:No;GW:#NAME:WirelessLANadapterWirelessNetworkConnection6;IP:192.168.1.104;MASK:255.255.255.0;DHCP:Yes;GW:192.168.1.1
+NAME:EthernetadapterLocalAreaConnection2;IP:10.154.74.223;MASK:255.0.0.0;DHCP:No;GW:#NAME:WirelessLANadapterWirelessNetworkConnection6;IP:192.168.1.104;MASK:255.255.255.0;DHCP:Yes;GW:192.168.1.1
