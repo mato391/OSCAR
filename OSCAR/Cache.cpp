@@ -295,8 +295,8 @@ void Cache::checkAndRunSubscription(Obj* obj, CACHE::Subscription::EType type)
 			boost::thread t(std::bind(&Cache::runOnObject, this, sub, obj));
 			t.detach();
 		}
-		else
-			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " sub name is another or type is not the same " << sub->name << " " << static_cast<int>(sub->type);
+		//else
+		//	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " sub name is another or type is not the same " << sub->name << " " << static_cast<int>(sub->type);
 	}
 	//funcTemp_ = std::bind(&Cache::emptyFunction, this, std::placeholders::_1);
 	//BOOST_LOG(logger_) << "DBG " << "Cache::checkAndRunSubscription: checkingDone ";
@@ -325,8 +325,8 @@ void Cache::checkAndRunSubscription(std::string name, CACHE::Subscription::EType
 				boost::thread t(std::bind(&Cache::runOnObject, this, sub, obj));
 				t.detach();
 			}
-			else
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " sub name is another or type is not the same "  << sub->name << " " << static_cast<int>(sub->type);
+			//else
+				//BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " sub name is another or type is not the same "  << sub->name << " " << static_cast<int>(sub->type);
 		}
 		//funcTemp_ = std::bind(&Cache::emptyFunction, this, std::placeholders::_1);
 	}
@@ -338,9 +338,11 @@ void Cache::runOnObject(CACHE::Subscription* sub, Obj* obj)
 	BOOST_LOG(logger_) << "INF " << "Cache::runOnObject for subId: " << subTmp_->subscriptionId << "  in thread: " << boost::this_thread::get_id();
 	if (subTmp_ != nullptr)
 	{
-		mtx_.lock();
+		while (!mtx_.try_lock())
+		{
+			boost::this_thread::sleep(boost::posix_time::microseconds(200));
+		}
 		sub->func(obj);
-//		funcTemp_ = std::bind(&Cache::emptyFunction, this, std::placeholders::_1);
 		mtx_.unlock();
 	}
 	else

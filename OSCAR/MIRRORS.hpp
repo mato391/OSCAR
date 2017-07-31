@@ -13,6 +13,8 @@ public:
 	enum class EOpeningState
 	{
 		closed,
+		opening,
+		closing,
 		opened
 	};
 	EOpeningState openingState;

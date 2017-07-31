@@ -24,7 +24,7 @@ void MirrorModule::initialize()
 void MirrorModule::setup()
 {
 	BOOST_LOG(logger_) << "INF " << "MirrorModule::setup " << std::endl;
-	mirrorModule_->protocol = MODULE::EProtocol::CSimpleMessage;
+	mirrorModule_->protocol = MODULE::EProtocol::CExtendedMessage;
 	mirrorModule_->operationalState = MODULE::EOperationalState::enabled;
 	doors_ = *static_cast<DOORS*>(cachePtr_->getUniqueObject("DOORS"));
 	cachePtr_->subscribe("MODULE_TASK", std::bind(&MirrorModule::handleModuleTask, this, std::placeholders::_1), { 0 });
@@ -37,7 +37,44 @@ void MirrorModule::handleModuleTask(Obj* obj)
 	if (moduleTask->type == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
 	{
 		auto ccst = static_cast<CHANGE_CONNECTOR_STATE_TASK*>(moduleTask);
-		BOOST_LOG(logger_) << "INF " << "MirrorModule::handleModuleTask: changeConnectorState: " << ccst->port << " to value " << ccst->value;
+		for (const auto &conn : mirrorModule_->children)
+		{
+			auto connC = static_cast<CONNECTOR*>(conn);
+			if (connC->id == ccst->port)
+			{
+				BOOST_LOG(logger_) << "INF " << "MirrorModule::handleModuleTask: changeConnectorState: " << ccst->port << " to value " << ccst->value;
+				connC->value = ccst->value;
+				return;
+			}
+		}
+		if (mirrorsObj_->commonOutGND->id == ccst->port)
+		{
+			mirrorsObj_->commonOutGND->value = ccst->value;
+			if (mirrorsObj_->openingState == MIRRORS::EOpeningState::closed
+				&& ccst->value == 0)
+			{
+				mirrorsObj_->openingState = MIRRORS::EOpeningState::closed;
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to closed";
+			}
+			else if (mirrorsObj_->openingState == MIRRORS::EOpeningState::opened
+				&& ccst->value == 0)
+			{
+				mirrorsObj_->openingState = MIRRORS::EOpeningState::opened;
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to opened";
+			}
+			else if (mirrorsObj_->openingState == MIRRORS::EOpeningState::opened
+				&& ccst->value == 1)
+			{
+				mirrorsObj_->openingState = MIRRORS::EOpeningState::closing;
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to closing";
+			}
+			else if (mirrorsObj_->openingState == MIRRORS::EOpeningState::closed
+				&& ccst->value == 1)
+			{
+				mirrorsObj_->openingState = MIRRORS::EOpeningState::opening;
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to opening";
+			}
+		}	
 	}
 }
 
@@ -54,12 +91,10 @@ void MirrorModule::handleDoorsStateChange(Obj* obj)
 			BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange: mirrors opening";
 			auto res = new RESULT();
 			res->applicant = "MIRROR_MODULE";
-			res->feedback = std::to_string(mirrorsObj_->commonOutGND->id)  + ":1";
+			res->feedback = std::to_string(mirrorsObj_->commonOutGND->id)  + ":1:125";
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " feedback: " << res->feedback;
 			res->status = RESULT::EStatus::success;
 			res->type = RESULT::EType::executive;
-			cachePtr_->addToChildren(mirrorModule_, res);
-			boost::this_thread::sleep(boost::posix_time::milliseconds(2500));
-			res->feedback = std::to_string(mirrorsObj_->commonOutGND->id) + ":0";
 			cachePtr_->addToChildren(mirrorModule_, res);
 		}
 	}

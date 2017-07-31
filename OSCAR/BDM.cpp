@@ -218,17 +218,26 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 	}
 	else if (res->applicant == "MIRROR_MODULE")
 	{
-		CMESSAGE::CSimpleMessage* msg = new CMESSAGE::CSimpleMessage();
+		CMESSAGE::CExtendedMessage* msg = new CMESSAGE::CExtendedMessage();
 		std::string tmpdomain = getDomainFor("BDM_MIRROR");
 		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
-		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
 		msg->fromDomain = OWNID;
 		msg->header = CC;
 		std::vector<std::string> tmp;
 		boost::split(tmp, res->feedback, boost::is_any_of(":"));
 		msg->port = std::stoi(tmp[0]);
-		msg->value = std::stoi(tmp[1]);
-		msg->protocol = CMESSAGE::CMessage::EProtocol::CSimpleProtocol;
+		msg->value = std::stoi(tmp[1]); 
+		msg->additional = std::stoi(tmp[2]);
+		msg->protocol = CMESSAGE::CMessage::EProtocol::CExtendedProtocol;
+		if (BDM_DBG)
+		{
+			BOOST_LOG(logger_) << "DBG " << "BDM::convertResultToCMessage: "
+				<< " MSG->protocol " << static_cast<int>(msg->protocol)
+				<< " \nMSG->fromDomain " << msg->fromDomain
+				<< " \nMSG->header " << msg->header
+				<< " \nMSG->port " << msg->port
+				<< " \nMSG->value " << msg->value;
+		}
 		return msg;
 	}
 	return nullptr;
