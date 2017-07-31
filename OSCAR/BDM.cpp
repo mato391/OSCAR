@@ -175,17 +175,32 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 {
 	if (res->applicant == "DOOR_MODULE")
 	{
-		CMESSAGE::CInitialMessage* msg = new CMESSAGE::CInitialMessage();
-		std::string tmpdomain = getDomainFor("BDM_DOOR");
-		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
-		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
-		msg->fromDomain = OWNID;
 		if (res->feedback == "Initialize")
 		{
+			CMESSAGE::CInitialMessage* msg = new CMESSAGE::CInitialMessage();
+			std::string tmpdomain = getDomainFor("BDM_DOOR");
+			msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
+			BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
+			msg->fromDomain = OWNID;
 			msg->header = AA;
 			msg->optional1 = 0;
 			msg->optional2 = 0;
 			msg->protocol = CMESSAGE::CMessage::EProtocol::CInitialProtocol;
+			return msg;
+		}
+		else
+		{
+			CMESSAGE::CSimpleMessage* msg = new CMESSAGE::CSimpleMessage();
+			std::string tmpdomain = getDomainFor("BDM_DOOR");
+			msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
+			BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
+			msg->fromDomain = OWNID;
+			msg->header = CC;
+			std::vector<std::string> tmp;
+			boost::split(tmp, res->feedback, boost::is_any_of(":"));
+			msg->port = std::stoi(tmp[0]);
+			msg->value = std::stoi(tmp[1]);
+			msg->protocol = CMESSAGE::CMessage::EProtocol::CSimpleProtocol;
 			return msg;
 		}
 	}

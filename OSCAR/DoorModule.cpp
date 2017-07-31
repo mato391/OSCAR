@@ -425,11 +425,42 @@ boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, i
 			BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: GND connector " << connC->id << " to value " << value;
 			doorsObj_->setLockingState(value);
 			cachePtr_->commitChanges(doorsObj_);
+			boost::thread t(std::bind(&DoorModule::setTimerForClose, this));
+			t.detach();
 			return (value == 0) ? "LOCK_DOORS" : "UNLOCK_DOORS";
 		}
 	}
 	BOOST_LOG(logger_) << "ERR " << "DoorModule::changeConnectorState: Connector not found...";
 	return boost::none;
+}
+
+void DoorModule::setTimerForClose()
+{
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__;
+	if (doorsObj_->lockingState == DOORS::ELockingState::unlocked)
+	{
+		int i = 0;
+		while (i < 10)
+		{
+			if (doorsObj_->openingState == DOORS::EOpeningState::opened)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " doors opened. ShutDown timer";
+				return;
+			}
+			boost::this_thread::sleep(boost::posix_time::seconds(1));
+			i++;
+			std::cout << "TIMER " << i << std::endl;
+		}
+		std::cout << "TIMER CLOSE" << std::endl;
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " timeout for opening doors";
+		RESULT* res = new RESULT();
+		res->applicant = "DOOR_MODULE";
+		res->feedback = std::to_string(static_cast<CONNECTOR*>(doorsObj_->commonLockGND->children[0])->id) + ":0";
+		res->status = RESULT::EStatus::success;
+		res->type = RESULT::EType::executive;
+		cachePtr_->addToChildren(bdmModuleObj_, res);
+
+	}
 }
 
 void DoorModule::changeDOORSOpeningStateIfNeeded(int value)

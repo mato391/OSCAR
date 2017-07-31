@@ -57,5 +57,6 @@ private:
 	void runTask(MODULE_TASK* task);
 	void onOpen();
 	void onClose();
+	void setTimerForClose();
 };
 

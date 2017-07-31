@@ -97,6 +97,7 @@ void MirrorModule::handleDoorsStateChange(Obj* obj)
 			res->type = RESULT::EType::executive;
 			cachePtr_->addToChildren(mirrorModule_, res);
 		}
+		//SHOULD BE ADDED FOR CLOSING BUT WE NEED TO CHANGE POLARISATION OF MOTOR
 	}
 }
 
