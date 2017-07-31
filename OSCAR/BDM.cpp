@@ -19,7 +19,7 @@ BDM::~BDM()
 RESULT* BDM::setup(int domain)
 {
 	if (resultSubId_ == 0)
-		resultSubId_ = cachePtr->subscribe("RESULT", std::bind(&BDM::handleOperationResult, this, std::placeholders::_1));
+		resultSubId_ = cachePtr->subscribe("RESULT", std::bind(&BDM::handleOperationResult, this, std::placeholders::_1), { 0 })[0];
 	BOOST_LOG(logger_) << "INF " << "BDM::setup: " << domain;
 	std::string sdomain = (domain < 10 ) ? "0x0"+std::to_string(domain) : "0x" + std::to_string(domain);
 	if (sdomain == "0x05")
@@ -28,6 +28,7 @@ RESULT* BDM::setup(int domain)
 		RESULT* result = new RESULT();
 		result->applicant = "BDM";
 		result->feedback = std::to_string(doorModule_->getModuleProtocol());
+		BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << result->feedback;
 		result->status = RESULT::EStatus::success;
 		return result;
 
@@ -38,6 +39,7 @@ RESULT* BDM::setup(int domain)
 		RESULT* result = new RESULT();
 		result->applicant = "BDM";
 		result->feedback = std::to_string(lightModule_->getModuleProtocol());
+		BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << result->feedback;
 		result->status = RESULT::EStatus::success;
 		return result;
 	}
@@ -47,6 +49,7 @@ RESULT* BDM::setup(int domain)
 		RESULT* result = new RESULT();
 		result->applicant = "BDM";
 		result->feedback = std::to_string(mirrorModule_->getModuleProtocol());
+		BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << result->feedback;
 		result->status = RESULT::EStatus::success;
 		return result;
 	}

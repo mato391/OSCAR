@@ -17,9 +17,9 @@ Ethernet adapter Local Area Connection 2:
    Physical Address. . . . . . . . . : 00-05-9A-3C-7A-00
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
-   Link-local IPv6 Address . . . . . : fe80::abe6:4113:a7b2:3fa2%29(Preferred) 
-   Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%29(Preferred) 
-   IPv4 Address. . . . . . . . . . . : 10.154.74.197(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::8cd7:a8f1:3725:ace6%28(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%28(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.154.78.184(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.0.0.0
    Default Gateway . . . . . . . . . : ::
                                        10.0.0.1
@@ -57,8 +57,8 @@ Wireless LAN adapter Wireless Network Connection 4:
    Link-local IPv6 Address . . . . . : fe80::39af:aab1:7b81:831a%21(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Thursday, July 20, 2017 3:55:48 PM
-   Lease Expires . . . . . . . . . . : Friday, July 21, 2017 6:15:58 PM
+   Lease Obtained. . . . . . . . . . : Monday, July 31, 2017 4:24:06 PM
+   Lease Expires . . . . . . . . . . : Tuesday, August 01, 2017 4:24:05 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283
@@ -103,7 +103,7 @@ Ethernet adapter VirtualBox Host-Only Network:
                                        fec0:0:0:ffff::3%1
    NetBIOS over Tcpip. . . . . . . . : Enabled
 
-Tunnel adapter isatap.{5CBBF503-9850-4C7D-B176-98EA565AD6F8}:
+Tunnel adapter isatap.{4C33EC9C-E94B-4E6F-866D-F9B25BBB847A}:
 
    Media State . . . . . . . . . . . : Media disconnected
    Connection-specific DNS Suffix  . : 
@@ -121,7 +121,7 @@ Tunnel adapter Teredo Tunneling Pseudo-Interface:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.{61D1E12C-7020-46F0-88D3-F82BDA414414}:
+Tunnel adapter isatap.nsn-intra.net:
 
    Media State . . . . . . . . . . . : Media disconnected
    Connection-specific DNS Suffix  . : 
@@ -139,10 +139,10 @@ Tunnel adapter isatap.{8B7A18ED-F89C-44BF-89CC-5E8364A84B04}:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.nsn-intra.net:
+Tunnel adapter isatap.emea.nsn-net.net:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : 
+   Connection-specific DNS Suffix  . : emea.nsn-net.net
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #5
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No
@@ -157,7 +157,7 @@ Tunnel adapter isatap.telsat.wroc.pl:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.{4C33EC9C-E94B-4E6F-866D-F9B25BBB847A}:
+Tunnel adapter isatap.{61D1E12C-7020-46F0-88D3-F82BDA414414}:
 
    Media State . . . . . . . . . . . : Media disconnected
    Connection-specific DNS Suffix  . : 
@@ -166,10 +166,10 @@ Tunnel adapter isatap.{4C33EC9C-E94B-4E6F-866D-F9B25BBB847A}:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.emea.nsn-net.net:
+Tunnel adapter isatap.{5CBBF503-9850-4C7D-B176-98EA565AD6F8}:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : emea.nsn-net.net
+   Connection-specific DNS Suffix  . : 
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #8
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No

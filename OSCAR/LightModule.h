@@ -43,6 +43,7 @@ private:
 	std::map<std::string, std::vector<CONNECTOR*>> lampsConnectorsMap_;
 	std::vector<CONNECTOR*> conns;
 	int welcomeTaskSubscrId_;
+	std::vector<int> doorsChangeSubscId_;
 	DOORS doorsObj_;
 
 	void getBDMModules();

@@ -33,7 +33,6 @@ void DoorModule::initialize()
 void DoorModule::setup()
 {
 	BOOST_LOG(logger_) << "DBG " << "DoorModule::setup";
-	cachePtr_->subscribe("MODULE_TASK", std::bind(&DoorModule::checkAndExecuteTask, this, std::placeholders::_1));
 	std::vector<CONNECTOR*> wrongSetupConnectors;
 	for (const auto &connGr : bdmModuleObj_->connectors_)
 	{
@@ -55,6 +54,8 @@ void DoorModule::setup()
 	}
 	bdmModuleObj_->protocol = MODULE::EProtocol::CSimpleMessage;
 	bdmModuleObj_->operationalState = MODULE::EOperationalState::enabled;
+	moduleTaskSubscrId_ = cachePtr_->subscribe("MODULE_TASK", std::bind(&DoorModule::checkAndExecuteTask, this, std::placeholders::_1), { 0 })[0];	//subscribe for create
+	BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " subscribed for MODULE_TASK. SubsId: " << moduleTaskSubscrId_;
 	if (wrongSetupConnectors.size() == 0)
 	{
 		//should be result with status OK
@@ -67,6 +68,7 @@ void DoorModule::setup()
 
 void DoorModule::checkAndExecuteTask(Obj* obj)
 {
+	BOOST_LOG(logger_) << "VIP " << "DoorModule::checkAndExecuteTask thread " << boost::this_thread::get_id();
 	runTask(static_cast<MODULE_TASK*>(obj));
 	cachePtr_->removeFromChild(bdmModuleObj_, obj);
 }
@@ -260,7 +262,7 @@ void DoorModule::createDoors(std::vector<CONNECTOR*> connectors)
 			if (commonLockGNDConn->id != -1)
 			{
 				doorsObj_->commonLockGND->children.push_back(commonLockGNDConn);
-				cachePtr_->commitChanges("DOORS");
+				cachePtr_->commitChanges(doorsObj_);
 			}
 		}
 		else
@@ -408,7 +410,7 @@ boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, i
 					BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: on door: " << door->label
 						<< " on port" << portC->label << " connector ID: " << connC->id << " to value " << value;
 					door->changeConnectorState(connectorId, value);
-					cachePtr_->commitChanges("DOOR");
+					cachePtr_->commitChanges(door);
 					changeDOORSOpeningStateIfNeeded(value);
 					return boost::none;
 				}
@@ -422,7 +424,7 @@ boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, i
 		{
 			BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: GND connector " << connC->id << " to value " << value;
 			doorsObj_->setLockingState(value);
-			cachePtr_->commitChanges("DOORS");
+			cachePtr_->commitChanges(doorsObj_);
 			return (value == 0) ? "LOCK_DOORS" : "UNLOCK_DOORS";
 		}
 	}
@@ -441,7 +443,7 @@ void DoorModule::changeDOORSOpeningStateIfNeeded(int value)
 	if (!diff && doorsObj_->openingState != static_cast<DOORS::EOpeningState>(value))
 	{
 		doorsObj_->openingState = static_cast<DOORS::EOpeningState>(value);
-		cachePtr_->commitChanges("DOORS");
+		cachePtr_->commitChanges(doorsObj_);
 		onOpen();
 	}
 }

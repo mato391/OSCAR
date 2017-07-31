@@ -66,7 +66,7 @@ CAN::messageCAN ProtocolManager::prepareCANMessageForInitial(CMESSAGE::CMessage*
 	else
 		cMsg.data[3] = 0;
 	if (msg->optional2 != 0)
-		cMsg.data[4] = msg->optional1;
+		cMsg.data[4] = msg->optional2;
 	else
 		cMsg.data[4] = 0;
 	for (int i = 5; i < 8; i++)

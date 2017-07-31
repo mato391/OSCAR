@@ -26,16 +26,25 @@ void LightModule::setup()
 			changeLightProceduralState(connector->label, connector->value);
 		}
 	}
-	welcomeTaskSubscrId_ = cachePtr_->subscribe("MODULE_TASK", std::bind(&LightModule::handleTask, this, std::placeholders::_1));
-	int doorsChangeSubscId = cachePtr_->subscribe("DOORS", std::bind(&LightModule::handleDoorsStateChange, this, std::placeholders::_1));
+	bdmModuleObj_->protocol = MODULE::EProtocol::CExtendedMessage;
+	welcomeTaskSubscrId_ = cachePtr_->subscribe("MODULE_TASK", std::bind(&LightModule::handleTask, this, std::placeholders::_1), { 0 })[0];	//subscribe for create
+	doorsChangeSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&LightModule::handleDoorsStateChange, this, std::placeholders::_1), { 0, 1 }); //subscribe for create
+	//BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Subscribed for MODULE_TASK and DOORS done with subscribtionIds: " << welcomeTaskSubscrId_ << " " << doorsChangeSubscId_[0]
+	//	<< " " << doorsChangeSubscId_[0];
 }
 
 void LightModule::handleDoorsStateChange(Obj* obj)
 {
+	
 	if (doorsObj_.children.empty())
+	{
 		doorsObj_ = *(static_cast<DOORS*>(obj));
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Doors object has no door";
+	}
+		
 	else
 	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Doors object has door";
 		compareStates(obj);
 		doorsObj_ = *(static_cast<DOORS*>(obj));
 	}
@@ -44,11 +53,11 @@ void LightModule::handleDoorsStateChange(Obj* obj)
 void LightModule::compareStates(Obj* obj)
 {
 	auto doorsObj = static_cast<DOORS*>(obj);
-	if (doorsObj_.openingState != doorsObj->openingState)
+	if (doorsObj != nullptr && doorsObj_.openingState != doorsObj->openingState)
 	{
 		BOOST_LOG(logger_) << "INF " << "LightModule::compareStates " << "openingState has been changed";
 	}
-	else if (doorsObj_.lockingState != doorsObj->lockingState)
+	else if (doorsObj != nullptr && doorsObj_.lockingState != doorsObj->lockingState)
 	{
 		BOOST_LOG(logger_) << "INF " << "LightModule::compareStates " << "lockingState has been changed";
 		auto res = new RESULT();
@@ -161,7 +170,7 @@ void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
 	}
 	if (pgLabel.find("BLINKER") != std::string::npos)
 	{
-		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers has been changed to: " << task->value;
+		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers has been changed to: " << (task->value == 1) ? "on":"off" ;
 	}
 	else
 		BOOST_LOG(logger_) << "ERR " << "LightModule::changeConnectorStateHandler: No pg found :(";

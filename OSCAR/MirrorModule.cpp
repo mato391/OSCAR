@@ -27,9 +27,9 @@ void MirrorModule::setup()
 	mirrorModule_->protocol = MODULE::EProtocol::CSimpleMessage;
 	mirrorModule_->operationalState = MODULE::EOperationalState::enabled;
 	doors_ = *static_cast<DOORS*>(cachePtr_->getUniqueObject("DOORS"));
-	cachePtr_->subscribe("MODULE_TASK", std::bind(&MirrorModule::handleModuleTask, this, std::placeholders::_1));
+	cachePtr_->subscribe("MODULE_TASK", std::bind(&MirrorModule::handleModuleTask, this, std::placeholders::_1), { 0 });
 	if (checkIfMotorOutExist())
-		int doorsSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&MirrorModule::handleDoorsStateChange, this, std::placeholders::_1));
+		int doorsSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&MirrorModule::handleDoorsStateChange, this, std::placeholders::_1), { 1 })[0];
 }
 void MirrorModule::handleModuleTask(Obj* obj)
 {

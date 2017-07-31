@@ -39,7 +39,7 @@ void TaskCreator::convertAndPushTask(CMESSAGE::CMessage* msg)
 		if (module.second->domain == msg->fromDomain)
 		{
 			cache_->addToChildren( module.second, modTask);
-			BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : Adding MODULE_TASK to tasks for module: " << module.second->domain;
+			//BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : Adding MODULE_TASK to tasks for module: " << module.second->domain;
 			break;
 		}
 	}

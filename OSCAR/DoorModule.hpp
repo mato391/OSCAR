@@ -42,6 +42,7 @@ private:
 	std::vector<Obj*>* cache_;
 	Cache* cachePtr_;
 	DOORS* doorsObj_;
+	int moduleTaskSubscrId_;
 	void getBDMModules();
 	void prepareTopology();
 	void setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label);
