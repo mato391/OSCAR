@@ -395,7 +395,7 @@ bool DoorModule::checkIfBateryAlarmRaised()
 
 boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, int value)
 {
-	BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState";
+	BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: " << connectorId << " to: " << value;
 	for (const auto &obj : doorsObj_->children)		//refactor 3 fory?!
 	{
 		auto door = static_cast<DOOR*>(obj);
@@ -410,8 +410,8 @@ boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, i
 					BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: on door: " << door->label
 						<< " on port" << portC->label << " connector ID: " << connC->id << " to value " << value;
 					door->changeConnectorState(connectorId, value);
-					cachePtr_->commitChanges(door);
 					changeDOORSOpeningStateIfNeeded(value);
+					cachePtr_->commitChanges(door);
 					return boost::none;
 				}
 			}
@@ -466,14 +466,20 @@ void DoorModule::setTimerForClose()
 void DoorModule::changeDOORSOpeningStateIfNeeded(int value)
 {
 	bool diff = false;
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " current: " << (doorsObj_->openingState == DOORS::EOpeningState::closed) ? "closed" : "opened";
 	for (const auto &door : doorsObj_->children)
 	{
 		if (static_cast<DOOR*>(door)->openingState != static_cast<DOOR::EOpeningState>(value))
+		{
 			diff = true;
+			break;
+		}
+			
 	}
-	if (!diff && doorsObj_->openingState != static_cast<DOORS::EOpeningState>(value))
+	if (diff && doorsObj_->openingState != static_cast<DOORS::EOpeningState>(value))
 	{
 		doorsObj_->openingState = static_cast<DOORS::EOpeningState>(value);
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " new: " << (doorsObj_->openingState == DOORS::EOpeningState::closed) ? "closed" : "opened";
 		cachePtr_->commitChanges(doorsObj_);
 		onOpen();
 	}
