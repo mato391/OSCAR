@@ -7,7 +7,7 @@ ModuleInitialConfigurator::ModuleInitialConfigurator(MODULE* mod, boost::log::so
 	logger_(logger)
 {
 	BOOST_LOG(logger) << "INF " << "ModuleInitialConfigurator ctor";
-	createBinaryMask();
+	//createBinaryMask();
 	setupConnectors();
 }
 
@@ -93,21 +93,40 @@ int ModuleInitialConfigurator::convertToDec(std::string sign)
 
 void ModuleInitialConfigurator::setupConnectors()
 {
-	BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: Mask size is: " << module_->connectors_.size();
-	for (auto &connGr : module_->connectors_)
+	std::vector<CONNECTOR*> conns;
+	for (auto &conn : module_->children)
 	{
-		int i = 0;
-		for (auto &conn : connGr)
+		if (conn->name == "CONNECTOR")
 		{
-			auto connector = static_cast<CONNECTOR*>(conn);
-			connector->value = binaryMask_[i];	//crash here
-			BOOST_LOG(logger_) << "INF "
-				<< "ModuleInitialConfigurator::setupConnectors: CONNECTOR ID: "
-				<< i
-				<< " Connector value: "
-				<< connector->value;
-			i++;
+			conns.push_back(static_cast<CONNECTOR*>(conn));
 		}
-		
 	}
+	BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: conns size is: " << conns.size();
+	if (std::stoi(module_->mask) > 255)
+	{
+		BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: mask is greater than 255 ";
+		std::bitset<8> bMask1(255);
+		std::bitset<8> bMask2(std::stoi(module_->mask) - 255);
+		for (int i = 0; i < 8; i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask1[i];
+			conns[i]->value = bMask1[i];
+		}
+		for (int i = 8; i < conns.size(); i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask2[i - 8];
+			conns[i]->value = bMask2[i - 8];
+		}
+	}
+	else
+	{
+		std::bitset<8> bMask1(std::stoi(module_->mask));
+		BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: mask is less than 255 ";
+		for (int i = 0; i < conns.size(); i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask1[i];
+			conns[i]->value = bMask1[i];
+		}
+	}
+	
 }

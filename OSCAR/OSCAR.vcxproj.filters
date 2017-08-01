@@ -267,6 +267,12 @@
     <ClInclude Include="swconfig.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ActionSet.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MASK_CONNECTORS_STATE.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -466,6 +472,12 @@
     </ClCompile>
     <ClCompile Include="Cache.cpp">
       <Filter>Source Files\Router</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MASK_CONNECTORS_STATE.cpp">
+      <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

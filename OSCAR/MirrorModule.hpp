@@ -5,15 +5,18 @@
 #include <boost\move\utility.hpp>
 #include <boost\log\sources\logger.hpp>
 #include <vector>
+#include <bitset>
 #include "Objects\Obj.hpp"
 #include "MODULE.hpp"
 #include "MIRROR.hpp"
 #include "MIRRORS.hpp"
 #include "DOORS.hpp"
 #include "CHANGE_CONNECTOR_STATE_TASK.h"
+#include "MASK_CONNECTORS_STATE.hpp"
 #include "Cache.hpp"
 #include <boost\thread.hpp>
 #include "swconfig.hpp"
+#include "ActionSet.hpp"
 
 class MirrorModule
 {
@@ -33,12 +36,18 @@ private:
 	MODULE* mirrorModule_;
 	DOORS doors_;
 	int doorsSubscId_;
+	ActionSet* actionSet_;
+
 	void getBDMModule();
 	void createMirrors();
 	void displayTopology();
 	bool checkIfMotorOutExist();
 	void handleDoorsStateChange(Obj* obj);
 	void handleModuleTask(Obj* obj);
+	std::pair<int, int> createMaskForConnectorChange(std::vector<int> portsId, std::vector<int> portsValues);
+	int getConnIdByLabel(std::string label);
+	std::vector<int> getPortsIdForMirrorClosing();
+	void getConnectorsIdsForDefualtActions();
 	
 };
 

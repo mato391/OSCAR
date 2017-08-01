@@ -112,6 +112,16 @@ void Router::receiver(std::string data)
 			//std::cout << "Router::receiver: message from domain: " << domain << std::endl;
 			BOOST_LOG(logger_) << "INF " << "Router::receiver: msg available from: " << msg->fromDomain
 				<< ", for: " << msg->toDomain << ", hdr " << msg->header << ", proto: " << static_cast<int>(msg->protocol);
+			if (ROUTER_DBG)
+			{
+				BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " Data[0] : " << static_cast<int>(canPtr_->messageRx.data[0])
+					<< " Data[1] : " << static_cast<int>(canPtr_->messageRx.data[1])
+					<< " Data[2] : " << static_cast<int>(canPtr_->messageRx.data[2])
+					<< " Data[3] : " << static_cast<int>(canPtr_->messageRx.data[3])
+					<< " Data[4] : " << static_cast<int>(canPtr_->messageRx.data[4])
+					<< " Data[5] : " << static_cast<int>(canPtr_->messageRx.data[5])
+					<< " Data[6] : " << static_cast<int>(canPtr_->messageRx.data[6]);
+			}
 			//BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
 			if (msg->header == BB)
 			{
@@ -248,6 +258,20 @@ void Router::setupModule(std::string domain, int mask)
 				auto module = static_cast<MODULE*>(mod);
 				if (module->domain == domain)
 					modLabel_ = module->label;
+			}
+			if (ROUTER_DBG)
+			{
+				for (const auto &conn : module->children)
+				{
+					if (conn->name == "CONNECTOR")
+					{
+						auto connC = static_cast<CONNECTOR*>(conn);
+						BOOST_LOG(logger_) << "DBG " << __FUNCTION__
+							<< " Conn Id " << connC->id
+							<< " Conn value " << connC->value;
+					}
+					
+				}					
 			}
 			//BOOST_LOG(logger_) << "DBG " << "Router::receiver modLabel: " << modLabel_;
 			for (const auto &component : components_)

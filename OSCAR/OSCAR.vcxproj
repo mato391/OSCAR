@@ -148,6 +148,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActionSet.hpp" />
     <ClInclude Include="ALARM.hpp" />
     <ClInclude Include="ANTENNA.h" />
     <ClInclude Include="BDM.hpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="LightModule.h" />
     <ClInclude Include="LIGHT_GOODBYE_TASK.h" />
     <ClInclude Include="LIGHT_WELCOMING_TASK.h" />
+    <ClInclude Include="MASK_CONNECTORS_STATE.hpp" />
     <ClInclude Include="MIRROR.hpp" />
     <ClInclude Include="MirrorModule.hpp" />
     <ClInclude Include="MIRRORS.hpp" />
@@ -217,6 +219,7 @@
     <ClInclude Include="WCM.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionSet.cpp" />
     <ClCompile Include="ALARM.cpp" />
     <ClCompile Include="ANTENNA.cpp" />
     <ClCompile Include="BUTTON.cpp" />
@@ -246,6 +249,7 @@
     <ClCompile Include="LightModule.cpp" />
     <ClCompile Include="LIGHT_GOODBYE_TASK.cpp" />
     <ClCompile Include="LIGHT_WELCOMING_TASK.cpp" />
+    <ClCompile Include="MASK_CONNECTORS_STATE.cpp" />
     <ClCompile Include="MIRROR.cpp" />
     <ClCompile Include="MirrorModule.cpp" />
     <ClCompile Include="MIRRORS.cpp" />

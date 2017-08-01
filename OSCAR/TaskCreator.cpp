@@ -34,6 +34,15 @@ void TaskCreator::convertAndPushTask(CMESSAGE::CMessage* msg)
 		modTask->taskFor = msg->fromDomain;
 		BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : creating CHANGE_CONNECTOR_STATE_TASK with values " << sMsg->port << ", " << sMsg->value;
 	}
+	else if (msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol)
+	{
+		CMESSAGE::CMaskMessage * sMsg = static_cast<CMESSAGE::CMaskMessage*>(msg);
+		modTask = new MASK_CONNECTORS_STATE();
+		modTask->taskFor = msg->fromDomain;
+		static_cast<MASK_CONNECTORS_STATE*>(modTask)->mask1 = sMsg->mask1;
+		static_cast<MASK_CONNECTORS_STATE*>(modTask)->mask2 = sMsg->mask2;
+		BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : creating MASK_CONNECTOR_STATE with values " << sMsg->mask1 << ", " << sMsg->mask2;
+	}
 	for (auto &module : *bdmModules_)
 	{
 		if (module.second->domain == msg->fromDomain)

@@ -16,6 +16,7 @@ namespace CMESSAGE
 			CAuthorizedProtocol,
 			CExtendedAuthorizedProtocol,
 			CBigDataProtocol,
+			CMaskProtocol,
 			CEmpty
 		};
 		EProtocol protocol;
@@ -42,8 +43,8 @@ namespace CMESSAGE
 			fromDomain = (hexa.str().size() == 1) ? "0x0" + hexa.str() : "0x"+hexa.str();
 			toDomain = std::to_string(static_cast<int>(msg->id));
 			header = static_cast<int>(msg->data[2]);
-			optional1 = msg->data[3];
-			optional2 = msg->data[4];
+			optional1 = static_cast<int>(msg->data[3]);
+			optional2 = static_cast<int>(msg->data[4]);
 		}
 		int optional1;
 		int optional2;
@@ -169,6 +170,27 @@ namespace CMESSAGE
 		{
 			protocol = CMessage::EProtocol::CEmpty;
 		};
+		EProtocol getProtocol() { return protocol; }
+	};
+
+	class CMaskMessage :
+		public CMessage
+	{
+	public:
+		CMaskMessage() {};
+		CMaskMessage(CAN::messageCAN* msg)
+		{
+			protocol = CMessage::EProtocol::CMaskProtocol;
+			std::stringstream hexa;
+			hexa << std::hex << static_cast<int>(msg->data[1]);
+			fromDomain = (hexa.str().size() == 1) ? "0x0" + hexa.str() : "0x" + hexa.str();
+			toDomain = std::to_string(static_cast<int>(msg->id));
+			header = static_cast<int>(msg->data[2]);
+			mask1 = msg->data[3];
+			mask2 = msg->data[4];
+		}
+		int mask1;
+		int mask2;
 		EProtocol getProtocol() { return protocol; }
 	};
 

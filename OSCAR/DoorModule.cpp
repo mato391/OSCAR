@@ -422,8 +422,10 @@ boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, i
 		auto connC = static_cast<CONNECTOR*>(conn);
 		if (connC->id == connectorId)
 		{
-			BOOST_LOG(logger_) << "INF " << "DoorModule::changeConnectorState: GND connector " << connC->id << " to value " << value;
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << ": GND connector " << connC->id << " to value " << value;
 			doorsObj_->setLockingState(value);
+			std::string state = (doorsObj_->lockingState == DOORS::ELockingState::locked) ? "locked" : "unlocked";
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " DOORS are:" << state;
 			cachePtr_->commitChanges(doorsObj_);
 			boost::thread t(std::bind(&DoorModule::setTimerForClose, this));
 			t.detach();

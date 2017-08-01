@@ -9,6 +9,7 @@
 #include "CMessage.hpp"
 #include "MODULE_TASK.hpp"
 #include "CHANGE_CONNECTOR_STATE_TASK.h"
+#include "MASK_CONNECTORS_STATE.hpp"
 #include "Cache.hpp"
 
 

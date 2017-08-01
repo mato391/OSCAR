@@ -37,7 +37,8 @@ public:
 		CExtendedMessage,
 		CAuthorizedProtocol,
 		CExtendedAuthorizedProtocol,
-		CBigDataProtocol
+		CBigDataProtocol,
+		CMaskProtocol
 	};
 	EProtocol protocol;
 	std::vector<MODULE_TASK*> tasks;

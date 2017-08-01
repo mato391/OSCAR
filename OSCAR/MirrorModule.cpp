@@ -7,6 +7,7 @@ MirrorModule::MirrorModule(std::vector<Obj*>* cache, boost::log::sources::logger
 	cache_ = cache;
 	cachePtr_ = cachePtr;
 	logger_ = logger;
+	actionSet_ = new ActionSet(logger);
 	//createMirrors();
 }
 
@@ -19,62 +20,62 @@ void MirrorModule::initialize()
 {
 	getBDMModule();
 	createMirrors();
+	getConnectorsIdsForDefualtActions();
+}
+
+void MirrorModule::getConnectorsIdsForDefualtActions()
+{
+	actionSet_->addAction(getPortsIdForMirrorClosing(), { 1, 0, 0, 1 }, "OPEN_MIRROR");
+	actionSet_->addAction(getPortsIdForMirrorClosing(), { 0, 1, 1, 0 }, "CLOSE_MIRROR");
+	//it will be more if it will be needed
 }
 
 void MirrorModule::setup()
 {
 	BOOST_LOG(logger_) << "INF " << "MirrorModule::setup " << std::endl;
-	mirrorModule_->protocol = MODULE::EProtocol::CExtendedMessage;
+	mirrorModule_->protocol = MODULE::EProtocol::CMaskProtocol;
 	mirrorModule_->operationalState = MODULE::EOperationalState::enabled;
 	doors_ = *static_cast<DOORS*>(cachePtr_->getUniqueObject("DOORS"));
 	cachePtr_->subscribe("MODULE_TASK", std::bind(&MirrorModule::handleModuleTask, this, std::placeholders::_1), { 0 });
 	if (checkIfMotorOutExist())
-		int doorsSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&MirrorModule::handleDoorsStateChange, this, std::placeholders::_1), { 1 })[0];
+		doorsSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&MirrorModule::handleDoorsStateChange, this, std::placeholders::_1), { 1 })[0];
 }
+
 void MirrorModule::handleModuleTask(Obj* obj)
 {
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__;
 	auto moduleTask = static_cast<MODULE_TASK*>(obj);
-	if (moduleTask->type == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
+	if (moduleTask->type == MODULE_TASK::EName::MASK_CONNECTORS_STATE)
 	{
-		auto ccst = static_cast<CHANGE_CONNECTOR_STATE_TASK*>(moduleTask);
-		for (const auto &conn : mirrorModule_->children)
+		auto mcs = static_cast<MASK_CONNECTORS_STATE*>(moduleTask);
+		std::bitset<8> bMask1(mcs->mask1);
+		std::bitset<8> bMask2(mcs->mask2);
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MASK_CONNECTORS_STATE: " << mcs->mask1 << " " << mcs->mask2;
+		for (int i = 0; i < 8; i++)
 		{
-			auto connC = static_cast<CONNECTOR*>(conn);
-			if (connC->id == ccst->port)
+			auto sconn = static_cast<CONNECTOR*>(mirrorModule_->children[i]);
+			if (sconn != nullptr && sconn->value != bMask1[i])
 			{
-				BOOST_LOG(logger_) << "INF " << "MirrorModule::handleModuleTask: changeConnectorState: " << ccst->port << " to value " << ccst->value;
-				connC->value = ccst->value;
-				return;
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changeConnectorState: " << sconn->label << " to value " << bMask1[i];
+				sconn->value = bMask1[i];
 			}
 		}
-		if (mirrorsObj_->commonOutGND->id == ccst->port)
+		if (mirrorModule_->children.size() > 8)
 		{
-			mirrorsObj_->commonOutGND->value = ccst->value;
-			if (mirrorsObj_->openingState == MIRRORS::EOpeningState::closed
-				&& ccst->value == 0)
+			for (int i = 8; i < mirrorModule_->children.size(); i++)
 			{
-				mirrorsObj_->openingState = MIRRORS::EOpeningState::closed;
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to closed";
+				if (mirrorModule_->children[i]->name == "CONNECTOR")
+				{
+					auto sconn = static_cast<CONNECTOR*>(mirrorModule_->children[i]);
+					if (sconn != nullptr && sconn->value != bMask2[i - 8])
+					{
+						BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changeConnectorState: " << sconn->label << " to value " << bMask1[i - 8];
+						sconn->value = bMask2[i - 8];
+					}
+				}
+					
 			}
-			else if (mirrorsObj_->openingState == MIRRORS::EOpeningState::opened
-				&& ccst->value == 0)
-			{
-				mirrorsObj_->openingState = MIRRORS::EOpeningState::opened;
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to opened";
-			}
-			else if (mirrorsObj_->openingState == MIRRORS::EOpeningState::opened
-				&& ccst->value == 1)
-			{
-				mirrorsObj_->openingState = MIRRORS::EOpeningState::closing;
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to closing";
-			}
-			else if (mirrorsObj_->openingState == MIRRORS::EOpeningState::closed
-				&& ccst->value == 1)
-			{
-				mirrorsObj_->openingState = MIRRORS::EOpeningState::opening;
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRRORS changing state to opening";
-			}
-		}	
+		}
 	}
 }
 
@@ -88,10 +89,13 @@ void MirrorModule::handleDoorsStateChange(Obj* obj)
 		if (doors_.lockingState == DOORS::ELockingState::unlocked
 			&& mirrorsObj_->openingState != MIRRORS::EOpeningState::opened)
 		{
+			auto action = actionSet_->getAction("OPEN_MIRROR");
+			auto mask = createMaskForConnectorChange(action->connIds, action->connValues);
 			BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange: mirrors opening";
 			auto res = new RESULT();
 			res->applicant = "MIRROR_MODULE";
-			res->feedback = std::to_string(mirrorsObj_->commonOutGND->id)  + ":1:125";
+			//createMaskForConnector({}
+			res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second);
 			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " feedback: " << res->feedback;
 			res->status = RESULT::EStatus::success;
 			res->type = RESULT::EType::executive;
@@ -99,6 +103,95 @@ void MirrorModule::handleDoorsStateChange(Obj* obj)
 		}
 		//SHOULD BE ADDED FOR CLOSING BUT WE NEED TO CHANGE POLARISATION OF MOTOR
 	}
+}
+
+std::pair<int, int> MirrorModule::createMaskForConnectorChange(std::vector<int> portsId, std::vector<int> portsValues)
+{
+	int decMask1 = 0;
+	int decMask2 = 0;
+	if (mirrorModule_->children.size() > 8)
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " more than 8 connctors";
+		for (int i = 0; i < 8; i++)
+		{
+			auto exist = [](std::vector<int> ids, int i)->int
+			{
+				int j = 0;
+				for (const auto &id : ids)
+				{
+					if (id == i)
+						return j;
+					j++;
+				}
+				return -1;
+			}(portsId, i);
+			if (exist != -1)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " first8: connector will be changed " << i << " portsValue " << portsValues[exist];
+				decMask1 += portsValues[exist] * static_cast<int>(pow(2, i));
+			}
+			else
+				decMask1 += static_cast<CONNECTOR*>(mirrorModule_->children[i])->value * static_cast<int>(pow(2, i));
+		}
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask1: " << decMask1;
+		auto conns = cachePtr_->getAllObjectsUnder(mirrorModule_, "CONNECTOR");
+		BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " connsize: " << conns.size();
+		for (int i = 8; i < conns.size(); i++)
+		{
+			auto exist = [](std::vector<int> ids, int i)->int
+			{
+				int j = 0;
+				for (const auto &id : ids)
+				{
+					if (id == i)
+						return j;
+					j++;
+				}
+				return -1;
+			}(portsId, i);
+			if (exist != -1)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " second8: connector will be changed " << i;
+				decMask2 += portsValues[exist] * static_cast<int>(pow(2, i));
+			}
+			else
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " second8: connector will be not changed " << i;
+				decMask2 += static_cast<CONNECTOR*>(conns[i])->value * static_cast<int>(pow(2, i));
+			}
+				
+		}
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask2: " << decMask2;
+	}
+	else
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " less than 8 connns";
+		decMask1 = 0;
+		auto conns = cachePtr_->getAllObjectsUnder(mirrorModule_, "CONNECTOR");
+		for (int i = 8; i < conns.size(); i++)
+		{
+			auto exist = [](std::vector<int> ids, int i)->int
+			{
+				int j = 0;
+				for (const auto &id : ids)
+				{
+					if (id == i)
+						return j;
+					j++;
+				}
+				return -1;
+			}(portsId, i);
+			if (exist != -1)
+			{
+				static_cast<CONNECTOR*>(mirrorModule_->children[i])->value = portsValues[exist];
+			}
+			decMask2 += static_cast<CONNECTOR*>(mirrorModule_->children[i])->value * (pow(2, i));
+		}
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask1: " << decMask1;
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask2: " << decMask2;
+
+	}
+	return std::make_pair(decMask1, decMask2);
 }
 
 void MirrorModule::getBDMModule()
@@ -146,10 +239,6 @@ void MirrorModule::createMirrors()
 			if (!exist)
 				mirrorsLabels.push_back(sLabel[0] + "_" + sLabel[1]);
 		}
-		else if (connC->label.find("OUT_GND") != std::string::npos)
-		{
-			mirrorsObj_->commonOutGND = connC;
-		}
 	}
 	for (const auto &label : mirrorsLabels)
 	{
@@ -179,7 +268,7 @@ void MirrorModule::createMirrors()
 
 void MirrorModule::displayTopology()
 {
-	BOOST_LOG(logger_) << "DBG " << "MirrorModule::displayTopology " << "commonOutGnd " << mirrorsObj_->commonOutGND->label;
+	//BOOST_LOG(logger_) << "DBG " << "MirrorModule::displayTopology " << "commonOutGnd " << mirrorsObj_->commonOutGND->label;
 	for (const auto &mirror : mirrorsObj_->children)
 	{
 		auto mirrorC = static_cast<MIRROR*>(mirror);
@@ -187,7 +276,7 @@ void MirrorModule::displayTopology()
 		for (const auto &conn : mirror->children)
 		{
 			auto connC = static_cast<CONNECTOR*>(conn);
-			BOOST_LOG(logger_) << "DBG " << "MirrorModule::displayTopology " << "CONNECTOR " << connC->id << " label " << connC->label;
+			BOOST_LOG(logger_) << "DBG " << "MirrorModule::displayTopology " << "CONNECTOR " << connC->id << " label " << connC->label << " value " << connC->value;
 		}
 	}
 }
@@ -195,6 +284,15 @@ void MirrorModule::displayTopology()
 void MirrorModule::setMirrorPosition(int x, int y, int z, int label)
 {
 	
+}
+
+std::vector<int> MirrorModule::getPortsIdForMirrorClosing()
+{
+	int connleft1 = getConnIdByLabel("MIRROR_LEFT_MOTOR_OUT_1");
+	int connleft2 = getConnIdByLabel("MIRROR_LEFT_MOTOR_OUT_2");
+	int connright1 = getConnIdByLabel("MIRROR_RIGHT_MOTOR_OUT_1");
+	int connright2 = getConnIdByLabel("MIRROR_RIGHT_MOTOR_OUT_2");
+	return{ connleft1, connleft2, connright1, connright2 };
 }
 
 bool MirrorModule::checkIfMotorOutExist()
@@ -211,5 +309,15 @@ bool MirrorModule::checkIfMotorOutExist()
 		}
 	}
 	return false;
+}
+
+int MirrorModule::getConnIdByLabel(std::string label)
+{
+	for (const auto &conn : mirrorModule_->children)
+	{
+		auto connC = static_cast<CONNECTOR*>(conn);
+		if (connC != nullptr && connC->label == label)
+			return connC->id;
+	}
 }
 

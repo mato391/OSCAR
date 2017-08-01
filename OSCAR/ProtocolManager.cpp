@@ -34,6 +34,9 @@ CMESSAGE::CMessage* ProtocolManager::createMessage(CAN::messageCAN message)
 		return new CMESSAGE::CExtendedAuthorizedMessage(&message);
 	case 5:
 		return new CMESSAGE::CBigDataMessage(&message);
+	case 6:
+		return new CMESSAGE::CMaskMessage(&message);
+	
 	default:
 		return nullptr;
 	}
@@ -49,6 +52,8 @@ CAN::messageCAN ProtocolManager::createMessage(CMESSAGE::CMessage* message)
 		return prepareCANMessageForSimple(message);
 	case CMESSAGE::CMessage::EProtocol::CExtendedProtocol:
 		return prepareCANMessageForExtended(message);
+	case CMESSAGE::CMessage::EProtocol::CMaskProtocol:
+		return prepareCANMessageForMask(message);
 	}
 }
 
@@ -147,6 +152,22 @@ CAN::messageCAN ProtocolManager::prepareCANMessageForBigData(CMESSAGE::CMessage*
 	cMsg.data[7] = msg->data[3];
 	return cMsg;
 }
+CAN::messageCAN ProtocolManager::prepareCANMessageForMask(CMESSAGE::CMessage* message)
+{
+	CMESSAGE::CMaskMessage* msg = static_cast<CMESSAGE::CMaskMessage*>(message);
+	CAN::messageCAN cMsg;
+	cMsg.id = std::stoi(msg->toDomain);
+	cMsg.data[0] = static_cast<int>(msg->protocol);
+	cMsg.data[1] = 100;
+	cMsg.data[2] = msg->header;
+	cMsg.data[3] = msg->mask1;
+	cMsg.data[4] = msg->mask2;
+	for (int i = 5; i < 8; i++)
+		cMsg.data[i] = 0;
+	return cMsg;
+}
+
+
 
 CAN::messageCAN ProtocolManager::createProtocolNegotatorMessage(int protocol, std::string domain)
 {
