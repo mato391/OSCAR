@@ -162,6 +162,7 @@
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="ComponentFactory.hpp" />
     <ClInclude Include="CONNECTOR.hpp" />
+    <ClInclude Include="ControlsManager.hpp" />
     <ClInclude Include="DoorModule.hpp" />
     <ClInclude Include="DOORS.hpp" />
     <ClInclude Include="EDM.hpp" />
@@ -232,6 +233,7 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="CONNECTOR.cpp" />
+    <ClCompile Include="ControlsManager.cpp" />
     <ClCompile Include="DoorModule.cpp" />
     <ClCompile Include="DOORS.cpp" />
     <ClCompile Include="EDM.cpp" />

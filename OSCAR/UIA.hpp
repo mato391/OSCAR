@@ -2,7 +2,9 @@
 #include "Component.hpp"
 #include <fstream>
 #include <boost\filesystem.hpp>
+#include "ControlsManager.hpp"
 #include "USER.hpp"
+
 class UIA :
 	public Component
 {
@@ -22,6 +24,7 @@ private:
 	std::vector<Obj*>* cache_;
 	std::vector<Component*>* componentCache_;
 	USER* userObjPtr_;
+	ControlsManager* conMan_;
 	const std::string uiRecvPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\ui_send.txt";
 	const std::string uiSendPath_ = "D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\System\\ui_recv.txt";
 

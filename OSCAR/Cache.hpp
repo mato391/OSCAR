@@ -43,6 +43,7 @@ public:
 	int addToChildren(Obj* parent, Obj* child);
 	void commitChanges(Obj* obj);
 	std::vector<Obj*> getAllObjects(std::string name);
+	std::vector<Obj> getObjects(std::string name);
 	std::vector<Obj*> getAllObjectsFromChildren(std::string parentName, std::string name);
 	std::vector<Obj*> getAllObjectsUnder(Obj* object, std::string name);
 	std::vector<Obj*> getAllObjectsFromGrandChildren(std::string grandName, std::string parentName, std::string name);
@@ -66,6 +67,7 @@ private:
 	std::string nameTmp_;
 	boost::mutex mtx_;
 	CACHE::Subscription* subTmp_;
+	int tmp_;
 
 	void checkAndRunSubscription(Obj* obj, CACHE::Subscription::EType type);
 	void checkAndRunSubscription(std::string name, CACHE::Subscription::EType type);

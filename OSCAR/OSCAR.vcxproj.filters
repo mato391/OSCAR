@@ -28,9 +28,6 @@
     <Filter Include="Header Files\EDM">
       <UniqueIdentifier>{61fd2de0-515c-4022-b54b-c52f836b83f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\WCM">
-      <UniqueIdentifier>{cdf2e074-0fa6-40de-b909-0230cb14f044}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\UCM">
       <UniqueIdentifier>{143ba94b-37f8-451e-b8c0-815df6a9a72c}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="Source Files\IDM">
       <UniqueIdentifier>{5165840e-7423-4f86-b382-590e0fd7b942}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\WCM">
+      <UniqueIdentifier>{cdf2e074-0fa6-40de-b909-0230cb14f044}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -273,6 +273,9 @@
     <ClInclude Include="MASK_CONNECTORS_STATE.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="ControlsManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -478,6 +481,9 @@
     </ClCompile>
     <ClCompile Include="MASK_CONNECTORS_STATE.cpp">
       <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlsManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

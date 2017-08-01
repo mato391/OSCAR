@@ -7,6 +7,7 @@ Cache::Cache(boost::log::sources::logger_mt logger) : logger_(logger)
 	std::fstream file("D:\\private\\OSCAR\\New_Architecture_OSCAR\\OSCAR\\Logs\\CacheDump.txt", std::ios::out);
 	file << "";
 	file.close();
+	tmp_ = 0;
 	//funcTemp_ = std::bind(&Cache::emptyFunction, this, std::placeholders::_1);
 }
 
@@ -104,6 +105,20 @@ std::vector<Obj*> Cache::getAllObjects(std::string name)
 		if (obj->name == name)
 		{
 			objVec.push_back(obj);
+		}
+	}
+	return objVec;
+}
+
+std::vector<Obj> Cache::getObjects(std::string name)
+{
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << name;
+	std::vector<Obj> objVec;
+	for (const auto &obj : cache_)
+	{
+		if (obj->name == name)
+		{
+			objVec.push_back(*obj);
 		}
 	}
 	return objVec;
@@ -226,7 +241,7 @@ std::vector<int> Cache::subscribe(std::string name, std::function<void(Obj*)> fu
 	for (const auto &type : types)
 	{
 		auto sub = new CACHE::Subscription(name, func);
-		boost::random::uniform_int_distribution<> dist(1, 10000);
+		boost::random::uniform_int_distribution<> dist(10, 1000);
 		sub->subscriptionId = dist(gen_);
 		sub->type = static_cast<CACHE::Subscription::EType>(type);
 		subIds.push_back(sub->subscriptionId);

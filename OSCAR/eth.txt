@@ -17,10 +17,9 @@ Ethernet adapter Local Area Connection 2:
    Physical Address. . . . . . . . . : 00-05-9A-3C-7A-00
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
-   Link-local IPv6 Address . . . . . : fe80::3c64:899b:5b38:be0e%28(Preferred) 
-   Link-local IPv6 Address . . . . . : fe80::479b:c0f7:3916:905d%28(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::36c2:222d:23b7:20fd%28(Preferred) 
    Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%28(Preferred) 
-   IPv4 Address. . . . . . . . . . . : 10.154.73.9(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.154.73.95(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.0.0.0
    Default Gateway . . . . . . . . . : ::
                                        10.0.0.1
@@ -59,7 +58,7 @@ Wireless LAN adapter Wireless Network Connection 4:
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
    Lease Obtained. . . . . . . . . . : Tuesday, August 01, 2017 3:57:55 PM
-   Lease Expires . . . . . . . . . . : Wednesday, August 02, 2017 7:43:32 PM
+   Lease Expires . . . . . . . . . . : Wednesday, August 02, 2017 9:20:39 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283

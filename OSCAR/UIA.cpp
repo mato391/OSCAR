@@ -17,7 +17,8 @@ UIA::~UIA()
 
 void UIA::initialize()
 {
-	
+	conMan_ = new ControlsManager(cachePtr, logger_);
+	conMan_->initialize();
 }
 
 void UIA::execute(std::string message)
