@@ -424,8 +424,7 @@ boost::optional<std::string> DoorModule::changeConnectorState(int connectorId, i
 		{
 			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << ": GND connector " << connC->id << " to value " << value;
 			doorsObj_->setLockingState(value);
-			std::string state = (doorsObj_->lockingState == DOORS::ELockingState::locked) ? "locked" : "unlocked";
-			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " DOORS are:" << state;
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " DOORS are:" << ((doorsObj_->lockingState == DOORS::ELockingState::locked) ? "locked" : "unlocked");
 			cachePtr_->commitChanges(doorsObj_);
 			boost::thread t(std::bind(&DoorModule::setTimerForClose, this));
 			t.detach();
@@ -468,7 +467,7 @@ void DoorModule::setTimerForClose()
 void DoorModule::changeDOORSOpeningStateIfNeeded(int value)
 {
 	bool diff = false;
-	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " current: " << (doorsObj_->openingState == DOORS::EOpeningState::closed) ? "closed" : "opened";
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " currently: " << ((doorsObj_->openingState == DOORS::EOpeningState::closed) ? "closed" : "opened");
 	for (const auto &door : doorsObj_->children)
 	{
 		if (static_cast<DOOR*>(door)->openingState != static_cast<DOOR::EOpeningState>(value))
@@ -478,10 +477,12 @@ void DoorModule::changeDOORSOpeningStateIfNeeded(int value)
 		}
 			
 	}
+	if (diff == false && doorsObj_->openingState != static_cast<DOORS::EOpeningState>(value))
+		diff = true;
 	if (diff && doorsObj_->openingState != static_cast<DOORS::EOpeningState>(value))
 	{
 		doorsObj_->openingState = static_cast<DOORS::EOpeningState>(value);
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " new: " << (doorsObj_->openingState == DOORS::EOpeningState::closed) ? "closed" : "opened";
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " new: " << ((doorsObj_->openingState == DOORS::EOpeningState::closed) ? "closed" : "opened");
 		cachePtr_->commitChanges(doorsObj_);
 		onOpen();
 	}

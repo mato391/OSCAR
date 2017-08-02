@@ -17,9 +17,9 @@ Ethernet adapter Local Area Connection 2:
    Physical Address. . . . . . . . . : 00-05-9A-3C-7A-00
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
-   Link-local IPv6 Address . . . . . : fe80::36c2:222d:23b7:20fd%28(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::3bc3:2901:4b52:c4ad%28(Preferred) 
    Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%28(Preferred) 
-   IPv4 Address. . . . . . . . . . . : 10.154.73.95(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.154.73.232(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.0.0.0
    Default Gateway . . . . . . . . . : ::
                                        10.0.0.1
@@ -57,8 +57,8 @@ Wireless LAN adapter Wireless Network Connection 4:
    Link-local IPv6 Address . . . . . : fe80::39af:aab1:7b81:831a%21(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Tuesday, August 01, 2017 3:57:55 PM
-   Lease Expires . . . . . . . . . . : Wednesday, August 02, 2017 9:20:39 PM
+   Lease Obtained. . . . . . . . . . : Wednesday, August 02, 2017 5:00:53 PM
+   Lease Expires . . . . . . . . . . : Thursday, August 03, 2017 6:38:40 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283
@@ -121,10 +121,10 @@ Tunnel adapter Teredo Tunneling Pseudo-Interface:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.emea.nsn-net.net:
+Tunnel adapter isatap.telsat.wroc.pl:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : emea.nsn-net.net
+   Connection-specific DNS Suffix  . : telsat.wroc.pl
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #2
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No
@@ -139,11 +139,11 @@ Tunnel adapter isatap.{8B7A18ED-F89C-44BF-89CC-5E8364A84B04}:
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
 
-Tunnel adapter isatap.telsat.wroc.pl:
+Tunnel adapter isatap.emea.nsn-net.net:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : telsat.wroc.pl
-   Description . . . . . . . . . . . : Microsoft ISATAP Adapter #6
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter #5
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes

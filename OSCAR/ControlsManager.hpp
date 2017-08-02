@@ -7,7 +7,7 @@
 #include <functional>
 #include <fstream>
 #include "DOORS.hpp"
-#include "Objects\LIGHT.hpp"
+#include "LIGHTES.hpp"
 
 class ControlsManager
 {
@@ -19,14 +19,16 @@ private:
 	Cache* cachePtr_;
 	boost::log::sources::logger_mt logger_;
 	DOORS doors_;
-	std::vector<Obj> lightes_;
+	LIGHTES lightes_;
 
 	
 	void handleDoorsChange(Obj* obj);
+	void handleLightesCreation(Obj* obj);
 	void handleLightChange(Obj* obj);
 
 	std::fstream file_;
 	std::vector<int> doorsSubsIds_;
+	int lightesSubsId_;
 	std::vector<int> lightsSubsIds_;
 };
 

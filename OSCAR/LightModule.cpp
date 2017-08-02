@@ -159,18 +159,54 @@ void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
 {
 	BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler";
 	std::string pgLabel;
-	for (auto &pg : lightes_->powerGroups_)
+	POWER_GROUP* pgTochange = new POWER_GROUP("");
+	for (auto &pg : lightes_->children)
 	{
-		if (pg->commonGND->id == task->port)
+		if (pg->name == "POWER_GROUP")
 		{
-			pg->commonGND->value = task->value;
-			pgLabel = pg->label;
-			break;
+			auto pgC = static_cast<POWER_GROUP*>(pg);
+			if (pgC->commonGND->id == task->port)
+			{
+				pgC->commonGND->value = task->value;
+				pgLabel = pgC->label;
+				pgTochange = pgC;
+				break;
+			}
 		}
+		
 	}
 	if (pgLabel.find("BLINKER") != std::string::npos)
 	{
-		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers has been changed to: " << (task->value == 1) ? "on":"off" ;
+		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers has been changed to: " << ((task->value == 0) ? "on":"off") ;
+	}
+	else if (pgLabel.find("BEAM") != std::string::npos)
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << pgLabel <<" lights have been changed to: " << ((task->value == 0) ? "on" : "off");
+		if (pgTochange->label != "")
+		{
+			for (auto &light : pgTochange->children)
+			{
+				auto lightC = static_cast<LIGHT*>(light);
+				if (static_cast<CONNECTOR*>(lightC->children[0])->value == 1)
+				{
+					static_cast<LIGHT*>(light)->proceduralState = static_cast<LIGHT::EProceduralState>(task->value);
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " lights " << static_cast<LIGHT*>(light)->label << " turned " << ((task->value == 0) ? "on" : "off");
+				}
+				else
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " conenctor state needs to be change";
+					auto res = new RESULT();
+					res->applicant = "LIGHT_MODULE";
+					res->feedback = std::to_string(static_cast<CONNECTOR*>(lightC->children[0])->id)
+						+ ":" + "1:00";
+					res->status = RESULT::EStatus::success;
+					res->type = RESULT::EType::executive;
+					cachePtr_->addToChildren(bdmModuleObj_, res);
+				}
+			}
+		}
+		else
+			BOOST_LOG(logger_) << "ERR " << "LightModule::changeConnectorStateHandler: No pgToChange found";
 	}
 	else
 		BOOST_LOG(logger_) << "ERR " << "LightModule::changeConnectorStateHandler: No pg found :(";
@@ -251,11 +287,11 @@ void LightModule::createLightsTopology()
 	{
 		BOOST_LOG(logger_) << "DBG " << "LightModule::createLightsTopology creating powerGroup: " << label << " with shortcut "
 				<< getShortLabelForPowerGroup(label);
-		lightes_->powerGroups_.push_back(new POWER_GROUP(
+		lightes_->children.push_back(new POWER_GROUP(
 			getShortLabelForPowerGroup(label)));
 	}
 	createLightObjs();
-	bdmModuleObj_->children.push_back(lightes_);
+	cachePtr_->addToChildren(bdmModuleObj_, lightes_);
 }
 
 std::string LightModule::getShortLabelForPowerGroup(std::string label)
@@ -282,17 +318,22 @@ void LightModule::createLightObjs()
 		{
 			std::vector<std::string> splittedLabel;
 			boost::split(splittedLabel, label, boost::is_any_of("_"));
-			for (const auto &powerGroup : lightsObjPtr->powerGroups_)
+			for (const auto &powerGroup : lightsObjPtr->children)
 			{
-				if (powerGroup->label == splittedLabel[0])
+				if (powerGroup->name == "POWER_GROUP")
 				{
-					for (const auto &light : powerGroup->lights_)
+					auto pgC = static_cast<POWER_GROUP*>(powerGroup);
+					if (pgC->label == splittedLabel[0])
 					{
-						if (light->label == label)
-							return std::make_pair("EXIST", powerGroup);
+						for (const auto &light : pgC->children)
+						{
+							if (static_cast<LIGHT*>(light)->label == label)
+								return std::make_pair("EXIST", pgC);
+						}
+						return std::make_pair("NOT_EXIST", pgC);
 					}
-					return std::make_pair("NOT_EXIST", powerGroup);
 				}
+				
 				
 			}
 			return std::make_pair("NOT_EXIST", nullptr);
@@ -303,12 +344,12 @@ void LightModule::createLightObjs()
 			LIGHT* light = new LIGHT();
 			light->label = lightLabel;
 			light->proceduralState = LIGHT::EProceduralState::on;//Should be setup based on connector state;
-			light->connector = conn;
-			isAlreadyCreated.second->lights_.push_back(light);
+			cachePtr_->addToChildren(light, conn);
+			cachePtr_->addToChildren(isAlreadyCreated.second, light);
 		}
 		else if (conn->label.find("GND") != std::string::npos && isAlreadyCreated.first == "NOT_EXIST" && isAlreadyCreated.second != nullptr)
 		{
-			BOOST_LOG(logger_) << "DBG " << "LightModule::createLightObjs: Adding common GND conn";
+			BOOST_LOG(logger_) << "DBG " << "LightModule::createLightObjs: Adding common GND conn to " << isAlreadyCreated.second->label;
 			isAlreadyCreated.second->commonGND = conn;
 		}
 	}
@@ -319,14 +360,19 @@ void LightModule::createLightObjs()
 void LightModule::blink(int count)
 {
 	std::vector<CONNECTOR*> commonGNDs;
-	BOOST_LOG(logger_) << "DBG " << "LightModule::blink: powerGroup label: " << lightes_->powerGroups_.size();
-	for (const auto &pg : lightes_->powerGroups_)
+	BOOST_LOG(logger_) << "DBG " << "LightModule::blink: powerGroup label: " << lightes_->children.size();
+	for (const auto &pg : lightes_->children)
 	{
-		if (pg->label.find("BLINKER") != std::string::npos)
+		if (pg->name == "POWER_GROUP")
 		{
-			BOOST_LOG(logger_) << "DBG " << "LightModule::blink: powerGroup label: " << pg->commonGND->label;
-			commonGNDs.push_back(pg->commonGND);
+			auto pgC = static_cast<POWER_GROUP*>(pg);
+			if (pgC->label.find("BLINKER") != std::string::npos)
+			{
+				BOOST_LOG(logger_) << "DBG " << "LightModule::blink: powerGroup label: " << pgC->commonGND->label;
+				commonGNDs.push_back(pgC->commonGND);
+			}
 		}
+		
 	}
 	BOOST_LOG(logger_) << "DBG " << "LightModule::blink: commonGND founded: " << commonGNDs.size();
 	RESULT* result = new RESULT();
@@ -339,12 +385,17 @@ void LightModule::blink(int count)
 
 std::string LightModule::getCommonGndConnectorId(std::string label)
 {
-	for (const auto &pg : lightes_->powerGroups_)
+	for (const auto &pg : lightes_->children)
 	{
-		if (pg->label.find(label) != std::string::npos)
+		if (pg->name == "POWER_GROUP")
 		{
-			return std::to_string(pg->commonGND->id);
+			auto pgC = static_cast<POWER_GROUP*>(pg);
+			if (pgC->label.find(label) != std::string::npos)
+			{
+				return std::to_string(pgC->commonGND->id);
+			}
 		}
+		
 	}
 	return "";
 			

@@ -14,6 +14,7 @@ public:
 	{
 		closed,
 		opening,
+		readyToClose,
 		closing,
 		opened
 	};

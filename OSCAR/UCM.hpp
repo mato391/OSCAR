@@ -41,6 +41,5 @@ private:
 	void startPedalOperation(PEDAL* pedal);
 	RESULT* getOperationResult();
 	Component* getComponent(std::string label);
-
 };
 

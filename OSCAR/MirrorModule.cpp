@@ -101,7 +101,28 @@ void MirrorModule::handleDoorsStateChange(Obj* obj)
 			res->type = RESULT::EType::executive;
 			cachePtr_->addToChildren(mirrorModule_, res);
 		}
+		if (doors_.lockingState == DOORS::ELockingState::locked
+			&& mirrorsObj_->openingState != MIRRORS::EOpeningState::opened)
+		{
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRROS changing state to: readyToClose";
+			mirrorsObj_->openingState = MIRRORS::EOpeningState::readyToClose;
+		}
 		//SHOULD BE ADDED FOR CLOSING BUT WE NEED TO CHANGE POLARISATION OF MOTOR
+	}
+	else if (doors_.lockingState == newDoors->lockingState &&
+		mirrorsObj_->openingState == MIRRORS::EOpeningState::readyToClose)
+	{
+		auto action = actionSet_->getAction("CLOSE_MIRROR");
+		auto mask = createMaskForConnectorChange(action->connIds, action->connValues);
+		BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange: mirrors closing";
+		auto res = new RESULT();
+		res->applicant = "MIRROR_MODULE";
+		//createMaskForConnector({}
+		res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second);
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " feedback: " << res->feedback;
+		res->status = RESULT::EStatus::success;
+		res->type = RESULT::EType::executive;
+		cachePtr_->addToChildren(mirrorModule_, res);
 	}
 }
 
