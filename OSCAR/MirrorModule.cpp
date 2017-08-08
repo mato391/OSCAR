@@ -45,7 +45,7 @@ void MirrorModule::handleModuleTask(Obj* obj)
 {
 	BOOST_LOG(logger_) << "INF " << __FUNCTION__;
 	auto moduleTask = static_cast<MODULE_TASK*>(obj);
-	if (moduleTask->type == MODULE_TASK::EName::MASK_CONNECTORS_STATE)
+	if (moduleTask->taskFor == mirrorModule_->domain && moduleTask->type == MODULE_TASK::EName::MASK_CONNECTORS_STATE)
 	{
 		auto mcs = static_cast<MASK_CONNECTORS_STATE*>(moduleTask);
 		std::bitset<8> bMask1(mcs->mask1);

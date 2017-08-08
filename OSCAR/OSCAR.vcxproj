@@ -156,6 +156,7 @@
     <ClInclude Include="Cache.hpp" />
     <ClInclude Include="CAN.h" />
     <ClInclude Include="CARD_PORT.hpp" />
+    <ClInclude Include="CHANGE_BUTTON_STATE_IND.hpp" />
     <ClInclude Include="CHANGE_CONNECTOR_STATE_TASK.h" />
     <ClInclude Include="CMessage.hpp" />
     <ClInclude Include="commonGNDChecker.hpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="DoorModule.hpp" />
     <ClInclude Include="DOORS.hpp" />
     <ClInclude Include="EDM.hpp" />
+    <ClInclude Include="EmergencyLightsAgent.hpp" />
     <ClInclude Include="ENGINE.hpp" />
     <ClInclude Include="EngineCommunicationService.hpp" />
     <ClInclude Include="EQM.hpp" />
@@ -228,6 +230,7 @@
     <ClCompile Include="CAN.cpp" />
     <ClCompile Include="CARD_PORT.cpp" />
     <ClCompile Include="BDM.cpp" />
+    <ClCompile Include="CHANGE_BUTTON_STATE_IND.cpp" />
     <ClCompile Include="CMessage.cpp" />
     <ClCompile Include="commonGNDChecker.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -237,6 +240,7 @@
     <ClCompile Include="DoorModule.cpp" />
     <ClCompile Include="DOORS.cpp" />
     <ClCompile Include="EDM.cpp" />
+    <ClCompile Include="EmergencyLightsAgent.cpp" />
     <ClCompile Include="ENGINE.cpp" />
     <ClCompile Include="EngineCommunicationService.cpp" />
     <ClCompile Include="EQM.cpp" />
@@ -289,6 +293,7 @@
     <ClCompile Include="TASK.cpp" />
     <ClCompile Include="TaskCreator.cpp" />
     <ClCompile Include="TIMER.cpp" />
+    <ClCompile Include="Tools.cpp" />
     <ClCompile Include="UCM.cpp" />
     <ClCompile Include="UIA.cpp" />
     <ClCompile Include="USER.cpp" />

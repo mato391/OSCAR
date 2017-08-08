@@ -9,5 +9,6 @@ public:
 	std::string label;
 	std::string port;
 	void turnOnLed() {};
+	bool value;
 };
 

@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
-
+#include <bitset>
 #include "Objects\Obj.hpp"
 #include "Objects\CP.hpp"
 #include "Objects\LIGHT.hpp"
@@ -14,7 +14,9 @@
 #include "RESULT.hpp"
 #include "MODULE_TASK.hpp"
 #include "CHANGE_CONNECTOR_STATE_TASK.h"
+#include "MASK_CONNECTORS_STATE.hpp"
 #include "Cache.hpp"
+#include "EmergencyLightsAgent.hpp"
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>
@@ -45,6 +47,7 @@ private:
 	int welcomeTaskSubscrId_;
 	std::vector<int> doorsChangeSubscId_;
 	DOORS doorsObj_;
+	EmergencyLightsAgent* eLA_;
 
 	void getBDMModules();
 	void createLightsTopology();
@@ -55,6 +58,7 @@ private:
 	void displayTopology();
 	std::string getCommonGndConnectorId(std::string label);
 	void changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task);
+	void maskConnectorStateHandler(MASK_CONNECTORS_STATE* task);
 	void handleDoorsStateChange(Obj* obj);
 	void compareStates(Obj* obj);
 };

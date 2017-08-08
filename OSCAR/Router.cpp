@@ -90,7 +90,7 @@ void Router::startComponent(std::string name, std::string address)
 		//componentsThreadGroup_.create_thread(std::bind(&ComponentFactory::createComponent, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 		components_.push_back(ComponentFactory::createComponent(name, address, logger_));
 		components_.back()->setCache(cache_);
-		if (name.find("BDM") != std::string::npos || name.find("UIA") != std::string::npos)
+		if (name.find("BDM") != std::string::npos || name.find("UIA") != std::string::npos || name.find("UCM") != std::string::npos)
 			components_.back()->setCache(cachePtr_);
 		components_.back()->setComponentsCache(&components_);
 		components_.back()->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
@@ -157,7 +157,7 @@ void Router::receiver(std::string data)
 					}
 					else if (result != nullptr && result->getProtocol() == CMESSAGE::CMessage::EProtocol::CEmpty)
 					{
-						BOOST_LOG(logger_) << "ERR " << "Router::receiver: Resutl has been found - CEmpty: not require response";
+						BOOST_LOG(logger_) << "ERR " << "Router::receiver: Result has been found - CEmpty: not require response";
 					}
 					else
 						BOOST_LOG(logger_) << "ERR " << "Router::receiver: No result found";

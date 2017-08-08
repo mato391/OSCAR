@@ -29,7 +29,8 @@ private:
 	CAN::messageCAN prepareCANMessageForAuthorized(CMESSAGE::CMessage* message);
 	CAN::messageCAN prepareCANMessageForExtAuthorized(CMESSAGE::CMessage* message);
 	CAN::messageCAN prepareCANMessageForBigData(CMESSAGE::CMessage* message);
-	CAN::messageCAN prepareCANMessageForMask(CMESSAGE::CMessage* message);;
+	CAN::messageCAN prepareCANMessageForMask(CMESSAGE::CMessage* message);
+	CAN::messageCAN prepareCANMessageForExtMask(CMESSAGE::CMessage* message);
 
 };
 

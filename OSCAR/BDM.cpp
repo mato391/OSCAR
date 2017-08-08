@@ -231,6 +231,35 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 		
 		return msg;
 	}
+	else if (res->applicant == "ELA")
+	{
+		CMESSAGE::CMaskExtendedMessage* msg = new CMESSAGE::CMaskExtendedMessage();
+		std::string tmpdomain = getDomainFor("BDM_LIGHT");
+		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
+		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
+		msg->fromDomain = OWNID;
+		msg->header = CC;
+		std::vector<std::string> tmp;
+		boost::split(tmp, res->feedback, boost::is_any_of(":"));
+		msg->mask1 = std::stoi(tmp[0]);
+		msg->mask2 = std::stoi(tmp[1]);
+		msg->counter = std::stoi(tmp[2]);
+		msg->interval = std::stoi(tmp[3]);
+		msg->protocol = CMESSAGE::CMessage::EProtocol::CMaskExtendedProtocol;
+		if (BDM_DBG)
+		{
+			BOOST_LOG(logger_) << "DBG " << "BDM::convertResultToCMessage: "
+				<< " MSG->protocol " << static_cast<int>(msg->protocol)
+				<< " \nMSG->fromDomain " << msg->fromDomain
+				<< " \nMSG->header " << msg->header
+				<< " \nMSG->mask1 " << msg->mask1
+				<< " \nMSG->mask2 " << msg->mask2
+				<< " \nMSG->counter " << msg->counter
+				<< " \nMSG->interval " << msg->interval;
+		}
+
+		return msg;
+	}
 	else if (res->applicant == "MIRROR_MODULE")
 	{
 		auto msg = new CMESSAGE::CMaskMessage();

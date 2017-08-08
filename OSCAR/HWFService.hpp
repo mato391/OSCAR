@@ -13,6 +13,7 @@
 #include "CONNECTOR.hpp"
 #include "EQM.hpp"
 #include "ANTENNA.h"
+#include "BUTTON.hpp"
 #include "Cache.hpp"
 
 class HWFService

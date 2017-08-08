@@ -61,6 +61,9 @@
     <Filter Include="Header Files\WCM">
       <UniqueIdentifier>{cdf2e074-0fa6-40de-b909-0230cb14f044}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{ef143ef1-4146-4eb6-8ee4-7aaa81f56bd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -276,6 +279,12 @@
     <ClInclude Include="ControlsManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CHANGE_BUTTON_STATE_IND.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EmergencyLightsAgent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -484,6 +493,15 @@
     </ClCompile>
     <ClCompile Include="ControlsManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CHANGE_BUTTON_STATE_IND.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EmergencyLightsAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools.cpp">
+      <Filter>Source Files\Tools</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

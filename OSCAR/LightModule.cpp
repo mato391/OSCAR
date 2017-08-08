@@ -8,6 +8,7 @@ LightModule::LightModule(std::vector<Obj*>* cache, boost::log::sources::logger_m
 	logger_ = logger;
 	cache_ = cache;
 	doorsObj_ = DOORS();
+	eLA_ = new EmergencyLightsAgent(logger, cachePtr);
 	BOOST_LOG(logger_) << "DEBUG " << "LightModule ctor";
 }
 
@@ -29,6 +30,7 @@ void LightModule::setup()
 	bdmModuleObj_->protocol = MODULE::EProtocol::CExtendedMessage;
 	welcomeTaskSubscrId_ = cachePtr_->subscribe("MODULE_TASK", std::bind(&LightModule::handleTask, this, std::placeholders::_1), { 0 })[0];	//subscribe for create
 	doorsChangeSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&LightModule::handleDoorsStateChange, this, std::placeholders::_1), { 0, 1 }); //subscribe for create
+	eLA_->getBlinkers();
 	//BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Subscribed for MODULE_TASK and DOORS done with subscribtionIds: " << welcomeTaskSubscrId_ << " " << doorsChangeSubscId_[0]
 	//	<< " " << doorsChangeSubscId_[0];
 }
@@ -148,6 +150,11 @@ void LightModule::handleTask(Obj* obj)
 			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: CHANGE_CONNECTOR_STATE_TASK";
 			changeConnectorStateHandler(static_cast<CHANGE_CONNECTOR_STATE_TASK*>(moduleTask));
 		}
+		else if (moduleTask->type == MODULE_TASK::EName::MASK_CONNECTORS_STATE)
+		{
+			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: MASK_CONNECTORS_STATE";
+			maskConnectorStateHandler(static_cast<MASK_CONNECTORS_STATE*>(moduleTask));
+		}
 		cachePtr_->addToChildren(moduleTask, res);
 	}
 	else
@@ -177,7 +184,7 @@ void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
 	}
 	if (pgLabel.find("BLINKER") != std::string::npos)
 	{
-		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers has been changed to: " << ((task->value == 0) ? "on":"off") ;
+		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers " << pgLabel << " has been changed to: " << ((task->value == 0) ? "on":"off") ;
 	}
 	else if (pgLabel.find("BEAM") != std::string::npos)
 	{
@@ -212,6 +219,39 @@ void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
 		BOOST_LOG(logger_) << "ERR " << "LightModule::changeConnectorStateHandler: No pg found :(";
 }
 
+void LightModule::maskConnectorStateHandler(MASK_CONNECTORS_STATE* task)
+{
+	std::bitset<8> mask1(task->mask1);
+	std::bitset<8> mask2(task->mask2);
+	auto conns = cachePtr_->getAllObjectsUnder(bdmModuleObj_, "CONNECTOR");
+	BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " CONNECTOR vector size: " << conns.size();
+	
+	if (conns.size() != 0)
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " connsVec size: " << conns.size();
+		for (int i = 0; i < 8; i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " mask[" << i << "] = " << mask1[i] << " conns->id " << static_cast<CONNECTOR*>(conns[i])->id;
+			if (static_cast<CONNECTOR*>(conns[i])->id == i &&  mask1[i] == 1)
+			{
+				static_cast<CONNECTOR*>(conns[i])->value = !static_cast<CONNECTOR*>(conns[i])->value;
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Connector " << static_cast<CONNECTOR*>(conns[i])->label << " changing state to " << static_cast<CONNECTOR*>(conns[i])->value;
+				//tutaj powinien zmienic sie jeszcze LIGHT state
+			}
+
+		}
+		for (int i = 8; i < conns.size(); i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " mask[" << i-8 << "] = " << mask2[i-8] << " conns->id " << static_cast<CONNECTOR*>(conns[i])->id;
+			if (static_cast<CONNECTOR*>(conns[i])->id == i && mask2[i - 8] == 1)
+			{
+				static_cast<CONNECTOR*>(conns[i])->value = !static_cast<CONNECTOR*>(conns[i])->value;
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Connector " << static_cast<CONNECTOR*>(conns[i])->label << " changing state to " << static_cast<CONNECTOR*>(conns[i])->value;
+				//tutaj powinien zmienic sie jeszcze LIGHT state
+			}
+		}
+	}
+}
 
 void LightModule::getBDMModules()
 {

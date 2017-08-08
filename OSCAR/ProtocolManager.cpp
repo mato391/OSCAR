@@ -36,6 +36,8 @@ CMESSAGE::CMessage* ProtocolManager::createMessage(CAN::messageCAN message)
 		return new CMESSAGE::CBigDataMessage(&message);
 	case 6:
 		return new CMESSAGE::CMaskMessage(&message);
+	case 7:
+		return new CMESSAGE::CMaskExtendedMessage(&message);
 	
 	default:
 		return nullptr;
@@ -54,6 +56,8 @@ CAN::messageCAN ProtocolManager::createMessage(CMESSAGE::CMessage* message)
 		return prepareCANMessageForExtended(message);
 	case CMESSAGE::CMessage::EProtocol::CMaskProtocol:
 		return prepareCANMessageForMask(message);
+	case CMESSAGE::CMessage::EProtocol::CMaskExtendedProtocol:
+		return prepareCANMessageForExtMask(message);
 	}
 }
 
@@ -164,6 +168,21 @@ CAN::messageCAN ProtocolManager::prepareCANMessageForMask(CMESSAGE::CMessage* me
 	cMsg.data[4] = msg->mask2;
 	for (int i = 5; i < 8; i++)
 		cMsg.data[i] = 0;
+	return cMsg;
+}
+CAN::messageCAN ProtocolManager::prepareCANMessageForExtMask(CMESSAGE::CMessage* message)
+{
+	auto msg = static_cast<CMESSAGE::CMaskExtendedMessage*>(message);
+	CAN::messageCAN cMsg;
+	cMsg.id = std::stoi(msg->toDomain);
+	cMsg.data[0] = static_cast<int>(msg->protocol);
+	cMsg.data[1] = 100;
+	cMsg.data[2] = msg->header;
+	cMsg.data[3] = msg->mask1;
+	cMsg.data[4] = msg->mask2;
+	cMsg.data[5] = msg->interval;
+	cMsg.data[6] = msg->counter;
+	cMsg.data[7] = 0;
 	return cMsg;
 }
 

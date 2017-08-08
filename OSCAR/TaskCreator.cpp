@@ -34,7 +34,8 @@ void TaskCreator::convertAndPushTask(CMESSAGE::CMessage* msg)
 		modTask->taskFor = msg->fromDomain;
 		BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : creating CHANGE_CONNECTOR_STATE_TASK with values " << sMsg->port << ", " << sMsg->value;
 	}
-	else if (msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol)
+	else if (msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol 
+		|| msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskExtendedProtocol)
 	{
 		CMESSAGE::CMaskMessage * sMsg = static_cast<CMESSAGE::CMaskMessage*>(msg);
 		modTask = new MASK_CONNECTORS_STATE();

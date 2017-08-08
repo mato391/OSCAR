@@ -17,9 +17,9 @@ Ethernet adapter Local Area Connection 2:
    Physical Address. . . . . . . . . : 00-05-9A-3C-7A-00
    DHCP Enabled. . . . . . . . . . . : No
    Autoconfiguration Enabled . . . . : Yes
-   Link-local IPv6 Address . . . . . : fe80::3bc3:2901:4b52:c4ad%28(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::406a:3b9a:58d9:bf19%28(Preferred) 
    Link-local IPv6 Address . . . . . : fe80::c0cc:5e0c:2de4:98ab%28(Preferred) 
-   IPv4 Address. . . . . . . . . . . : 10.154.73.232(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.154.74.237(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.0.0.0
    Default Gateway . . . . . . . . . : ::
                                        10.0.0.1
@@ -57,8 +57,8 @@ Wireless LAN adapter Wireless Network Connection 4:
    Link-local IPv6 Address . . . . . : fe80::39af:aab1:7b81:831a%21(Preferred) 
    IPv4 Address. . . . . . . . . . . : 192.168.1.104(Preferred) 
    Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Lease Obtained. . . . . . . . . . : Wednesday, August 02, 2017 5:00:53 PM
-   Lease Expires . . . . . . . . . . : Thursday, August 03, 2017 6:38:40 PM
+   Lease Obtained. . . . . . . . . . : Tuesday, August 08, 2017 4:35:38 PM
+   Lease Expires . . . . . . . . . . : Wednesday, August 09, 2017 6:43:23 PM
    Default Gateway . . . . . . . . . : 192.168.1.1
    DHCP Server . . . . . . . . . . . : 192.168.1.1
    DHCPv6 IAID . . . . . . . . . . . : 914358283
@@ -142,7 +142,7 @@ Tunnel adapter isatap.{8B7A18ED-F89C-44BF-89CC-5E8364A84B04}:
 Tunnel adapter isatap.emea.nsn-net.net:
 
    Media State . . . . . . . . . . . : Media disconnected
-   Connection-specific DNS Suffix  . : 
+   Connection-specific DNS Suffix  . : emea.nsn-net.net
    Description . . . . . . . . . . . : Microsoft ISATAP Adapter #5
    Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
    DHCP Enabled. . . . . . . . . . . : No
