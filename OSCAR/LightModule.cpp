@@ -73,17 +73,20 @@ void LightModule::compareStates(Obj* obj)
 
 void LightModule::changeLightProceduralState(std::string label, int value)
 {
-	for (const auto &pg : lightes_->powerGroups_)
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " label: " << label;
+	auto pgs = cachePtr_->getAllObjectsUnder(lightes_, "POWER_GROUP");
+	for (const auto &pg : pgs)
 	{
-		for (auto &light : pg->lights_)
+		for (auto &light : pg->children)
 		{
-			auto common = pg->commonGND;
-			if (label.find(light->label) != std::string::npos)
+			auto common = static_cast<POWER_GROUP*>(pg)->commonGND;
+			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " light label: " << static_cast<LIGHT*>(light)->label;
+			std::vector<std::string> slabel;
+			boost::split(slabel, label, boost::is_any_of("_"));
+			if (static_cast<LIGHT*>(light)->label.find(slabel[1]) != std::string::npos)
 			{
-				if (common->value == 0)
-					light->proceduralState = static_cast<LIGHT::EProceduralState>(value);
-				else
-					light->proceduralState = static_cast<LIGHT::EProceduralState>(!value);
+				static_cast<LIGHT*>(light)->proceduralState = static_cast<LIGHT::EProceduralState>(value);
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << static_cast<LIGHT*>(light)->label << " to " << static_cast<int>(static_cast<LIGHT*>(light)->proceduralState);			
 			}
 		}
 	}
@@ -236,7 +239,8 @@ void LightModule::maskConnectorStateHandler(MASK_CONNECTORS_STATE* task)
 			{
 				static_cast<CONNECTOR*>(conns[i])->value = !static_cast<CONNECTOR*>(conns[i])->value;
 				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Connector " << static_cast<CONNECTOR*>(conns[i])->label << " changing state to " << static_cast<CONNECTOR*>(conns[i])->value;
-				//tutaj powinien zmienic sie jeszcze LIGHT state
+				if (static_cast<CONNECTOR*>(conns[i])->label.find("GND") != std::string::npos)
+					changeLightProceduralState(static_cast<CONNECTOR*>(conns[i])->label, static_cast<int>(static_cast<CONNECTOR*>(conns[i])->value));
 			}
 
 		}
@@ -247,7 +251,7 @@ void LightModule::maskConnectorStateHandler(MASK_CONNECTORS_STATE* task)
 			{
 				static_cast<CONNECTOR*>(conns[i])->value = !static_cast<CONNECTOR*>(conns[i])->value;
 				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Connector " << static_cast<CONNECTOR*>(conns[i])->label << " changing state to " << static_cast<CONNECTOR*>(conns[i])->value;
-				//tutaj powinien zmienic sie jeszcze LIGHT state
+				changeLightProceduralState(static_cast<CONNECTOR*>(conns[i])->label, static_cast<int>(static_cast<CONNECTOR*>(conns[i])->value));
 			}
 		}
 	}
