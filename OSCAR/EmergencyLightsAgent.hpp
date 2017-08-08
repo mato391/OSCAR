@@ -15,6 +15,7 @@ public:
 	EmergencyLightsAgent(boost::log::sources::logger_mt logger, Cache* cachePtr);
 	~EmergencyLightsAgent();
 	void getBlinkers();
+	std::pair<int, int> createMask();
 private:
 	boost::log::sources::logger_mt logger_;
 	Cache* cachePtr_;
@@ -24,7 +25,6 @@ private:
 	std::vector<CONNECTOR*> blinkersCommonConns_;
 	void handleChangeButtonStateIndication(Obj* obj);
 	void startBlinkerService();
-	std::pair<int, int> createMask();
 	
 };
 

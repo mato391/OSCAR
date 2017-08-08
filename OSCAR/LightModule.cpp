@@ -61,10 +61,15 @@ void LightModule::compareStates(Obj* obj)
 	}
 	else if (doorsObj != nullptr && doorsObj_.lockingState != doorsObj->lockingState)
 	{
+		auto mask = eLA_->createMask();
+		doorsObj_.lockingState = doorsObj->lockingState;
 		BOOST_LOG(logger_) << "INF " << "LightModule::compareStates " << "lockingState has been changed";
 		auto res = new RESULT();
-		res->applicant = "LIGHT_MODULE";
-		res->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1:" + std::to_string(static_cast<int>(doorsObj->lockingState) + 1) + "5";
+		res->applicant = "ELA";
+		if (doorsObj_.lockingState == DOORS::ELockingState::unlocked )
+			res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second) + ":2:5";
+		else
+			res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second) + ":1:5";
 		res->status = RESULT::EStatus::success;
 		res->type = RESULT::EType::executive;
 		cachePtr_->addToChildren(bdmModuleObj_, res);
