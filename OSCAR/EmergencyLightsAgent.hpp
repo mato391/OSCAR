@@ -25,6 +25,7 @@ private:
 	std::vector<CONNECTOR*> blinkersCommonConns_;
 	void handleChangeButtonStateIndication(Obj* obj);
 	void startBlinkerService();
+	void stopBlinkerService();
 	
 };
 

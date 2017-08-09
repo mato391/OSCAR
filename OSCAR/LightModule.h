@@ -56,7 +56,6 @@ private:
 	void changeLightProceduralState(std::string label, int value);
 	std::string getShortLabelForPowerGroup(std::string label);
 	void displayTopology();
-	std::string getCommonGndConnectorId(std::string label);
 	void changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task);
 	void maskConnectorStateHandler(MASK_CONNECTORS_STATE* task);
 	void handleDoorsStateChange(Obj* obj);

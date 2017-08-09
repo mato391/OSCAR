@@ -137,23 +137,7 @@ void LightModule::handleTask(Obj* obj)
 	auto moduleTask = static_cast<MODULE_TASK*>(obj);
 	if (moduleTask->taskFor == bdmModuleObj_->domain)
 	{
-		if (moduleTask->type == MODULE_TASK::EName::LIGHT_WELCOMING_TASK)
-		{
-			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_WELCOMING_TASK";
-
-			res->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "15";
-			res->status = RESULT::EStatus::success;
-			res->type = RESULT::EType::executive;
-
-		}
-		else if (moduleTask->type == MODULE_TASK::EName::LIGHT_GOODBYE_TASK)
-		{
-			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: LIGHT_GOODBYE_TASK";
-			res->feedback = getCommonGndConnectorId("BLINKER") + ":" + "1" + ":" "25";
-			res->status = RESULT::EStatus::success;
-			res->type = RESULT::EType::executive;
-		}
-		else if (moduleTask->type == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
+		if (moduleTask->type == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
 		{
 			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: CHANGE_CONNECTOR_STATE_TASK";
 			changeConnectorStateHandler(static_cast<CHANGE_CONNECTOR_STATE_TASK*>(moduleTask));
@@ -350,7 +334,6 @@ std::string LightModule::getShortLabelForPowerGroup(std::string label)
 	return splittedLabel[1];
 }
 
-
 void LightModule::createLightObjs()
 {
 	for (const auto &conn : conns)
@@ -430,24 +413,6 @@ void LightModule::blink(int count)
 	result->feedback = commonGNDs[0]->id + commonGNDs[1]->id;
 	cachePtr_->addToChildren(bdmModuleObj_, result);
 	//bdmModuleObj_->children.push_back(result);
-}
-
-std::string LightModule::getCommonGndConnectorId(std::string label)
-{
-	for (const auto &pg : lightes_->children)
-	{
-		if (pg->name == "POWER_GROUP")
-		{
-			auto pgC = static_cast<POWER_GROUP*>(pg);
-			if (pgC->label.find(label) != std::string::npos)
-			{
-				return std::to_string(pgC->commonGND->id);
-			}
-		}
-		
-	}
-	return "";
-			
 }
 
 void LightModule::displayTopology()

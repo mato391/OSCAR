@@ -171,6 +171,7 @@ CMESSAGE::CMessage* UCM::execute(CMESSAGE::CMessage* msg)
 	{
 		auto msgC = static_cast<CMESSAGE::CSimpleMessage*>(msg);
 		CHANGE_BUTTON_STATE_IND* cbsi = new CHANGE_BUTTON_STATE_IND();
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " CHANGE_BUTTON_STATE_IND port: " << msgC->port << " value: " << msgC->value;
 		for (const auto &conn : ucmModuleObj_->children)
 		{
 			if (conn->name == "CONNECTOR")
