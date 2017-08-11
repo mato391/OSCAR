@@ -102,11 +102,21 @@ void ModuleInitialConfigurator::setupConnectors()
 		}
 	}
 	BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: conns size is: " << conns.size();
-	if (std::stoi(module_->mask) > 255)
+	if (conns.size() < 8)
 	{
 		BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: mask is greater than 255 ";
-		std::bitset<8> bMask1(255);
+		std::bitset<8> bMask1(std::stoi(module_->mask));
+		for (int i = 0; i < conns.size(); i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask1[i];
+			conns[i]->value = bMask1[i];
+		}
+	}
+	else if (conns.size() > 8 && conns.size() < 16)
+	{
+		std::bitset<8> bMask1(std::stoi(module_->mask));
 		std::bitset<8> bMask2(std::stoi(module_->mask) - 255);
+		BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: mask is less than 255 ";
 		for (int i = 0; i < 8; i++)
 		{
 			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask1[i];
@@ -118,14 +128,54 @@ void ModuleInitialConfigurator::setupConnectors()
 			conns[i]->value = bMask2[i - 8];
 		}
 	}
-	else
+	else if (conns.size() > 16 && conns.size() < 24)
 	{
 		std::bitset<8> bMask1(std::stoi(module_->mask));
+		std::bitset<8> bMask2(std::stoi(module_->mask) - 255);
+		std::bitset<8> bMask3(std::stoi(module_->mask) - 511);
 		BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: mask is less than 255 ";
-		for (int i = 0; i < conns.size(); i++)
+		for (int i = 0; i < 8; i++)
 		{
 			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask1[i];
 			conns[i]->value = bMask1[i];
+		}
+		for (int i = 8; i < 16; i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask2[i - 8];
+			conns[i]->value = bMask2[i - 8];
+		}
+		for (int i = 16; i < conns.size(); i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask3[i - 16];
+			conns[i]->value = bMask3[i - 16];
+		}
+	}
+	else if (conns.size() > 24)
+	{
+		std::bitset<8> bMask1(std::stoi(module_->mask));
+		std::bitset<8> bMask2(std::stoi(module_->mask) - 255);
+		std::bitset<8> bMask3(std::stoi(module_->mask) - 511);
+		std::bitset<8> bMask4(std::stoi(module_->mask) - 766);
+		BOOST_LOG(logger_) << "INF " << "ModuleInitialConfigurator::setupConnectors: mask is less than 255 ";
+		for (int i = 0; i < 8; i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask1[i];
+			conns[i]->value = bMask1[i];
+		}
+		for (int i = 8; i < 16; i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask2[i - 8];
+			conns[i]->value = bMask2[i - 8];
+		}
+		for (int i = 16; i < 24; i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask3[i - 16];
+			conns[i]->value = bMask3[i - 16];
+		}
+		for (int i = 24; i < conns.size(); i++)
+		{
+			BOOST_LOG(logger_) << "DBG " << "ModuleInitialConfigurator::setupConnectors: conns->ID " << conns[i]->id << " bMask[" << i << "] " << bMask4[i - 24];
+			conns[i]->value = bMask4[i - 24];
 		}
 	}
 	

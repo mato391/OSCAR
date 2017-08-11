@@ -243,8 +243,10 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 		boost::split(tmp, res->feedback, boost::is_any_of(":"));
 		msg->mask1 = std::stoi(tmp[0]);
 		msg->mask2 = std::stoi(tmp[1]);
-		msg->counter = std::stoi(tmp[2]);
-		msg->interval = std::stoi(tmp[3]);
+		msg->mask3 = std::stoi(tmp[2]);
+		msg->mask4 = std::stoi(tmp[3]);
+		msg->counter = std::stoi(tmp[4]);
+		msg->interval = std::stoi(tmp[5]);
 		msg->protocol = CMESSAGE::CMessage::EProtocol::CMaskExtendedProtocol;
 		if (BDM_DBG)
 		{
@@ -271,6 +273,8 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 		boost::split(tmp, res->feedback, boost::is_any_of(":"));
 		msg->mask1 = std::stoi(tmp[0]);
 		msg->mask2 = std::stoi(tmp[1]); 
+		msg->mask3 = 0;
+		msg->mask4 = 0;
 		msg->protocol = CMESSAGE::CMessage::EProtocol::CMaskProtocol;
 		if (BDM_DBG)
 		{

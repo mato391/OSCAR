@@ -50,6 +50,8 @@ void MirrorModule::handleModuleTask(Obj* obj)
 		auto mcs = static_cast<MASK_CONNECTORS_STATE*>(moduleTask);
 		std::bitset<8> bMask1(mcs->mask1);
 		std::bitset<8> bMask2(mcs->mask2);
+		std::bitset<8> bMask3(mcs->mask3);
+		std::bitset<8> bMask4(mcs->mask4);
 		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MASK_CONNECTORS_STATE: " << mcs->mask1 << " " << mcs->mask2;
 		for (int i = 0; i < 8; i++)
 		{
@@ -60,7 +62,7 @@ void MirrorModule::handleModuleTask(Obj* obj)
 				sconn->value = bMask1[i];
 			}
 		}
-		if (mirrorModule_->children.size() > 8)
+		if (mirrorModule_->children.size() > 8 && mirrorModule_->children.size() < 16)
 		{
 			for (int i = 8; i < mirrorModule_->children.size(); i++)
 			{
@@ -75,6 +77,41 @@ void MirrorModule::handleModuleTask(Obj* obj)
 				}
 					
 			}
+
+		}
+		if (mirrorModule_->children.size() > 16 && mirrorModule_->children.size() < 24)
+		{
+			for (int i = 16; i < mirrorModule_->children.size(); i++)
+			{
+				if (mirrorModule_->children[i]->name == "CONNECTOR")
+				{
+					auto sconn = static_cast<CONNECTOR*>(mirrorModule_->children[i]);
+					if (sconn != nullptr && sconn->value != bMask3[i - 16])
+					{
+						BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changeConnectorState: " << sconn->label << " to value " << bMask3[i - 16];
+						sconn->value = bMask3[i - 16];
+					}
+				}
+
+			}
+
+		}
+		if (mirrorModule_->children.size() > 24 && mirrorModule_->children.size() < 32)
+		{
+			for (int i = 24; i < mirrorModule_->children.size(); i++)
+			{
+				if (mirrorModule_->children[i]->name == "CONNECTOR")
+				{
+					auto sconn = static_cast<CONNECTOR*>(mirrorModule_->children[i]);
+					if (sconn != nullptr && sconn->value != bMask4[i - 24])
+					{
+						BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changeConnectorState: " << sconn->label << " to value " << bMask4[i - 24];
+						sconn->value = bMask4[i - 24];
+					}
+				}
+
+			}
+
 		}
 	}
 }

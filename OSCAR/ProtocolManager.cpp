@@ -166,8 +166,9 @@ CAN::messageCAN ProtocolManager::prepareCANMessageForMask(CMESSAGE::CMessage* me
 	cMsg.data[2] = msg->header;
 	cMsg.data[3] = msg->mask1;
 	cMsg.data[4] = msg->mask2;
-	for (int i = 5; i < 8; i++)
-		cMsg.data[i] = 0;
+	cMsg.data[5] = msg->mask3;
+	cMsg.data[6] = msg->mask4;
+	cMsg.data[7] = 0;
 	return cMsg;
 }
 CAN::messageCAN ProtocolManager::prepareCANMessageForExtMask(CMESSAGE::CMessage* message)
@@ -180,9 +181,10 @@ CAN::messageCAN ProtocolManager::prepareCANMessageForExtMask(CMESSAGE::CMessage*
 	cMsg.data[2] = msg->header;
 	cMsg.data[3] = msg->mask1;
 	cMsg.data[4] = msg->mask2;
-	cMsg.data[5] = msg->interval;
-	cMsg.data[6] = msg->counter;
-	cMsg.data[7] = 0;
+	cMsg.data[5] = msg->mask3;
+	cMsg.data[6] = msg->mask4;
+	auto data7s = std::to_string(msg->interval) + std::to_string(msg->counter);
+	cMsg.data[7] = std::stoi(data7s);
 	return cMsg;
 }
 

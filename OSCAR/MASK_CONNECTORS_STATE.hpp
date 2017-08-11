@@ -8,5 +8,7 @@ public:
 	~MASK_CONNECTORS_STATE();
 	int mask1;
 	int mask2;
+	int mask3;
+	int mask4;
 };
 

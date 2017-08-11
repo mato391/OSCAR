@@ -285,6 +285,15 @@
     <ClInclude Include="EmergencyLightsAgent.hpp">
       <Filter>Header Files\BDM</Filter>
     </ClInclude>
+    <ClInclude Include="BeamLightAgent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectorManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CONNECTORS_MASKING_DONE_IND.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -502,6 +511,15 @@
     </ClCompile>
     <ClCompile Include="CHANGE_BUTTON_STATE_IND.cpp">
       <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="BeamLightAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectorManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CONNECTORS_MASKING_DONE_IND.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

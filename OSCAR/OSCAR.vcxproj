@@ -152,6 +152,7 @@
     <ClInclude Include="ALARM.hpp" />
     <ClInclude Include="ANTENNA.h" />
     <ClInclude Include="BDM.hpp" />
+    <ClInclude Include="BeamLightAgent.hpp" />
     <ClInclude Include="BUTTON.hpp" />
     <ClInclude Include="Cache.hpp" />
     <ClInclude Include="CAN.h" />
@@ -163,6 +164,8 @@
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="ComponentFactory.hpp" />
     <ClInclude Include="CONNECTOR.hpp" />
+    <ClInclude Include="ConnectorManager.hpp" />
+    <ClInclude Include="CONNECTORS_MASKING_DONE_IND.hpp" />
     <ClInclude Include="ControlsManager.hpp" />
     <ClInclude Include="DoorModule.hpp" />
     <ClInclude Include="DOORS.hpp" />
@@ -225,6 +228,7 @@
     <ClCompile Include="ActionSet.cpp" />
     <ClCompile Include="ALARM.cpp" />
     <ClCompile Include="ANTENNA.cpp" />
+    <ClCompile Include="BeamLightAgent.cpp" />
     <ClCompile Include="BUTTON.cpp" />
     <ClCompile Include="Cache.cpp" />
     <ClCompile Include="CAN.cpp" />
@@ -236,6 +240,8 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="CONNECTOR.cpp" />
+    <ClCompile Include="ConnectorManager.cpp" />
+    <ClCompile Include="CONNECTORS_MASKING_DONE_IND.cpp" />
     <ClCompile Include="ControlsManager.cpp" />
     <ClCompile Include="DoorModule.cpp" />
     <ClCompile Include="DOORS.cpp" />

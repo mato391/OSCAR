@@ -32,6 +32,8 @@ void Router::startAutodetection()
 	}
 	startComponentService();
 	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " hwfTopologyDone. Waiting for hardware";
+	cM_ = new ConnectorManager(logger_, cachePtr_);
+	cM_->getModules();
 }
 
 void Router::startComponentService()
@@ -123,6 +125,13 @@ void Router::receiver(std::string data)
 					<< " Data[6] : " << static_cast<int>(canPtr_->messageRx.data[6]);
 			}
 			//BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
+			if (cM_ != nullptr && (msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskExtendedProtocol
+				|| msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol))
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Protocol6 or 7 detected. Going to ConnectorManager";
+				cM_->handleMaskConnectorChange(msg);
+				return;
+			}
 			if (msg->header == BB)
 			{
 				auto initMsg = static_cast<CMESSAGE::CInitialMessage*>(msg);

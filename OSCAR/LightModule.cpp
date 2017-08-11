@@ -28,11 +28,47 @@ void LightModule::setup()
 		}
 	}
 	bdmModuleObj_->protocol = MODULE::EProtocol::CExtendedMessage;
-	welcomeTaskSubscrId_ = cachePtr_->subscribe("MODULE_TASK", std::bind(&LightModule::handleTask, this, std::placeholders::_1), { 0 })[0];	//subscribe for create
+	//welcomeTaskSubscrId_ = cachePtr_->subscribe("MODULE_TASK", std::bind(&LightModule::handleTask, this, std::placeholders::_1), { 0 })[0];	//subscribe for create
+	cmdiSubscrId_ = cachePtr_->subscribe("CONNECTORS_MASKING_DONE_IND", std::bind(&LightModule::handleIndication, this, std::placeholders::_1), { 0 })[0];
 	doorsChangeSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&LightModule::handleDoorsStateChange, this, std::placeholders::_1), { 0, 1 }); //subscribe for create
 	eLA_->getBlinkers();
 	//BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Subscribed for MODULE_TASK and DOORS done with subscribtionIds: " << welcomeTaskSubscrId_ << " " << doorsChangeSubscId_[0]
 	//	<< " " << doorsChangeSubscId_[0];
+}
+
+void LightModule::handleIndication(Obj* obj)
+{
+	auto cmdInd = static_cast<CONNECTORS_MASKING_DONE_IND*>(obj);
+	if (cmdInd->domain != bdmModuleObj_->domain)
+		return;
+	for (const auto &conn : cmdInd->connectors_)
+	{
+		std::vector<std::string> sLabel;
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << conn->label;
+		boost::split(sLabel, conn->label, boost::is_any_of("_"));
+		std::string lLabel = sLabel[1] + "_" + sLabel[2];
+		setLightState(conn->value, lLabel);
+	}
+
+}
+
+void LightModule::setLightState(int connValue, std::string label)
+{
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " for label " << label << " to value " << connValue;
+	auto pgs = cachePtr_->getAllObjectsUnder(lightes_, "POWER_GROUP");
+	for (const auto &pg : pgs)
+	{
+		for (auto &light : pg->children)
+		{
+			//BOOST_LOG(logger_) << "DBG " << __FUNCTION__
+			//	<< static_cast<LIGHT*>(light)->label;
+			if (static_cast<LIGHT*>(light)->label.find(label) != std::string::npos)
+			{
+				static_cast<LIGHT*>(light)->proceduralState = static_cast<LIGHT::EProceduralState>(connValue);
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << static_cast<LIGHT*>(light)->label << " to " << static_cast<int>(static_cast<LIGHT*>(light)->proceduralState);
+			}
+		}
+	}
 }
 
 void LightModule::handleDoorsStateChange(Obj* obj)
@@ -61,15 +97,24 @@ void LightModule::compareStates(Obj* obj)
 	}
 	else if (doorsObj != nullptr && doorsObj_.lockingState != doorsObj->lockingState)
 	{
-		auto mask = eLA_->createMask();
+		auto masks = eLA_->createMask();
 		doorsObj_.lockingState = doorsObj->lockingState;
 		BOOST_LOG(logger_) << "INF " << "LightModule::compareStates " << "lockingState has been changed";
 		auto res = new RESULT();
 		res->applicant = "ELA";
-		if (doorsObj_.lockingState == DOORS::ELockingState::unlocked )
-			res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second) + ":2:5";
+		res->feedback = "";
+		if (doorsObj_.lockingState == DOORS::ELockingState::unlocked)
+		{
+			for (const auto &mask : masks)
+				res->feedback = std::to_string(mask) + ":";
+			res->feedback += ":2:5";
+		}
 		else
-			res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second) + ":1:5";
+		{
+			for (const auto &mask : masks)
+				res->feedback = std::to_string(mask) + ":";
+			res->feedback += ":1:5";
+		}
 		res->status = RESULT::EStatus::success;
 		res->type = RESULT::EType::executive;
 		cachePtr_->addToChildren(bdmModuleObj_, res);
@@ -85,7 +130,7 @@ void LightModule::changeLightProceduralState(std::string label, int value)
 		for (auto &light : pg->children)
 		{
 			auto common = static_cast<POWER_GROUP*>(pg)->commonGND;
-			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " light label: " << static_cast<LIGHT*>(light)->label;
+			//BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " light label: " << static_cast<LIGHT*>(light)->label;
 			std::vector<std::string> slabel;
 			boost::split(slabel, label, boost::is_any_of("_"));
 			if (static_cast<LIGHT*>(light)->label.find(slabel[1]) != std::string::npos)
@@ -102,148 +147,8 @@ void LightModule::initialize()
 	BOOST_LOG(logger_) << "INF " << "LightModule::initialize";
 	getBDMModules();
 	createLightsTopology();
+	bLA_ = new BeamLightAgent(logger_, cachePtr_);
 	//displayTopology();
-}
-
-void LightModule::changeConnectorStateIndication(std::string connectorId, std::string value)
-{
-	for (const auto &pg : lightes_->powerGroups_)
-	{
-		for (auto &light : pg->lights_)
-		{
-			if (light->connector->id == std::stoi(connectorId))
-			{
-				light->proceduralState = static_cast<LIGHT::EProceduralState>(std::stoi(value));
-				return;
-			}
-				
-		}
-		if (pg->commonGND->id == std::stoi(connectorId))
-		{
-			for (auto &light : pg->lights_)
-			{
-				light->proceduralState = static_cast<LIGHT::EProceduralState>(std::stoi(value));
-				return;
-			}
-		}
-	}
-	
-}
-
-void LightModule::handleTask(Obj* obj)
-{
-	auto res = new RESULT();
-	res->applicant = "LIGHT_MODULE";
-	auto moduleTask = static_cast<MODULE_TASK*>(obj);
-	if (moduleTask->taskFor == bdmModuleObj_->domain)
-	{
-		if (moduleTask->type == MODULE_TASK::EName::CHANGE_CONNECTOR_STATE_TASK)
-		{
-			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: CHANGE_CONNECTOR_STATE_TASK";
-			changeConnectorStateHandler(static_cast<CHANGE_CONNECTOR_STATE_TASK*>(moduleTask));
-		}
-		else if (moduleTask->type == MODULE_TASK::EName::MASK_CONNECTORS_STATE)
-		{
-			BOOST_LOG(logger_) << "INF " << "LightModule::handleTask: MASK_CONNECTORS_STATE";
-			maskConnectorStateHandler(static_cast<MASK_CONNECTORS_STATE*>(moduleTask));
-		}
-		cachePtr_->addToChildren(moduleTask, res);
-	}
-	else
-		BOOST_LOG(logger_) << "INF " << "LightModule::handleTask " << "This task is not for LightModule or type is unknown " << moduleTask->taskFor << " != " << bdmModuleObj_->domain;
-	
-}
-
-void LightModule::changeConnectorStateHandler(CHANGE_CONNECTOR_STATE_TASK* task)
-{
-	BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler";
-	std::string pgLabel;
-	POWER_GROUP* pgTochange = new POWER_GROUP("");
-	for (auto &pg : lightes_->children)
-	{
-		if (pg->name == "POWER_GROUP")
-		{
-			auto pgC = static_cast<POWER_GROUP*>(pg);
-			if (pgC->commonGND->id == task->port)
-			{
-				pgC->commonGND->value = task->value;
-				pgLabel = pgC->label;
-				pgTochange = pgC;
-				break;
-			}
-		}
-		
-	}
-	if (pgLabel.find("BLINKER") != std::string::npos)
-	{
-		BOOST_LOG(logger_) << "INF " << "LightModule::changeConnectorStateHandler: blinkers " << pgLabel << " has been changed to: " << ((task->value == 0) ? "on":"off") ;
-	}
-	else if (pgLabel.find("BEAM") != std::string::npos)
-	{
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << pgLabel <<" lights have been changed to: " << ((task->value == 0) ? "on" : "off");
-		if (pgTochange->label != "")
-		{
-			for (auto &light : pgTochange->children)
-			{
-				auto lightC = static_cast<LIGHT*>(light);
-				if (static_cast<CONNECTOR*>(lightC->children[0])->value == 1)
-				{
-					static_cast<LIGHT*>(light)->proceduralState = static_cast<LIGHT::EProceduralState>(task->value);
-					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " lights " << static_cast<LIGHT*>(light)->label << " turned " << ((task->value == 0) ? "on" : "off");
-				}
-				else
-				{
-					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " conenctor state needs to be change";
-					auto res = new RESULT();
-					res->applicant = "LIGHT_MODULE";
-					res->feedback = std::to_string(static_cast<CONNECTOR*>(lightC->children[0])->id)
-						+ ":" + "1:00";
-					res->status = RESULT::EStatus::success;
-					res->type = RESULT::EType::executive;
-					cachePtr_->addToChildren(bdmModuleObj_, res);
-				}
-			}
-		}
-		else
-			BOOST_LOG(logger_) << "ERR " << "LightModule::changeConnectorStateHandler: No pgToChange found";
-	}
-	else
-		BOOST_LOG(logger_) << "ERR " << "LightModule::changeConnectorStateHandler: No pg found :(";
-}
-
-void LightModule::maskConnectorStateHandler(MASK_CONNECTORS_STATE* task)
-{
-	std::bitset<8> mask1(task->mask1);
-	std::bitset<8> mask2(task->mask2);
-	auto conns = cachePtr_->getAllObjectsUnder(bdmModuleObj_, "CONNECTOR");
-	BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " CONNECTOR vector size: " << conns.size();
-	
-	if (conns.size() != 0)
-	{
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " connsVec size: " << conns.size();
-		for (int i = 0; i < 8; i++)
-		{
-			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " mask[" << i << "] = " << mask1[i] << " conns->id " << static_cast<CONNECTOR*>(conns[i])->id;
-			if (static_cast<CONNECTOR*>(conns[i])->id == i &&  mask1[i] == 1)
-			{
-				static_cast<CONNECTOR*>(conns[i])->value = !static_cast<CONNECTOR*>(conns[i])->value;
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Connector " << static_cast<CONNECTOR*>(conns[i])->label << " changing state to " << static_cast<CONNECTOR*>(conns[i])->value;
-				if (static_cast<CONNECTOR*>(conns[i])->label.find("GND") != std::string::npos)
-					changeLightProceduralState(static_cast<CONNECTOR*>(conns[i])->label, static_cast<int>(static_cast<CONNECTOR*>(conns[i])->value));
-			}
-
-		}
-		for (int i = 8; i < conns.size(); i++)
-		{
-			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " mask[" << i-8 << "] = " << mask2[i-8] << " conns->id " << static_cast<CONNECTOR*>(conns[i])->id;
-			if (static_cast<CONNECTOR*>(conns[i])->id == i && mask2[i - 8] == 1)
-			{
-				static_cast<CONNECTOR*>(conns[i])->value = !static_cast<CONNECTOR*>(conns[i])->value;
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Connector " << static_cast<CONNECTOR*>(conns[i])->label << " changing state to " << static_cast<CONNECTOR*>(conns[i])->value;
-				changeLightProceduralState(static_cast<CONNECTOR*>(conns[i])->label, static_cast<int>(static_cast<CONNECTOR*>(conns[i])->value));
-			}
-		}
-	}
 }
 
 void LightModule::getBDMModules()
@@ -255,7 +160,7 @@ void LightModule::getBDMModules()
 		{
 			BOOST_LOG(logger_) << "INF " << "LightModule::getBDMModule: MODULE found";
 			bdmModuleObj_ = static_cast<MODULE*>(obj);
-			return;
+			
 		}
 	}
 	BOOST_LOG(logger_) << "ERR " << "LightModule::getBDMModule: MODULE not found";

@@ -42,7 +42,10 @@ void TaskCreator::convertAndPushTask(CMESSAGE::CMessage* msg)
 		modTask->taskFor = msg->fromDomain;
 		static_cast<MASK_CONNECTORS_STATE*>(modTask)->mask1 = sMsg->mask1;
 		static_cast<MASK_CONNECTORS_STATE*>(modTask)->mask2 = sMsg->mask2;
-		BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : creating MASK_CONNECTOR_STATE with values " << sMsg->mask1 << ", " << sMsg->mask2;
+		static_cast<MASK_CONNECTORS_STATE*>(modTask)->mask3 = sMsg->mask3;
+		static_cast<MASK_CONNECTORS_STATE*>(modTask)->mask4 = sMsg->mask4;
+		BOOST_LOG(logger_) << "INF " << "TaskCreator::convertAndPushTask : creating MASK_CONNECTOR_STATE with values " << sMsg->mask1 << ", " << sMsg->mask2
+			<< ", " << sMsg->mask3 << ", " << sMsg->mask4;
 	}
 	for (auto &module : *bdmModules_)
 	{

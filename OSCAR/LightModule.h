@@ -13,10 +13,12 @@
 #include "POWER_GROUP.hpp"
 #include "RESULT.hpp"
 #include "MODULE_TASK.hpp"
+#include "CONNECTORS_MASKING_DONE_IND.hpp"
 #include "CHANGE_CONNECTOR_STATE_TASK.h"
 #include "MASK_CONNECTORS_STATE.hpp"
 #include "Cache.hpp"
 #include "EmergencyLightsAgent.hpp"
+#include "BeamLightAgent.hpp"
 #include <boost\algorithm\string.hpp>
 #include <boost\log\trivial.hpp>
 #include <boost\move\utility.hpp>
@@ -45,9 +47,11 @@ private:
 	std::map<std::string, std::vector<CONNECTOR*>> lampsConnectorsMap_;
 	std::vector<CONNECTOR*> conns;
 	int welcomeTaskSubscrId_;
+	int cmdiSubscrId_;
 	std::vector<int> doorsChangeSubscId_;
 	DOORS doorsObj_;
 	EmergencyLightsAgent* eLA_;
+	BeamLightAgent* bLA_;
 
 	void getBDMModules();
 	void createLightsTopology();
@@ -60,5 +64,8 @@ private:
 	void maskConnectorStateHandler(MASK_CONNECTORS_STATE* task);
 	void handleDoorsStateChange(Obj* obj);
 	void compareStates(Obj* obj);
+
+	void handleIndication(Obj* obj);
+	void setLightState(int connValue, std::string label);
 };
 

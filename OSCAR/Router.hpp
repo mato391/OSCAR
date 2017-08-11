@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.hpp"
+#include "ConnectorManager.hpp"
 #include <vector>
 #include <string>
 #include <fstream>
@@ -54,6 +55,7 @@ private:
 	bool timeout_;
 	//boost::thread hwPlannerServiceThread_;
 	
+	ConnectorManager* cM_;
 	HWFService* hwfService_;
 	ModuleInitialConfigurator* mIC_;
 	CAN * canPtr_;

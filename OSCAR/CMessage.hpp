@@ -189,9 +189,13 @@ namespace CMESSAGE
 			header = static_cast<int>(msg->data[2]);
 			mask1 = msg->data[3];
 			mask2 = msg->data[4];
+			mask3 = msg->data[5];
+			mask4 = msg->data[6];
 		}
 		int mask1;
 		int mask2;
+		int mask3;
+		int mask4;
 		EProtocol getProtocol() { return protocol; }
 	};
 
@@ -210,11 +214,16 @@ namespace CMESSAGE
 			header = static_cast<int>(msg->data[2]);
 			mask1 = msg->data[3];
 			mask2 = msg->data[4];
-			interval = msg->data[5];
-			counter = msg->data[6];
+			mask3 = msg->data[5];
+			mask4 = msg->data[6];
+			auto data7s = std::to_string(msg->data[7]);
+			interval = std::stoi(data7s.substr(0, 2));
+			counter = std::stoi(data7s.substr(2, 2));
 		}
 		int mask1;
 		int mask2;
+		int mask3;
+		int mask4;
 		int interval;
 		int counter;
 		EProtocol getProtocol() { return protocol; }
