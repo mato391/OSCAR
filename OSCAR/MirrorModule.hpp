@@ -44,7 +44,6 @@ private:
 	void displayTopology();
 	bool checkIfMotorOutExist();
 	void handleDoorsStateChange(Obj* obj);
-	void handleModuleTask(Obj* obj);
 	std::pair<int, int> createMaskForConnectorChange(std::vector<int> portsId, std::vector<int> portsValues);
 	int getConnIdByLabel(std::string label);
 	std::vector<int> getPortsIdForMirrorClosing();

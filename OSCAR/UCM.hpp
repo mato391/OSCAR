@@ -11,6 +11,7 @@
 #include "RESULT.hpp"
 #include "StartStopEngineButtonAgent.hpp"
 #include "CHANGE_BUTTON_STATE_IND.hpp"
+#include "CHANGE_CONNECTOR_DONE_IND.hpp"
 
 #include <boost\algorithm\string.hpp>
 class UCM :
@@ -40,6 +41,8 @@ private:
 	StartStopEngineButtonAgent* startStopEngineButtonAgent_;
 	//Cache* cachePtr_;
 
+	int ccdiSubscrId_;
+
 	void initialize();
 	void getUCMModule();
 	void prepareSwitchTopology();
@@ -51,5 +54,7 @@ private:
 	void startPedalOperation(PEDAL* pedal);
 	RESULT* getOperationResult();
 	Component* getComponent(std::string label);
+
+	void handleConnectorChange(Obj* obj);
 };
 

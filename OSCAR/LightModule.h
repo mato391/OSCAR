@@ -44,6 +44,7 @@ private:
 	DOORS doorsObj_;
 
 	int cmdiSubscrId_;
+	int cbsiSubscrId_;
 	std::vector<int> doorsChangeSubscId_;	
 	EmergencyLightsAgent* eLA_;
 	BeamLightAgent* bLA_;
@@ -58,6 +59,7 @@ private:
 	void handleDoorsStateChange(Obj* obj);
 	void compareStates(Obj* obj);
 	void handleIndication(Obj* obj);
+	void handleButton(Obj* obj);
 	void setLightState(int connValue, int connId);
 	void setLightStateBasedOnConnId(LIGHT* light, int connId, int connValue);
 };

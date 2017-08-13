@@ -38,24 +38,27 @@ void DoorModule::setup()
 void DoorModule::changeConnectorIndHandler(Obj* obj)
 {
 	auto ccsi = static_cast<CHANGE_CONNECTOR_DONE_IND*>(obj);
-	int connId = ccsi->connector->id;
-	int connValue = ccsi->connector->value;
-	BOOST_LOG(logger_) << "INF " __FUNCTION__ << " connId " << connId << " connValue " << connValue;
-	if (ccsi->connector->type == CONNECTOR::EType::input)
+	if (ccsi->domain == bdmModuleObj_->domain)
 	{
-		auto doorC = getDoorByRefId(connId);
-		if (doorC == nullptr)
-			return;
-		doorC->openingState = static_cast<DOOR::EOpeningState>(connValue);
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " door " << doorC->label << " has been "
-			<< ((doorC->openingState == DOOR::EOpeningState::closed) ? "closed" : "opened");
-		//checking if all doors are closed and changing state of doorsObj should be added
-	}
-	else
-	{
-		doorsObj_->setLockingState(connValue);
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " DOORS " << ((doorsObj_->lockingState == DOORS::ELockingState::locked) ? " locked " : " unlocked ");
-		cachePtr_->commitChanges(doorsObj_);
+		int connId = ccsi->connector->id;
+		int connValue = ccsi->connector->value;
+		BOOST_LOG(logger_) << "INF " __FUNCTION__ << " connId " << connId << " connValue " << connValue;
+		if (ccsi->connector->type == CONNECTOR::EType::input)
+		{
+			auto doorC = getDoorByRefId(connId);
+			if (doorC == nullptr)
+				return;
+			doorC->openingState = static_cast<DOOR::EOpeningState>(connValue);
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " door " << doorC->label << " has been "
+				<< ((doorC->openingState == DOOR::EOpeningState::closed) ? "closed" : "opened");
+			//checking if all doors are closed and changing state of doorsObj should be added
+		}
+		else
+		{
+			doorsObj_->setLockingState(connValue);
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " DOORS " << ((doorsObj_->lockingState == DOORS::ELockingState::locked) ? " locked " : " unlocked ");
+			cachePtr_->commitChanges(doorsObj_);
+		}
 	}
 }
 

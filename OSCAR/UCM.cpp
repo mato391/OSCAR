@@ -25,10 +25,23 @@ void UCM::initialize()
 
 RESULT* UCM::setup(int domain)
 {
+	ccdiSubscrId_ = cachePtr->subscribe("CHANGE_CONNECTOR_DONE_IND", std::bind(&UCM::handleConnectorChange, this, std::placeholders::_1), { 0 })[0];
 	RESULT* result = new RESULT();
 	result->status = RESULT::EStatus::success;
 	result->feedback = std::to_string(static_cast<int>(ucmModuleObj_->protocol));
 	return result;
+}
+
+void UCM::handleConnectorChange(Obj* obj)
+{
+	auto ccdi = static_cast<CHANGE_CONNECTOR_DONE_IND*>(obj);
+	if (ccdi->connector->label.find("EMCY") != std::string::npos)
+	{
+		CHANGE_BUTTON_STATE_IND* cbsi = new CHANGE_BUTTON_STATE_IND();
+		cbsi->buttonLabel = "EMCY_BUTTON_1";
+		cbsi->value = ccdi->connector->value;
+		cachePtr->addToChildren(ucmModuleObj_, cbsi);
+	}
 }
 
 void UCM::getUCMModule()

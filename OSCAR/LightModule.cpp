@@ -19,7 +19,27 @@ void LightModule::setup()
 	bdmModuleObj_->protocol = MODULE::EProtocol::CExtendedMessage;
 	cmdiSubscrId_ = cachePtr_->subscribe("CONNECTORS_MASKING_DONE_IND", std::bind(&LightModule::handleIndication, this, std::placeholders::_1), { 0 })[0];
 	doorsChangeSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&LightModule::handleDoorsStateChange, this, std::placeholders::_1), { 0, 1 }); //subscribe for create
+	cbsiSubscrId_ = cachePtr_->subscribe("CHANGE_BUTTON_STATE_IND", std::bind(&LightModule::handleButton, this, std::placeholders::_1), { 0 })[0];
 	eLA_->getBlinkers();
+}
+
+void LightModule::handleButton(Obj* obj)
+{
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__;
+	auto cbsi = static_cast<CHANGE_BUTTON_STATE_IND*>(obj);
+	if (cbsi->buttonLabel.find("EMCY") != std::string::npos)
+	{
+		auto res = new RESULT();
+		res->applicant = "ELA";
+		res->feedback = "";
+		res->status = RESULT::EStatus::success;
+		res->type = RESULT::EType::executive;
+		auto masks = eLA_->createMask();
+		for (const auto &mask : masks)
+			res->feedback += std::to_string(mask) + ":";
+		res->feedback += "9:5";
+		cachePtr_->addToChildren(bdmModuleObj_, res);
+	}
 }
 
 void LightModule::initialize()
