@@ -11,7 +11,6 @@ MirrorModule::MirrorModule(std::vector<Obj*>* cache, boost::log::sources::logger
 	//createMirrors();
 }
 
-
 MirrorModule::~MirrorModule()
 {
 }
@@ -46,15 +45,47 @@ void MirrorModule::handleConnectorMaskingInd(Obj * obj)
 	auto cmdi = static_cast<CONNECTORS_MASKING_DONE_IND*>(obj);
 	if (cmdi->domain == mirrorModule_->domain)
 	{
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__;
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << cmdi->connectors_.size();
 		for (const auto &conn : cmdi->connectors_)
 		{
 			auto connC = static_cast<CONNECTOR*>(conn);
-			if (connC->label.find("COMMON") != std::string::npos)
+			handleConnectorChange(conn);
+		}
+	}
+}
+
+void MirrorModule::handleConnectorChange(CONNECTOR* conn)
+{
+	if (conn->label.find("COMMON"))
+	{
+		for (auto &mirror : mirrorsObj_->children)
+		{
+			auto mirrorC = static_cast<MIRROR*>(mirror);
+			if (conn->value == 0
+				&& mirrorC->openingState == MIRROR::EOpeningState::closed)
 			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__;
-				//should be finished
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changing state to opening";
+				mirrorC->openingState = MIRROR::EOpeningState::opening;
 			}
+			else if (conn->value == 1
+				&& mirrorC->openingState == MIRROR::EOpeningState::opening)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changing state to opened";
+				mirrorC->openingState = MIRROR::EOpeningState::opened;
+			}
+			else if (conn->value == 0
+				&& mirrorC->openingState == MIRROR::EOpeningState::opened)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changing state to closing";
+				mirrorC->openingState = MIRROR::EOpeningState::closing;
+			}
+			else if (conn->value == 1
+				&& mirrorC->openingState == MIRROR::EOpeningState::closing)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " changing state to closed";
+				mirrorC->openingState = MIRROR::EOpeningState::closed;
+			}
+				
 		}
 	}
 }
@@ -195,90 +226,27 @@ void MirrorModule::onDoorsLock()
 	cachePtr_->addToChildren(mirrorModule_, res);
 }
 
-std::pair<int, int> MirrorModule::createMaskForConnectorChange(std::vector<int> portsId, std::vector<int> portsValues)			//REFACTOR ME!!!!!!!!!
+std::pair<int, int> MirrorModule::createMaskForConnectorChange(std::vector<int> portsId, std::vector<int> portsValues)
 {
-	int decMask1 = 0;
-	int decMask2 = 0;
-	if (mirrorModule_->children.size() > 8)
+	int sum = 0;
+	int iterations = portsId.size();
+	int decMask1, decMask2 = 0;
+	for (int i = 0; i < iterations; i++)
 	{
-		//BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " more than 8 connctors";
-		for (int i = 0; i < 8; i++)
+		if (portsValues[i] == 1)
 		{
-			auto exist = [](std::vector<int> ids, int i)->int
-			{
-				int j = 0;
-				for (const auto &id : ids)
-				{
-					if (id == i)
-						return j;
-					j++;
-				}
-				return -1;
-			}(portsId, i);
-			if (exist != -1)
-			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " first8: connector will be changed " << i << " portsValue " << portsValues[exist];
-				decMask1 += portsValues[exist] * static_cast<int>(pow(2, i));
-			}
-			else
-				decMask1 += static_cast<CONNECTOR*>(mirrorModule_->children[i])->value * static_cast<int>(pow(2, i));
+			sum += std::pow(2, portsId[i]);
 		}
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask1: " << decMask1;
-		auto conns = cachePtr_->getAllObjectsUnder(mirrorModule_, "CONNECTOR");
-		BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " connsize: " << conns.size();
-		for (int i = 8; i < conns.size(); i++)
-		{
-			auto exist = [](std::vector<int> ids, int i)->int
-			{
-				int j = 0;
-				for (const auto &id : ids)
-				{
-					if (id == i)
-						return j;
-					j++;
-				}
-				return -1;
-			}(portsId, i);
-			if (exist != -1)
-			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " second8: connector will be changed " << i;
-				decMask2 += portsValues[exist] * static_cast<int>(pow(2, i));
-			}
-			else
-			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " second8: connector will be not changed " << i;
-				decMask2 += static_cast<CONNECTOR*>(conns[i])->value * static_cast<int>(pow(2, i));
-			}
-				
-		}
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask2: " << decMask2;
+	}
+	if (sum > 255)
+	{
+		decMask1 = 255;
+		decMask2 = sum - decMask1;
 	}
 	else
 	{
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " less than 8 connns";
-		decMask1 = 0;
-		auto conns = cachePtr_->getAllObjectsUnder(mirrorModule_, "CONNECTOR");
-		for (int i = 0; i < conns.size(); i++)
-		{
-			auto exist = [](std::vector<int> ids, int i)->int
-			{
-				int j = 0;
-				for (const auto &id : ids)
-				{
-					if (id == i)
-						return j;
-					j++;
-				}
-				return -1;
-			}(portsId, i);
-			if (exist != -1)
-			{
-				static_cast<CONNECTOR*>(mirrorModule_->children[i])->value = portsValues[exist];
-			}
-		}
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask1: " << decMask1;
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask2: " << decMask2;
-
+		decMask1 = sum;
+		decMask2 = 0;
 	}
 	return std::make_pair(decMask1, decMask2);
 }

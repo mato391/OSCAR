@@ -270,9 +270,6 @@
     <ClInclude Include="swconfig.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ActionSet.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MASK_CONNECTORS_STATE.hpp">
       <Filter>Header Files\Objects</Filter>
     </ClInclude>
@@ -296,6 +293,9 @@
     </ClInclude>
     <ClInclude Include="ConnectorManager.hpp">
       <Filter>Header Files\Router</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionSet.hpp">
+      <Filter>Header Files\BDM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -497,9 +497,6 @@
     <ClCompile Include="Cache.cpp">
       <Filter>Source Files\Router</Filter>
     </ClCompile>
-    <ClCompile Include="ActionSet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MASK_CONNECTORS_STATE.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
@@ -526,6 +523,9 @@
     </ClCompile>
     <ClCompile Include="CHANGE_CONNECTOR_DONE_IND.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionSet.cpp">
+      <Filter>Source Files\BDM</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

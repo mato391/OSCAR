@@ -12,7 +12,9 @@ public:
 	enum class EOpeningState
 	{
 		closed,
-		opened
+		opening,
+		opened, 
+		closing
 	};
 	EOpeningState openingState;
 	void open();
