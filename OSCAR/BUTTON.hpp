@@ -10,5 +10,6 @@ public:
 	std::string port;
 	void turnOnLed() {};
 	bool value;
+	std::vector<int> refs;
 };
 
