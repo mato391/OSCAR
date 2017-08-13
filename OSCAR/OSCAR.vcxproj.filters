@@ -288,11 +288,14 @@
     <ClInclude Include="BeamLightAgent.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectorManager.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="CHANGE_CONNECTOR_DONE_IND.hpp">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="CONNECTORS_MASKING_DONE_IND.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectorManager.hpp">
+      <Filter>Header Files\Router</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -519,6 +522,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CONNECTORS_MASKING_DONE_IND.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CHANGE_CONNECTOR_DONE_IND.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

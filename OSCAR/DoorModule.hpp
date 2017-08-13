@@ -13,6 +13,7 @@
 #include "RESULT.hpp"
 #include "MODULE_TASK.hpp"
 #include "CHANGE_CONNECTOR_STATE_TASK.h"
+#include "CHANGE_CONNECTOR_DONE_IND.hpp"
 #include "Cache.hpp"
 
 #include "commonGNDChecker.hpp"
@@ -33,30 +34,21 @@ public:
 	void initialize();
 	void setup();
 	std::vector<MODULE_TASK*>* tasks;
-	boost::optional<std::string> changeConnectorState(int connectorId, int value);
 	int getModuleProtocol() { return static_cast<int>(bdmModuleObj_->protocol); }
-	void checkAndExecuteTask(Obj* obj);
 private:
 	boost::log::sources::logger_mt logger_;
 	MODULE* bdmModuleObj_;
-	std::vector<Obj*>* cache_;
 	Cache* cachePtr_;
 	DOORS* doorsObj_;
 	int moduleTaskSubscrId_;
+	int ccIndSubscrId_;
+
 	void getBDMModules();
 	void prepareTopology();
-	void setDoorLockingInitStatus(DOOR::ELockingState lockState, std::string label);
-	void setDoorOpeningInitStatus(DOOR::EOpeningState openState, std::string label);
+	DOOR* getDoorByLabel(std::string label);
+	DOOR* getDoorByRefId(int ref);
+
+	void changeConnectorIndHandler(Obj* obj);
 	
-	void displayTopology();
-	std::string* checkIfDoorsAreClosed();
-	bool checkIfBateryAlarmRaised();
-	void createDoors(std::vector<CONNECTOR*> connectors);
-	bool checkDoesDoorExist(std::string label);
-	void changeDOORSOpeningStateIfNeeded(int value);
-	void runTask(MODULE_TASK* task);
-	void onOpen();
-	void onClose();
-	void setTimerForClose();
 };
 

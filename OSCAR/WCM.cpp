@@ -9,7 +9,6 @@ WCM::WCM(std::string domain, boost::log::sources::logger_mt logger)
 	BOOST_LOG(logger) << "DEBUG " << "WCM ctor ";
 	this->domain = domain;
 	userManager_ = new UserManager();
-	
 }
 
 
@@ -50,7 +49,7 @@ void WCM::prepareTopology()
 
 void WCM::getAllAntenaDecives()
 {
-	BOOST_LOG(logger_) << "DBG " << "WCM::getAllAntenaDecives: " << wcmModule_->connectors_[0].size();
+	//BOOST_LOG(logger_) << "DBG " << "WCM::getAllAntenaDecives: " << wcmModule_->connectors_[0].size();
 	for (const auto &objVec : wcmModule_->connectors_)
 	{
 		for (auto &obj : objVec)

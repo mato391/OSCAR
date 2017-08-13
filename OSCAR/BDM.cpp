@@ -6,7 +6,7 @@ BDM::BDM(std::string domain, boost::log::sources::logger_mt logger)
 {
 	configuringState = EConfiguringState::online;
 	logger_ = logger;
-	BOOST_LOG(logger_) << "DEBUG " << "BDM ctor";
+	BOOST_LOG(logger_) << "DBG " << __FUNCTION__;
 	this->domain = domain;
 	name = "BDM";
 	resultSubId_ = 0;
@@ -116,20 +116,6 @@ CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
 	{
 		return initialProtocolMessageHandler(msg);
 	}
-	else if (msg->getProtocol() != CMESSAGE::CMessage::EProtocol::CInitialProtocol)
-	{
-		BOOST_LOG(logger_) << "INF " << "BDM::execute: creating task";
-		if (taskCreator_ == nullptr)
-		{
-			taskCreator_ = new TaskCreator(&bdmModules_, logger_, cachePtr);
-		}
-		else
-		{
-			BOOST_LOG(logger_) << "INF " << "TaskCreator constructed earlier";
-		}
-		taskCreator_->convertAndPushTask(msg);
-		//doTasks();	//to remove
-	}
 	return nullptr;
 }
 
@@ -235,6 +221,7 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 	{
 		CMESSAGE::CMaskExtendedMessage* msg = new CMESSAGE::CMaskExtendedMessage();
 		std::string tmpdomain = getDomainFor("BDM_LIGHT");
+
 		msg->toDomain = (tmpdomain.find("0x0") != std::string::npos) ? tmpdomain.substr(3, 1) : tmpdomain;
 		BOOST_LOG(logger_) << "INF " << "BDM::convertResultToCMessage: msg->toDomain: " << msg->toDomain;
 		msg->fromDomain = OWNID;
@@ -292,10 +279,13 @@ CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 
 std::string BDM::getDomainFor(std::string label)
 {
+	BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " for " << label;
 	for (const auto &mod : bdmModules_)
 	{
+		BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " " << mod.second->label;
 		if (mod.second->label == label)
 		{
+			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " returning " << mod.second->domain;
 			return mod.second->domain;
 		}
 	}
@@ -403,12 +393,12 @@ void BDM::execute(INTER_MODULE_OPERATION* imo)
 		if (imo->details == "00")
 		{
 			doorModule_->unlockDoors();
-			lightModule_->blink(1);
+//			lightModule_->blink(1);
 		}
 		else if (imo->details == "01")
 		{
 			doorModule_->lockDoors();
-			lightModule_->blink(2);
+	//		lightModule_->blink(2);
 		}
 	}
 	if (imo->operation == "GET_MIRROR_POS")
@@ -440,21 +430,24 @@ void BDM::initialize()
 	mirrorModule_ = new MirrorModule(cache_, logger_, cachePtr);
 	mirrorModule_->initialize();
 	setConfiguringStateIfNeeded();
+	displayTopology();
 }
 
 void BDM::getBDMObjectIfNeeded()
 {
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__;
 	if (bdmModules_.empty() || bdmModules_.size() < 2)
 	{
 		auto eqmObj = static_cast<EQM*>(cachePtr->getUniqueObject("EQM"));
 		if (eqmObj != nullptr)
 		{
-			for (const auto &mod : eqmObj->modules_)
+
+			for (const auto &mod : eqmObj->children)
 			{
 				auto module = static_cast<MODULE*>(mod);
 				if (module->label.find("BDM") != std::string::npos)
 				{
-					BOOST_LOG(logger_) << "INF " << "BDM::getBDMObjectIfNeeded: setting module " << module->label;
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " setting module " << module->label;
 					bdmModules_[module->label] = module;
 				}
 			}
@@ -468,5 +461,33 @@ void BDM::setConfiguringStateIfNeeded()
 	{
 		BOOST_LOG(logger_) << "INF " << "BDM::setConfiguringStateIfNeeded: " << "OK";
 		configuringState = EConfiguringState::configured;
+	}
+}
+
+void BDM::displayTopology()
+{
+	BOOST_LOG(logger_) << "DBG " << __FUNCTION__;
+	for (const auto &obj : bdmModules_)
+	{
+		BOOST_LOG(logger_) << obj.first;
+		for (const auto &element : obj.second->children)
+		{
+			BOOST_LOG(logger_) << element->name;
+			if (element->name == "CONNECTOR")
+			{
+				auto conn = static_cast<CONNECTOR*>(element);
+				BOOST_LOG(logger_) << conn->id << " " << conn->label << " " << static_cast<int>(conn->type);
+			}
+			else if (element->name == "DOORS")
+			{
+				BOOST_LOG(logger_) << "CommonGND " << static_cast<DOORS*>(element)->commonLockGND->id;
+				for (const auto &door : element->children)
+				{
+					auto doorC = static_cast<DOOR*>(element);
+					BOOST_LOG(logger_) << doorC->label;
+				}
+			}
+
+		}
 	}
 }

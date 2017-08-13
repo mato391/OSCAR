@@ -123,6 +123,32 @@ std::vector<Obj> Cache::getObjects(std::string name)
 	}
 	return objVec;
 }
+Obj* Cache::searchObject(std::string name)
+{
+	for (const auto &obj : cache_)
+	{
+		if (obj->name == name)
+			return obj;
+		else
+			return searchInChildren(obj, name);
+			
+	}
+}
+
+Obj* Cache::searchInChildren(Obj* obj, std::string name)
+{
+	if (!obj->children.empty())
+	{
+		for (const auto &child : obj->children)
+		{
+			if (child->name == name)
+				return child;
+			else
+				return searchInChildren(child, name);
+		}
+	}
+	
+}
 
 Obj* Cache::getUniqueObject(std::string name)
 {

@@ -158,6 +158,7 @@
     <ClInclude Include="CAN.h" />
     <ClInclude Include="CARD_PORT.hpp" />
     <ClInclude Include="CHANGE_BUTTON_STATE_IND.hpp" />
+    <ClInclude Include="CHANGE_CONNECTOR_DONE_IND.hpp" />
     <ClInclude Include="CHANGE_CONNECTOR_STATE_TASK.h" />
     <ClInclude Include="CMessage.hpp" />
     <ClInclude Include="commonGNDChecker.hpp" />
@@ -235,6 +236,7 @@
     <ClCompile Include="CARD_PORT.cpp" />
     <ClCompile Include="BDM.cpp" />
     <ClCompile Include="CHANGE_BUTTON_STATE_IND.cpp" />
+    <ClCompile Include="CHANGE_CONNECTOR_DONE_IND.cpp" />
     <ClCompile Include="CMessage.cpp" />
     <ClCompile Include="commonGNDChecker.cpp" />
     <ClCompile Include="Component.cpp" />

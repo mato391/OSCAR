@@ -17,5 +17,6 @@ public:
 	EOpeningState openingState;
 	void open();
 	void close();
+	std::vector<int> refs;
 };
 

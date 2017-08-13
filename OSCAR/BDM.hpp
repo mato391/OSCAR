@@ -57,5 +57,6 @@ private:
 	std::string getDomainFor(std::string label);
 	MODULE* getModuleWithDomain(std::string domain);
 	void doTasks();
+	void displayTopology();
 };
 

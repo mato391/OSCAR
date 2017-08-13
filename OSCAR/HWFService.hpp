@@ -11,9 +11,11 @@
 
 #include "MODULE.hpp"
 #include "CONNECTOR.hpp"
+
 #include "EQM.hpp"
 #include "ANTENNA.h"
 #include "BUTTON.hpp"
+#include "Objects\DOOR.hpp"
 #include "Cache.hpp"
 
 class HWFService
@@ -31,5 +33,6 @@ private:
 	MODULE* createModule(std::string data);
 	void createModuleTopology(MODULE* moduleObj, std::string data);
 	std::string hwfFileContent_;
+	
 };
 

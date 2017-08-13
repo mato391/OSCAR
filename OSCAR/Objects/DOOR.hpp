@@ -23,7 +23,7 @@ public:
 	};
 	EOpeningState openingState;
 	WINDOW* window;
-	std::vector<PORT*> ports;
+	std::vector<int> refs;
 	void unlockDoor();
 	void lockDoor();
 	void openDoor();

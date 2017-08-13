@@ -11,7 +11,7 @@ public:
 	~DOORS();
 	void addDoors(DOOR* door);
 	std::vector<DOOR*> container_;
-	PORT* commonLockGND;
+	CONNECTOR* commonLockGND;
 	void setLockingState(int state);
 	enum class EOpeningState
 	{

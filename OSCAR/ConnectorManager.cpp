@@ -56,7 +56,35 @@ void ConnectorManager::handleMaskConnectorChange(CMESSAGE::CMessage* msg)
 
 void ConnectorManager::handleSingleConnectorChange(CMESSAGE::CMessage* msg)
 {
-	
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__;
+	auto cSimpleMessage = static_cast<CMESSAGE::CSimpleMessage*>(msg);
+	std::string domain = msg->fromDomain;
+	auto moduleConnectors = getConnectorsFromModule(domain);
+	if (!moduleConnectors.empty())
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " connectors found";
+		for (const auto &module : modules_)
+		{
+			if (static_cast<MODULE*>(module)->domain == domain)
+			{
+				for (const auto &conn : moduleConnectors)
+				{
+					if (static_cast<CONNECTOR*>(conn)->id == cSimpleMessage->port)
+					{
+						static_cast<CONNECTOR*>(conn)->value = !static_cast<CONNECTOR*>(conn)->value;
+						CHANGE_CONNECTOR_DONE_IND* ccdi = new CHANGE_CONNECTOR_DONE_IND();
+						ccdi->connector = static_cast<CONNECTOR*>(conn);
+						ccdi->domain = domain;
+						cachePtr_->addToChildren(module, ccdi);
+						return;
+					}
+				}
+				
+			}
+		}
+	}
+	else
+		BOOST_LOG(logger_) << "WRN " << __FUNCTION__ << " No connectors";
 }
 
 std::vector<Obj*> ConnectorManager::getConnectorsFromModule(std::string domain)

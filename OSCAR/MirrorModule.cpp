@@ -35,10 +35,28 @@ void MirrorModule::setup()
 	BOOST_LOG(logger_) << "INF " << "MirrorModule::setup " << std::endl;
 	mirrorModule_->protocol = MODULE::EProtocol::CMaskProtocol;
 	mirrorModule_->operationalState = MODULE::EOperationalState::enabled;
-	doors_ = *static_cast<DOORS*>(cachePtr_->getUniqueObject("DOORS"));
-	cachePtr_->subscribe("MODULE_TASK", std::bind(&MirrorModule::handleModuleTask, this, std::placeholders::_1), { 0 });
+	doors_ = DOORS();
 	if (checkIfMotorOutExist())
 		doorsSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&MirrorModule::handleDoorsStateChange, this, std::placeholders::_1), { 1 })[0];
+	cmdiSubscrId_ = cachePtr_->subscribe("CONNECTORS_MASKING_DONE_IND", std::bind(&MirrorModule::handleConnectorMaskingInd, this, std::placeholders::_1), { 0 })[0];
+}
+
+void MirrorModule::handleConnectorMaskingInd(Obj * obj)
+{
+	auto cmdi = static_cast<CONNECTORS_MASKING_DONE_IND*>(obj);
+	if (cmdi->domain == mirrorModule_->domain)
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__;
+		for (const auto &conn : cmdi->connectors_)
+		{
+			auto connC = static_cast<CONNECTOR*>(conn);
+			if (connC->label.find("COMMON") != std::string::npos)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__;
+				//should be finished
+			}
+		}
+	}
 }
 
 void MirrorModule::handleModuleTask(Obj* obj)
@@ -120,56 +138,70 @@ void MirrorModule::handleDoorsStateChange(Obj* obj)
 {
 	BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange";
 	auto newDoors = static_cast<DOORS*>(obj);
-	if (doors_.lockingState != newDoors->lockingState)
+	if (doors_.children.empty())
 	{
-		doors_.lockingState = newDoors->lockingState;
-		if (doors_.lockingState == DOORS::ELockingState::unlocked
-			&& mirrorsObj_->openingState != MIRRORS::EOpeningState::opened)
-		{
-			auto action = actionSet_->getAction("OPEN_MIRROR");
-			auto mask = createMaskForConnectorChange(action->connIds, action->connValues);
-			BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange: mirrors opening";
-			auto res = new RESULT();
-			res->applicant = "MIRROR_MODULE";
-			//createMaskForConnector({}
-			res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second);
-			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " feedback: " << res->feedback;
-			res->status = RESULT::EStatus::success;
-			res->type = RESULT::EType::executive;
-			cachePtr_->addToChildren(mirrorModule_, res);
-		}
-		if (doors_.lockingState == DOORS::ELockingState::locked
-			&& mirrorsObj_->openingState != MIRRORS::EOpeningState::opened)
-		{
-			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRROS changing state to: readyToClose";
-			mirrorsObj_->openingState = MIRRORS::EOpeningState::readyToClose;
-		}
-		//SHOULD BE ADDED FOR CLOSING BUT WE NEED TO CHANGE POLARISATION OF MOTOR
+		doors_ = *newDoors;
+		if (doors_.lockingState == DOORS::ELockingState::locked)
+			onDoorsLock();
+		else if (doors_.lockingState == DOORS::ELockingState::unlocked)
+			onDoorsUnlock();
 	}
-	else if (doors_.lockingState == newDoors->lockingState &&
-		mirrorsObj_->openingState == MIRRORS::EOpeningState::readyToClose)
+	else
 	{
-		auto action = actionSet_->getAction("CLOSE_MIRROR");
-		auto mask = createMaskForConnectorChange(action->connIds, action->connValues);
-		BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange: mirrors closing";
-		auto res = new RESULT();
-		res->applicant = "MIRROR_MODULE";
-		//createMaskForConnector({}
-		res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second);
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " feedback: " << res->feedback;
-		res->status = RESULT::EStatus::success;
-		res->type = RESULT::EType::executive;
-		cachePtr_->addToChildren(mirrorModule_, res);
+		if (doors_.lockingState != newDoors->lockingState)
+		{
+			doors_.lockingState = newDoors->lockingState;
+			if (doors_.lockingState == DOORS::ELockingState::unlocked
+				&& mirrorsObj_->openingState != MIRRORS::EOpeningState::opened)
+				onDoorsUnlock();
+			if (doors_.lockingState == DOORS::ELockingState::locked
+				&& mirrorsObj_->openingState != MIRRORS::EOpeningState::opened)
+			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " MIRROS changing state to: readyToClose";
+				mirrorsObj_->openingState = MIRRORS::EOpeningState::readyToClose;
+			}
+		}
+		else if (doors_.lockingState == newDoors->lockingState &&
+			mirrorsObj_->openingState == MIRRORS::EOpeningState::readyToClose)
+			onDoorsLock();
 	}
 }
 
-std::pair<int, int> MirrorModule::createMaskForConnectorChange(std::vector<int> portsId, std::vector<int> portsValues)
+void MirrorModule::onDoorsUnlock()
+{
+	auto action = actionSet_->getAction("OPEN_MIRROR");
+	auto mask = createMaskForConnectorChange(action->connIds, action->connValues);
+	BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange: mirrors opening";
+	auto res = new RESULT();
+	res->applicant = "MIRROR_MODULE";
+	res->status = RESULT::EStatus::success;
+	res->type = RESULT::EType::executive;
+	res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second);
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " feedback: " << res->feedback;
+	cachePtr_->addToChildren(mirrorModule_, res);
+}
+
+void MirrorModule::onDoorsLock()
+{
+	auto action = actionSet_->getAction("CLOSE_MIRROR");
+	auto mask = createMaskForConnectorChange(action->connIds, action->connValues);
+	BOOST_LOG(logger_) << "INF " << "MirrorModule::handleDoorsStateChange: mirrors closing";
+	auto res = new RESULT();
+	res->applicant = "MIRROR_MODULE";
+	res->status = RESULT::EStatus::success;
+	res->type = RESULT::EType::executive;
+	res->feedback = std::to_string(mask.first) + ":" + std::to_string(mask.second);
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " feedback: " << res->feedback;
+	cachePtr_->addToChildren(mirrorModule_, res);
+}
+
+std::pair<int, int> MirrorModule::createMaskForConnectorChange(std::vector<int> portsId, std::vector<int> portsValues)			//REFACTOR ME!!!!!!!!!
 {
 	int decMask1 = 0;
 	int decMask2 = 0;
 	if (mirrorModule_->children.size() > 8)
 	{
-		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " more than 8 connctors";
+		//BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " more than 8 connctors";
 		for (int i = 0; i < 8; i++)
 		{
 			auto exist = [](std::vector<int> ids, int i)->int
@@ -226,7 +258,7 @@ std::pair<int, int> MirrorModule::createMaskForConnectorChange(std::vector<int> 
 		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " less than 8 connns";
 		decMask1 = 0;
 		auto conns = cachePtr_->getAllObjectsUnder(mirrorModule_, "CONNECTOR");
-		for (int i = 8; i < conns.size(); i++)
+		for (int i = 0; i < conns.size(); i++)
 		{
 			auto exist = [](std::vector<int> ids, int i)->int
 			{
@@ -243,7 +275,6 @@ std::pair<int, int> MirrorModule::createMaskForConnectorChange(std::vector<int> 
 			{
 				static_cast<CONNECTOR*>(mirrorModule_->children[i])->value = portsValues[exist];
 			}
-			decMask2 += static_cast<CONNECTOR*>(mirrorModule_->children[i])->value * (pow(2, i));
 		}
 		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask1: " << decMask1;
 		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask2: " << decMask2;
@@ -306,19 +337,15 @@ void MirrorModule::createMirrors()
 		mirror->openingState = MIRROR::EOpeningState::closed;
 		mirror->x = 0;
 		mirror->y = 0;
-		mirrorsObj_->children.push_back(mirror);
-	}
-	for (const auto &mirror : mirrorsObj_->children)
-	{
-		auto mirrorC = static_cast<MIRROR*>(mirror);
 		for (const auto &conn : connsVec)
 		{
 			auto connC = static_cast<CONNECTOR*>(conn);
-			if (connC->label.find(mirrorC->label) != std::string::npos)
+			if (connC->label.find(mirror->label) != std::string::npos)
 			{
-				mirrorC->children.push_back(connC);
+				mirror->refs.push_back(connC->id);
 			}
 		}
+		mirrorsObj_->children.push_back(mirror);
 	}
 	if (BDM_DBG)
 		displayTopology();
@@ -326,16 +353,14 @@ void MirrorModule::createMirrors()
 
 void MirrorModule::displayTopology()
 {
-	//BOOST_LOG(logger_) << "DBG " << "MirrorModule::displayTopology " << "commonOutGnd " << mirrorsObj_->commonOutGND->label;
+	BOOST_LOG(logger_) << "DBG " << __FUNCTION__;
 	for (const auto &mirror : mirrorsObj_->children)
 	{
 		auto mirrorC = static_cast<MIRROR*>(mirror);
-		BOOST_LOG(logger_) << "DBG " << "MirrorModule::displayTopology " << "MIRROR " << mirrorC->label;
-		for (const auto &conn : mirror->children)
-		{
-			auto connC = static_cast<CONNECTOR*>(conn);
-			BOOST_LOG(logger_) << "DBG " << "MirrorModule::displayTopology " << "CONNECTOR " << connC->id << " label " << connC->label << " value " << connC->value;
-		}
+		BOOST_LOG(logger_) << "DBG " << "MIRROR " << mirrorC->label;
+		BOOST_LOG(logger_) << "DBG " << "REFs:";
+		for (const auto &ref : mirrorC->refs)
+			BOOST_LOG(logger_) << "DBG " << ref;
 	}
 }
 
@@ -355,13 +380,14 @@ std::vector<int> MirrorModule::getPortsIdForMirrorClosing()
 
 bool MirrorModule::checkIfMotorOutExist()
 {
-	for (const auto &mirror : mirrorsObj_->children)
+	for (const auto &connector : mirrorModule_->children)
 	{
-		for (const auto &conn : mirror->children)
+		if (connector->name == "CONNECTOR")
 		{
-			auto connC = static_cast<CONNECTOR*>(conn);
+			auto connC = static_cast<CONNECTOR*>(connector);
 			if (connC->label.find("MOTOR_OUT") != std::string::npos)
 			{
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " true";
 				return true;
 			}
 		}

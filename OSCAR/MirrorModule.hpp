@@ -11,7 +11,7 @@
 #include "MIRROR.hpp"
 #include "MIRRORS.hpp"
 #include "DOORS.hpp"
-#include "CHANGE_CONNECTOR_STATE_TASK.h"
+#include "CONNECTORS_MASKING_DONE_IND.hpp"
 #include "MASK_CONNECTORS_STATE.hpp"
 #include "Cache.hpp"
 #include <boost\thread.hpp>
@@ -36,6 +36,7 @@ private:
 	MODULE* mirrorModule_;
 	DOORS doors_;
 	int doorsSubscId_;
+	int cmdiSubscrId_;
 	ActionSet* actionSet_;
 
 	void getBDMModule();
@@ -48,6 +49,10 @@ private:
 	int getConnIdByLabel(std::string label);
 	std::vector<int> getPortsIdForMirrorClosing();
 	void getConnectorsIdsForDefualtActions();
+
+	void onDoorsUnlock();
+	void onDoorsLock();
+	void handleConnectorMaskingInd(Obj * obj);
 	
 };
 

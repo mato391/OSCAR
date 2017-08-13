@@ -12,6 +12,7 @@
 
 #include "CONNECTOR.hpp"
 #include "CONNECTORS_MASKING_DONE_IND.hpp"
+#include "CHANGE_CONNECTOR_DONE_IND.hpp"
 
 
 class ConnectorManager

@@ -29,11 +29,12 @@ void Router::startAutodetection()
 	{
 		hwfService_ = new HWFService(eqmObj_, logger_, cachePtr_);
 		hwfService_->prepareTopology();
+		cM_ = new ConnectorManager(logger_, cachePtr_);
+		cM_->getModules();
 	}
 	startComponentService();
 	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " hwfTopologyDone. Waiting for hardware";
-	cM_ = new ConnectorManager(logger_, cachePtr_);
-	cM_->getModules();
+	
 }
 
 void Router::startComponentService()
@@ -75,11 +76,11 @@ void Router::createEQM()
 
 void Router::startComponent(std::string name, std::string address)
 {
-	BOOST_LOG(logger_) << "INF " << "Router::startComponent: name " << name << " address: " << address;
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__<<" name " << name << " address: " << address;
 	bool exist = false;
 	for (auto &component : components_)
 	{
-		BOOST_LOG(logger_) << "DBG " << " Router::startComponent: found: " << component->name;
+		//BOOST_LOG(logger_) << "DBG " << " Router::startComponent: found: " << component->name;
 		if (name.find(component->name) != std::string::npos)
 		{
 			exist = true;
@@ -97,8 +98,6 @@ void Router::startComponent(std::string name, std::string address)
 		components_.back()->setComponentsCache(&components_);
 		components_.back()->setSenderPtr(std::bind(&Router::sender, this, std::placeholders::_1));
 		components_.back()->initialize();
-		
-		//tutaj powinien pójsc runtime() componentsThreadGroup_.create_thread(std::bind(&Component::runtime, components_.back()));
 	}
 }
 
@@ -110,8 +109,6 @@ void Router::receiver(std::string data)
 		{
 			canPtr_->receiveMessage();
 			auto msg = protoManager_->createMessage(canPtr_->messageRx);
-
-			//std::cout << "Router::receiver: message from domain: " << domain << std::endl;
 			BOOST_LOG(logger_) << "INF " << "Router::receiver: msg available from: " << msg->fromDomain
 				<< ", for: " << msg->toDomain << ", hdr " << msg->header << ", proto: " << static_cast<int>(msg->protocol);
 			if (ROUTER_DBG)
@@ -126,54 +123,64 @@ void Router::receiver(std::string data)
 			}
 			//BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
 			if (cM_ != nullptr && (msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskExtendedProtocol
-				|| msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol))
+				|| msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol))		//DONE do not change
 			{
 				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Protocol6 or 7 detected. Going to ConnectorManager";
 				cM_->handleMaskConnectorChange(msg);
+				if (msg->header == BB)
+				{
+					auto initMsg = static_cast<CMESSAGE::CInitialMessage*>(msg);
+					BOOST_LOG(logger_) << "INF " << "Router::receiver: setup message has been received";
+					setupModule(initMsg->fromDomain, initMsg->optional1 + initMsg->optional2);
+				}
 				return;
 			}
-			if (msg->header == BB)
+			else if (cM_ != nullptr && msg->protocol == CMESSAGE::CMessage::EProtocol::CSimpleProtocol)
 			{
-				auto initMsg = static_cast<CMESSAGE::CInitialMessage*>(msg);
-				BOOST_LOG(logger_) << "INF " << "Router::receiver: setup message has been received";
-				setupModule(initMsg->fromDomain, initMsg->optional1 + initMsg->optional2);
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Protocol2 detected. Going to ConnectorManager";
+				cM_->handleSingleConnectorChange(msg);
 				return;
 			}
-			for (const auto &mod : eqmObj_->modules_)
+			if (msg->header == AA)		//DONE do not change
 			{
-				auto module = static_cast<MODULE*>(mod);
-				if (module->domain == msg->fromDomain)
+				BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " AA message detected";
+				for (const auto &mod : eqmObj_->children)
 				{
-					modLabel_ = module->label;
-					break;
+					auto module = static_cast<MODULE*>(mod);
+					BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << "module to check " << module->domain << " " << module->label;
+					if (module->domain == msg->fromDomain)
+					{
+						BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << "module found " << module->domain << " " << module->label;
+						modLabel_ = module->label;
+						break;
+					}
+				}
+				for (const auto &component : components_)
+				{
+					if (modLabel_ != "" && modLabel_.find(component->name) != std::string::npos)
+					{
+						auto result = component->execute(msg);
+						if (result != nullptr && result->getProtocol() != CMESSAGE::CMessage::EProtocol::CEmpty)
+						{
+							BOOST_LOG(logger_) << "INF " << "Router::receiver: transferring message to " << component->name;
+							canPtr_->messageTx = protoManager_->createMessage(result);
+							canPtr_->sendMessage();
+							return;
+						}
+						else if (result != nullptr && result->getProtocol() == CMESSAGE::CMessage::EProtocol::CEmpty)
+						{
+							BOOST_LOG(logger_) << "ERR " << "Router::receiver: Result has been found - CEmpty: not required response";
+						}
+						else
+							BOOST_LOG(logger_) << "ERR " << "Router::receiver: No result found";
+					}
 				}
 			}
-			for (const auto &component : components_)
-			{
-				//BOOST_LOG(logger_) << "DBG " << "Router::receiver: Component: " << component->name;
-				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component configuringState: " << static_cast<int>(component->configuringState);
-				//BOOST_LOG(logger_) << "DEBUG " << "Router::receiver: Component: domain " << component->domain;
-				//BOOST_LOG(logger_) << "DBG " << "Router::receiver: Component to find: " << modLabel_;
-				if (modLabel_ != "" && modLabel_.find(component->name) != std::string::npos)
-				{
-					auto result = component->execute(msg);
-					if (result != nullptr && result->getProtocol() != CMESSAGE::CMessage::EProtocol::CEmpty)
-					{
-						BOOST_LOG(logger_) << "INF " << "Router::receiver: transferring message to " << component->name;
-						canPtr_->messageTx = protoManager_->createMessage(result);
-						canPtr_->sendMessage();
-						return;
-					}
-					else if (result != nullptr && result->getProtocol() == CMESSAGE::CMessage::EProtocol::CEmpty)
-					{
-						BOOST_LOG(logger_) << "ERR " << "Router::receiver: Result has been found - CEmpty: not require response";
-					}
-					else
-						BOOST_LOG(logger_) << "ERR " << "Router::receiver: No result found";
-				}
-			}
-			BOOST_LOG(logger_) << "ERR " << "Router::receiver: No component found" << modLabel_;
 		}
+	}
+	else
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " it should be determine";
 	}
 }
 
@@ -253,71 +260,56 @@ void Router::startHWPlanerService()
 void Router::setupModule(std::string domain, int mask)
 {
 	BOOST_LOG(logger_) << "INF " << "Router::setupModule: " << domain << " mask: " << mask;
-	for (const auto &mod : eqmObj_->modules_)
+	auto moduleObjs = cachePtr_->getAllObjectsUnder(eqmObj_, "MODULE");
+	MODULE* moduleForSetup_ = new MODULE();
+	moduleForSetup_->domain = "XX";
+	for (const auto &mod : moduleObjs)
 	{
 		auto module = static_cast<MODULE*>(mod);
 		if (module->domain == domain)
 		{
-			//BOOST_LOG(logger_) << "DBG " << domain << " is wanted. " << module->domain << " found";
-			module->mask = std::to_string(mask);
-			//BOOST_LOG(logger_) << "DBG " << module->mask;
-			mIC_ = new ModuleInitialConfigurator(module, logger_);
-			for (const auto &mod : eqmObj_->modules_)
-			{
-				auto module = static_cast<MODULE*>(mod);
-				if (module->domain == domain)
-					modLabel_ = module->label;
-			}
-			if (ROUTER_DBG)
-			{
-				for (const auto &conn : module->children)
-				{
-					if (conn->name == "CONNECTOR")
-					{
-						auto connC = static_cast<CONNECTOR*>(conn);
-						BOOST_LOG(logger_) << "DBG " << __FUNCTION__
-							<< " Conn Id " << connC->id
-							<< " Conn value " << connC->value;
-					}
-					
-				}					
-			}
-			//BOOST_LOG(logger_) << "DBG " << "Router::receiver modLabel: " << modLabel_;
-			for (const auto &component : components_)
-			{
-				//BOOST_LOG(logger_) << "DBG " << "Router::setupModule component: " << component->name;
-				if (modLabel_ != "" && modLabel_.find(component->name) != std::string::npos)
-				{
-					int idomain = std::stoi(module->domain.substr(2, 2));
-					auto result = component->setup(idomain);
-					BOOST_LOG(logger_) << "INF " << "Router::setupModule: Component setup "
-						<< component->name << " done, with status: "
-						<< static_cast<int>(result->status) << " | domain: " << idomain;
-					if (result != nullptr && result->status == RESULT::EStatus::success)
-					{
-						BOOST_LOG(logger_) << "INF " << "Router::setupModule: " << "Sending Protocol setup message";
-						canPtr_->messageTx = protoManager_->createProtocolNegotatorMessage(std::stoi(result->feedback), std::to_string(idomain));
-						if (ROUTER_DBG)
-						{
-							BOOST_LOG(logger_) << "DBG " << "Router::sender: messageCAN: data[0]" << static_cast<int>(canPtr_->messageTx.data[0])
-								<< " data[1] " << static_cast<int>(canPtr_->messageTx.data[1])
-								<< " data[2] " << static_cast<int>(canPtr_->messageTx.data[2])
-								<< " data[3] " << static_cast<int>(canPtr_->messageTx.data[3])
-								<< " data[4] " << static_cast<int>(canPtr_->messageTx.data[4])
-								<< " data[5] " << static_cast<int>(canPtr_->messageTx.data[5])
-								<< " data[6] " << static_cast<int>(canPtr_->messageTx.data[6])
-								<< " data[7] " << static_cast<int>(canPtr_->messageTx.data[7]);
-						}
-						canPtr_->sendMessage();
-						//BOOST_LOG(logger_) << "INF " << "Router::setupModule: Message sent";
-						//assert(1 != 1);
-						delete result;
-					}
-				}
-			}
-			BOOST_LOG(logger_) << "INF " << "Router::setupModule: done";
-			return;
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << "moduleForSetup put";
+			moduleForSetup_ = module;
+			break;
 		}
 	}
+	//BOOST_LOG(logger_) << "DBG " << "Router::receiver modLabel: " << modLabel_;
+	BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " put module " << moduleForSetup_->label;
+	for (const auto &component : components_)
+	{
+		BOOST_LOG(logger_) << "DBG " << "Router::setupModule component: " << component->name;
+		if (moduleForSetup_->domain != "XX" && moduleForSetup_->label.find(component->name) != std::string::npos)
+		{
+			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " Trying to setup component";
+			int idomain = std::stoi(moduleForSetup_->domain.substr(2, 2));
+			auto result = component->setup(idomain);
+			BOOST_LOG(logger_) << "INF " << "Router::setupModule: Component setup "
+				<< component->name << " done, with status: "
+				<< static_cast<int>(result->status) << " | domain: " << idomain;
+			if (result != nullptr && result->status == RESULT::EStatus::success)
+			{
+				BOOST_LOG(logger_) << "INF " << "Router::setupModule: " << "Sending Protocol setup message";
+				canPtr_->messageTx = protoManager_->createProtocolNegotatorMessage(std::stoi(result->feedback), std::to_string(idomain));
+				if (ROUTER_DBG)
+				{
+					BOOST_LOG(logger_) << "DBG " << "Router::sender: messageCAN: data[0]" << static_cast<int>(canPtr_->messageTx.data[0])
+						<< " data[1] " << static_cast<int>(canPtr_->messageTx.data[1])
+						<< " data[2] " << static_cast<int>(canPtr_->messageTx.data[2])
+						<< " data[3] " << static_cast<int>(canPtr_->messageTx.data[3])
+						<< " data[4] " << static_cast<int>(canPtr_->messageTx.data[4])
+						<< " data[5] " << static_cast<int>(canPtr_->messageTx.data[5])
+						<< " data[6] " << static_cast<int>(canPtr_->messageTx.data[6])
+						<< " data[7] " << static_cast<int>(canPtr_->messageTx.data[7]);
+				}
+				canPtr_->sendMessage();
+				//BOOST_LOG(logger_) << "INF " << "Router::setupModule: Message sent";
+				//assert(1 != 1);
+				delete result;
+				break;
+			}
+		}
+	}
+	BOOST_LOG(logger_) << "INF " << "Router::setupModule: done";
+	return;	
 }
 

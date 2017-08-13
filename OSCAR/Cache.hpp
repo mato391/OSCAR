@@ -55,6 +55,7 @@ public:
 	//int subscribe(std::string name, std::function<void()> func);
 	void unsubscribe(int subscriptionId, int type);
 	void changeSubscriptionType(int subId, int type);
+	Obj* searchObject(std::string name);
 private:
 	std::vector<Obj*> cache_;
 	boost::log::sources::logger_mt logger_;
@@ -68,12 +69,13 @@ private:
 	boost::mutex mtx_;
 	CACHE::Subscription* subTmp_;
 	int tmp_;
-
+	int levelCounter_;
 	void checkAndRunSubscription(Obj* obj, CACHE::Subscription::EType type);
 	void checkAndRunSubscription(std::string name, CACHE::Subscription::EType type);
 	void dumpObject(std::string serialized);
 	void runOnObject(CACHE::Subscription* sub, Obj* obj);
 	void emptyFunction(Obj* obj) { BOOST_LOG(logger_) << "INF " << __FUNCTION__; };
 	void showSubscriptions();
+	Obj* searchInChildren(Obj* obj, std::string name);
 };
 

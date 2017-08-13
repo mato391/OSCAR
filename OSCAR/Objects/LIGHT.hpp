@@ -19,7 +19,9 @@ public:
 	EProceduralState proceduralState;
 	std::string label;
 	CONNECTOR* connector;
+	std::vector<int> refs;
 	LIGHT();
+	LIGHT(std::string label) { this->label = label; name = "LIGHT"; };
 	~LIGHT();
 };
 

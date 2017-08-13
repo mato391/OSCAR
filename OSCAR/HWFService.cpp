@@ -43,18 +43,15 @@ void HWFService::prepareTopology()
 		}
 		
 	}
-	eqmObjPtr_->modules_ = modules;
-	//NEW CACHE
 	for (const auto &module : modules)
 	{
 		eqmObjPtr_->children.push_back(module);
 	}
-	//*************
 }
 
 MODULE* HWFService::createModule(std::string data)
 {
-	BOOST_LOG(logger_) << "DBG " << "HWFService::createModule: " << data;
+	//BOOST_LOG(logger_) << "DBG " << "HWFService::createModule: " << data;
 	std::vector<std::string> elementRawData;
 	boost::split(elementRawData, data, boost::is_any_of("|"));
 	std::vector<std::string> moduleInfRawData;
@@ -66,7 +63,7 @@ MODULE* HWFService::createModule(std::string data)
 	module->serialNumber = moduleInf[0];
 	module->domain = moduleInf[1];
 	module->label = moduleInf[2];
-	BOOST_LOG(logger_) << "DBG " << "HWFService::createModule: module->label:" << module->label << std::endl;
+	BOOST_LOG(logger_) << "DBG " << "HWFService::createModule: module->label:" << module->label;
 	module->detectionStatus = MODULE::EDetectionStatus::offline;
 	return module;
 }
@@ -85,37 +82,30 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 			boost::split(connectorRawData, *i, boost::is_any_of(":"));
 			std::vector<std::string> connectorData;
 			boost::split(connectorData, connectorRawData[1], boost::is_any_of(","));
-			BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology connectorData.size: " << connectorData.size();
+			//BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology connectorData.size: " << connectorData.size();
 			CONNECTOR* conn = new CONNECTOR(std::stoi(connectorData[0]));
 			conn->label = connectorData[1];
 			conn->used = true;
 			conn->type = static_cast<CONNECTOR::EType>(std::stoi(connectorData[2]));
-			connectorsGroup.push_back(conn);
-			//cachePtr_->addToChildren(moduleObj, conn);	//NEW CACHE
+			cachePtr_->addToChildren(moduleObj, conn);	//NEW CACHE
+			BOOST_LOG(logger_) << "DBG " __FUNCTION__ << " MODULE: " << moduleObj->label << " created CONNECTOR: " << conn->label << " type: " << static_cast<int>(conn->type);
 			
 		}
 		else if ((*i).find("Antenna") != std::string::npos)
 		{
-			BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology in for: " << *i;
+			//BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology in for: " << *i;
 			std::vector<std::string> connectorRawData;
 			boost::split(connectorRawData, *i, boost::is_any_of(":"));
 			std::vector<std::string> connectorData;
 			boost::split(connectorData, connectorRawData[1], boost::is_any_of(","));
-			BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology AntennaData.size: " << connectorData.size();
+			//BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology AntennaData.size: " << connectorData.size();
 			ANTENNA* antenna = new ANTENNA();
 			antenna->id = std::stoi(connectorData[0]);
 			antenna->label = connectorData[1];
-			connectorsGroup.push_back(antenna);
-			//cachePtr_->addToChildren(moduleObj, antenna);
+			cachePtr_->addToChildren(moduleObj, antenna);
 		}
 	}
-	BOOST_LOG(logger_) << "~!!!" << "SIZE of connectorGroups " << connectorsGroup.size();
-	for (const auto &conn : connectorsGroup)
-	{
-		BOOST_LOG(logger_) << "!!!!" << cachePtr_->addToChildren(moduleObj, conn);
-	}
-	BOOST_LOG(logger_) << "~!!!" << moduleObj->label << " size children " << moduleObj->children.size();
-
-	moduleObj->connectors_.push_back(connectorsGroup);	//should be deleted when all modules have CACHE
+	
 }
+
 
