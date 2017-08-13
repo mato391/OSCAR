@@ -37,11 +37,6 @@ public:
 	void setSenderPtr(std::function<void(CMESSAGE::CMessage*)> func) { send = func; }
 	RESULT* setup(int domain);
 	void setup(std::string domain) {};//TO BE DELETED WHEN ALL COMPONENTS WILL USING RESULTS
-	int runtime() {};
-	void unlockDoors();
-	void lockDoors();
-	void setConfiguringStateIfNeeded();
-	void handleOperationResult(Obj* obj);
 private:
 	DoorModule* doorModule_;
 	LightModule* lightModule_;
@@ -51,12 +46,14 @@ private:
 	std::map<std::string, MODULE*> bdmModules_;
 	TaskCreator* taskCreator_;
 	int resultSubId_;
+
 	CMESSAGE::CInitialMessage* initialProtocolMessageHandler(CMESSAGE::CMessage* msg);
 	void getBDMObjectIfNeeded();
 	CMESSAGE::CMessage* convertResultToCMessage(RESULT* res);
 	std::string getDomainFor(std::string label);
 	MODULE* getModuleWithDomain(std::string domain);
-	void doTasks();
 	void displayTopology();
+	void setConfiguringStateIfNeeded();
+	void handleOperationResult(Obj* obj);
 };
 

@@ -119,44 +119,6 @@ CMESSAGE::CMessage* BDM::execute(CMESSAGE::CMessage* msg)
 	return nullptr;
 }
 
-void BDM::doTasks()	//cale to do zmiany na subskrypcje
-{
-	//doorModule_->checkAndExecuteTask();
-	/*
-	auto mod = getModuleWithDomain(getDomainFor("BDM_DOOR"));
-	auto lightMod = getModuleWithDomain(getDomainFor("BDM_LIGHT"));
-	if (lightMod == nullptr)
-	{
-		BOOST_LOG(logger_) << "ERR " << "BDM::doTasks: lightModule does not exists";
-		return;
-	}
-	if (mod != nullptr && mod->tasks.size() > 0)
-	{
-		auto taskResult = mod->tasks[0]->getResult();
-		BOOST_LOG(logger_) << "INF " << "BDM::doTasks:tasks size: " << mod->tasks.size();
-		
-		
-	}
-	//cachePtr->subscribe("RESULT", ) Here we shoul
-	if (lightMod->tasks.size() > 0)
-	{
-		auto objsVec = cachePtr->getAllObjectsUnder(lightMod, "MODULE_TASK");
-		auto result = static_cast<RESULT*>(cachePtr->getUniqueObjectUnder((objsVec[0]), "RESULT"));
-		if (result != nullptr)
-		{
-			if (result->type == RESULT::EType::executive)
-			{
-				auto cmsg = convertResultToCMessage(result);
-				send(cmsg);
-			}
-		}
-
-	}
-	mod->tasks.clear();
-	lightMod->tasks.clear();
-	*/
-}
-
 CMESSAGE::CMessage* BDM::convertResultToCMessage(RESULT* res)
 {
 	if (res->applicant == "DOOR_MODULE")
@@ -306,118 +268,12 @@ MODULE* BDM::getModuleWithDomain(std::string domain)
 
 void BDM::execute(std::string message)
 {
-	/*//0x01012
-	std::string domain;
-	std::string data;
-	std::string port;
-	std::string operation;
-	getBDMObjectIfNeeded();
-	BOOST_LOG(logger_) << "INFO " << "BDM::execute";
-	int startPoint = std::string::npos;
-	startPoint = message.find("aa");
-	if (startPoint == std::string::npos)
-	{
-		startPoint = message.find("bb");
-		if (startPoint == std::string::npos)
-		{
-			startPoint = message.find("cc");
-		}
-	}
-	if (startPoint == 1)
-	{
-		domain = "0x0" + message.substr(0, 1);
-		operation = message.substr(1, 2);
-		
-	}
-	//TODO: if domain is not 1 number
-	//		port getting
-	 
 	
-	std::string moduleLabel;
-	if (operation == "aa")
-	{
-		BOOST_LOG(logger_) << "INF " << "BDM::execute: " << "Module " << domain << " has been detected";
-		for (auto &module : bdmModules_)
-		{
-			BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << module.second->domain << " has been found";
-			if (module.second->domain == domain)
-			{
-				module.second->detectionStatus = MODULE::EDetectionStatus::online;
-				moduleLabel = module.first;
-				BOOST_LOG(logger_) << "DBG " << "BDM::execute: " << "Module " << moduleLabel << " has been set";
-				break;
-				
-			}
-		}
-		if (moduleLabel == "BDM_DOOR")
-		{
-			if (doorModule_ == nullptr)
-				doorModule_ = new DoorModule(cache_, logger_);
-			doorModule_->initialize();
-		}
-		else if (moduleLabel == "BDM_LIGHT")
-		{
-			if (lightModule_ == nullptr)
-				lightModule_ = new LightModule(cache_, logger_);
-			lightModule_->initialize();
-		}
-	}
-	else
-	{
-		BOOST_LOG(logger_) << "INF " << "BDM::execute: " << "Module " << domain << " indicates";
-		for (const auto &mod : bdmModules_)
-		{
-			if (mod.second->domain == domain)
-			{
-				moduleLabel = mod.first;
-			}
-		}
-		if (moduleLabel == "BDM_DOOR")
-		{
-			doorModule_->changeConnectorState(std::stoi(port), std::stoi(operation));
-		}
-		else if (moduleLabel == "BDM_LIGHT")
-		{
-			lightModule_->changeConnectorStateIndication(port, operation);
-		}
-	}
-	*/
 }
-
-
 
 void BDM::execute(INTER_MODULE_OPERATION* imo)
 {
-	if (imo->operation == "DOOR_LOCKING_OPERATION")
-	{
-		if (imo->details == "00")
-		{
-			doorModule_->unlockDoors();
-//			lightModule_->blink(1);
-		}
-		else if (imo->details == "01")
-		{
-			doorModule_->lockDoors();
-	//		lightModule_->blink(2);
-		}
-	}
-	if (imo->operation == "GET_MIRROR_POS")
-	{
-		//mirrorModule_->getMirrorPosition(std::stoi(imo->details));
-		//IMO_RESULT should be created 
-		
-		
-	}
-}
 
-void BDM::unlockDoors()
-{
-	doorModule_->unlockDoors();
-}
-
-void BDM::lockDoors()
-{
-	doorModule_->lockDoors();
 }
 
 void BDM::initialize()
@@ -426,7 +282,6 @@ void BDM::initialize()
 	doorModule_->initialize();
 	lightModule_ = new LightModule(cache_, logger_, cachePtr);
 	lightModule_->initialize();
-	setConfiguringStateIfNeeded();
 	mirrorModule_ = new MirrorModule(cache_, logger_, cachePtr);
 	mirrorModule_->initialize();
 	setConfiguringStateIfNeeded();
