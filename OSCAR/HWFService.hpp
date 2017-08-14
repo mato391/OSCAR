@@ -14,6 +14,7 @@
 
 #include "EQM.hpp"
 #include "ANTENNA.h"
+#include "SWITCH_CONNECTOR.hpp"
 #include "BUTTON.hpp"
 #include "Objects\DOOR.hpp"
 #include "Cache.hpp"

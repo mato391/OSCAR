@@ -59,7 +59,6 @@ private:
 	void handleDoorsStateChange(Obj* obj);
 	void compareStates(Obj* obj);
 	void handleIndication(Obj* obj);
-	void handleButton(Obj* obj);
 	void setLightState(int connValue, int connId);
 	void setLightStateBasedOnConnId(LIGHT* light, int connId, int connValue);
 };

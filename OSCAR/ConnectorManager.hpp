@@ -13,6 +13,7 @@
 #include "CONNECTOR.hpp"
 #include "CONNECTORS_MASKING_DONE_IND.hpp"
 #include "CHANGE_CONNECTOR_DONE_IND.hpp"
+#include "SWITCH_CONNECTOR.hpp"
 
 
 class ConnectorManager
@@ -28,7 +29,7 @@ private:
 	Cache* cachePtr_;
 	Obj* eqm_;
 	std::vector<Obj*> modules_;
-	std::vector<CONNECTOR*> changed_;
+	std::vector<Obj*> changed_;
 
 	std::vector<Obj*> getConnectorsFromModule(std::string domain);
 	void maskConnectors(std::vector<Obj*> connectors, std::vector<std::bitset<8>> masks);

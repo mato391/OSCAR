@@ -52,7 +52,7 @@ private:
 	void onDoorsUnlock();
 	void onDoorsLock();
 	void handleConnectorMaskingInd(Obj * obj);
-	void handleConnectorChange(CONNECTOR* conn);
+	void handleConnectorChange(Obj* obj);
 	
 };
 

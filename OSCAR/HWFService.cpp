@@ -104,6 +104,19 @@ void HWFService::createModuleTopology(MODULE* moduleObj, std::string data)
 			antenna->label = connectorData[1];
 			cachePtr_->addToChildren(moduleObj, antenna);
 		}
+		else if ((*i).find("Switch") != std::string::npos)
+		{
+			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " creating switch";
+			std::vector<std::string> connectorRawData;
+			boost::split(connectorRawData, *i, boost::is_any_of(":"));
+			std::vector<std::string> connectorData;
+			boost::split(connectorData, connectorRawData[1], boost::is_any_of(","));
+			//BOOST_LOG(logger_) << "DBG " << " HWFService::createModuleTopology AntennaData.size: " << connectorData.size();
+			SWITCH_CONNECTOR* sConn = new SWITCH_CONNECTOR();
+			sConn->id = std::stoi(connectorData[0]);
+			sConn->label = connectorData[1];
+			cachePtr_->addToChildren(moduleObj, sConn);
+		}
 	}
 	
 }

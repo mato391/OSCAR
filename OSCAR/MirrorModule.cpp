@@ -54,8 +54,11 @@ void MirrorModule::handleConnectorMaskingInd(Obj * obj)
 	}
 }
 
-void MirrorModule::handleConnectorChange(CONNECTOR* conn)
+void MirrorModule::handleConnectorChange(Obj* obj)
 {
+	if (obj->name != "CONNECTOR")
+		return;
+	auto conn = static_cast<CONNECTOR*>(obj);
 	if (conn->label.find("COMMON"))
 	{
 		for (auto &mirror : mirrorsObj_->children)

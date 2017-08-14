@@ -297,6 +297,12 @@
     <ClInclude Include="BeamLightAgent.hpp">
       <Filter>Header Files\BDM</Filter>
     </ClInclude>
+    <ClInclude Include="SWITCH_CONNECTOR.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="SWITCH.hpp">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -509,9 +515,6 @@
     <ClCompile Include="CHANGE_BUTTON_STATE_IND.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectorManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ActionSet.cpp">
       <Filter>Source Files\BDM</Filter>
     </ClCompile>
@@ -526,6 +529,15 @@
     </ClCompile>
     <ClCompile Include="EmergencyLightsAgent.cpp">
       <Filter>Source Files\BDM</Filter>
+    </ClCompile>
+    <ClCompile Include="SWITCH_CONNECTOR.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="SWITCH.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectorManager.cpp">
+      <Filter>Source Files\Router</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

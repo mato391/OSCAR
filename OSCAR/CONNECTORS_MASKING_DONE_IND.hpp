@@ -8,7 +8,7 @@ class CONNECTORS_MASKING_DONE_IND :
 public:
 	CONNECTORS_MASKING_DONE_IND();
 	~CONNECTORS_MASKING_DONE_IND();
-	std::vector<CONNECTOR*> connectors_;
+	std::vector<Obj*> connectors_;
 	std::string domain;
 };
 

@@ -49,13 +49,13 @@ void EmergencyLightsAgent::getBlinkers()
 void EmergencyLightsAgent::handleChangeButtonStateIndication(Obj* obj)
 {
 	auto cbsi = static_cast<CHANGE_BUTTON_STATE_IND*>(obj);
-	if (cbsi->buttonLabel == "EMCY_BUTTON" && cbsi->value == 1)
+	if (cbsi->buttonLabel.find("EMCY_BUTTON") != std::string::npos && cbsi->value == 1)
 	{
 		bssf_ = true;
 		boost::thread t(std::bind(&EmergencyLightsAgent::startBlinkerService, this));
 		t.detach();
 	}
-	else if (cbsi->buttonLabel == "EMCY_BUTTON" && cbsi->value == 0)
+	else if (cbsi->buttonLabel.find("EMCY_BUTTON") != std::string::npos && cbsi->value == 0)
 	{
 		boost::thread t(std::bind(&EmergencyLightsAgent::stopBlinkerService, this));
 		t.detach();

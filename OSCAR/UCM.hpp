@@ -5,6 +5,8 @@
 #include "SCF.hpp"
 #include "MODULE.hpp"
 #include "SWITCH_TOPOLOGY.hpp"
+#include "SWITCH_CONNECTOR.hpp"
+#include "SWITCH.hpp"
 #include "BUTTON.hpp"
 #include "PEDAL.h"
 #include "ENGINE.hpp"
@@ -42,8 +44,10 @@ private:
 	void initialize();
 	void getUCMModule();
 	void prepareSwitchTopology();
+	void prepareSwitchConnectorsTopology();
 	void displayTopology();
 
 	void handleConnectorChange(Obj* obj);
+	SWITCH* getSwitchByLabel(std::string name);
 };
 

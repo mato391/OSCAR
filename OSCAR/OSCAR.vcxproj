@@ -214,6 +214,8 @@
     <ClInclude Include="StartStopEngineProcedure.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="swconfig.hpp" />
+    <ClInclude Include="SWITCH.hpp" />
+    <ClInclude Include="SWITCH_CONNECTOR.hpp" />
     <ClInclude Include="SWITCH_TOPOLOGY.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TASK.hpp" />
@@ -297,6 +299,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SWITCH.cpp" />
+    <ClCompile Include="SWITCH_CONNECTOR.cpp" />
     <ClCompile Include="SWITCH_TOPOLOGY.cpp" />
     <ClCompile Include="TASK.cpp" />
     <ClCompile Include="TaskCreator.cpp" />

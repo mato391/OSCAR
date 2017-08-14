@@ -69,11 +69,23 @@ void ConnectorManager::handleSingleConnectorChange(CMESSAGE::CMessage* msg)
 			{
 				for (const auto &conn : moduleConnectors)
 				{
-					if (static_cast<CONNECTOR*>(conn)->id == cSimpleMessage->port)
+					if (conn->name == "CONNECTOR" && static_cast<CONNECTOR*>(conn)->id == cSimpleMessage->port)
 					{
+						
 						static_cast<CONNECTOR*>(conn)->value = !static_cast<CONNECTOR*>(conn)->value;
+						BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " CONNECTOR changed " << static_cast<CONNECTOR*>(conn)->label;
 						CHANGE_CONNECTOR_DONE_IND* ccdi = new CHANGE_CONNECTOR_DONE_IND();
 						ccdi->connector = static_cast<CONNECTOR*>(conn);
+						ccdi->domain = domain;
+						cachePtr_->addToChildren(module, ccdi);
+						return;
+					}
+					else if (conn->name == "SWITCH_CONNECTOR" && static_cast<SWITCH_CONNECTOR*>(conn)->id == cSimpleMessage->port)
+					{
+						BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " SWITCH_CONNECTOR changed";
+						static_cast<SWITCH_CONNECTOR*>(conn)->value = cSimpleMessage->value;
+						CHANGE_CONNECTOR_DONE_IND* ccdi = new CHANGE_CONNECTOR_DONE_IND();
+						ccdi->swConnector = static_cast<SWITCH_CONNECTOR*>(conn);
 						ccdi->domain = domain;
 						cachePtr_->addToChildren(module, ccdi);
 						return;
@@ -90,6 +102,8 @@ void ConnectorManager::handleSingleConnectorChange(CMESSAGE::CMessage* msg)
 std::vector<Obj*> ConnectorManager::getConnectorsFromModule(std::string domain)
 {
 	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " domain: " << domain;
+	std::vector<Obj*> conns, swConns;
+
 	for (const auto &module : modules_)
 	{
 		auto moduleC = static_cast<MODULE*>(module);
@@ -97,7 +111,10 @@ std::vector<Obj*> ConnectorManager::getConnectorsFromModule(std::string domain)
 		if (moduleC->domain == domain)
 		{
 			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " returning connectors";
-			return cachePtr_->getAllObjectsUnder(moduleC, "CONNECTOR");
+			conns = cachePtr_->getAllObjectsUnder(moduleC, "CONNECTOR");
+			swConns = cachePtr_->getAllObjectsUnder(moduleC, "SWITCH_CONNECTOR");
+			conns.insert(conns.end(), swConns.begin(), swConns.end());
+			return conns;
 		}
 	}
 	BOOST_LOG(logger_) << "ERR " << __FUNCTION__ << " no module with domain " << domain;
@@ -116,9 +133,19 @@ void ConnectorManager::maskConnectors(std::vector<Obj*> connectors, std::vector<
 		{
 			if (masks[0][7 - i] == 1 && i < connsCount)
 			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[0][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
-				static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
-				changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				if (connectors[i]->name == "CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[0][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
+					static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				}
+				else if (connectors[i]->name == "SWITCH_CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[0][" << i << "] its 1 changing connector " << static_cast<SWITCH_CONNECTOR*>(connectors[i])->label;
+					static_cast<SWITCH_CONNECTOR*>(connectors[i])->value = !static_cast<SWITCH_CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<SWITCH_CONNECTOR*>(connectors[i]));
+				}
+				
 			}
 		}
 	}
@@ -128,9 +155,18 @@ void ConnectorManager::maskConnectors(std::vector<Obj*> connectors, std::vector<
 		{
 			if (masks[1][7 - (i - 8)] == 1 && i < connsCount)
 			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[1][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
-				static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
-				changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				if (connectors[i]->name == "CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[1][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
+					static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				}
+				else if (connectors[i]->name == "SWITCH_CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[1][" << i << "] its 1 changing connector " << static_cast<SWITCH_CONNECTOR*>(connectors[i])->label;
+					static_cast<SWITCH_CONNECTOR*>(connectors[i])->value = !static_cast<SWITCH_CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<SWITCH_CONNECTOR*>(connectors[i]));
+				}
 			}
 		}
 	}
@@ -140,9 +176,18 @@ void ConnectorManager::maskConnectors(std::vector<Obj*> connectors, std::vector<
 		{
 			if (masks[2][7 - (i - 16)] == 1 && i < connsCount)
 			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[2][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
-				static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
-				changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				if (connectors[i]->name == "CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[2][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
+					static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				}
+				else if (connectors[i]->name == "SWITCH_CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[2][" << i << "] its 1 changing connector " << static_cast<SWITCH_CONNECTOR*>(connectors[i])->label;
+					static_cast<SWITCH_CONNECTOR*>(connectors[i])->value = !static_cast<SWITCH_CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<SWITCH_CONNECTOR*>(connectors[i]));
+				}
 			}
 		}
 	}
@@ -152,9 +197,18 @@ void ConnectorManager::maskConnectors(std::vector<Obj*> connectors, std::vector<
 		{
 			if (masks[3][7 - (i - 24)] == 1 && i < connsCount)
 			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[3][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
-				static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
-				changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				if (connectors[i]->name == "CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[3][" << i << "] its 1 changing connector " << static_cast<CONNECTOR*>(connectors[i])->label;
+					static_cast<CONNECTOR*>(connectors[i])->value = !static_cast<CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<CONNECTOR*>(connectors[i]));
+				}
+				else if (connectors[i]->name == "SWITCH_CONNECTOR")
+				{
+					BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " mask[3][" << i << "] its 1 changing connector " << static_cast<SWITCH_CONNECTOR*>(connectors[i])->label;
+					static_cast<SWITCH_CONNECTOR*>(connectors[i])->value = !static_cast<SWITCH_CONNECTOR*>(connectors[i])->value;
+					changed_.push_back(static_cast<SWITCH_CONNECTOR*>(connectors[i]));
+				}
 			}
 		}
 	}

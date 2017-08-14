@@ -1,0 +1,13 @@
+#include "stdafx.h"
+#include "SWITCH_CONNECTOR.hpp"
+
+
+SWITCH_CONNECTOR::SWITCH_CONNECTOR()
+{
+	name = "SWITCH_CONNECTOR";
+}
+
+
+SWITCH_CONNECTOR::~SWITCH_CONNECTOR()
+{
+}

@@ -35,13 +35,45 @@ RESULT* UCM::setup(int domain)
 void UCM::handleConnectorChange(Obj* obj)
 {
 	auto ccdi = static_cast<CHANGE_CONNECTOR_DONE_IND*>(obj);
-	if (ccdi->connector->label.find("EMCY") != std::string::npos)
+	if (ccdi->connector != nullptr && ccdi->connector->label.find("EMCY") != std::string::npos)
 	{
 		CHANGE_BUTTON_STATE_IND* cbsi = new CHANGE_BUTTON_STATE_IND();
-		cbsi->buttonLabel = "EMCY_BUTTON_1";
+		cbsi->buttonLabel = ccdi->connector->label;
 		cbsi->value = ccdi->connector->value;
 		cachePtr->addToChildren(ucmModuleObj_, cbsi);
+		//delete ccdi;
 	}
+	else if (ccdi->swConnector != nullptr &&ccdi->swConnector->label.find("LIGHT_SWITCH") != std::string::npos)
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " LIGHT_SWITCH handling";
+		std::vector<std::string> slabel;
+		boost::split(slabel, ccdi->swConnector->label, boost::is_any_of("_"));
+		auto switchObj = getSwitchByLabel(slabel[0] + "_" + slabel[1]);
+		if (switchObj != nullptr)
+		{
+			switchObj->pos = std::stoi(slabel[2]);
+			CHANGE_BUTTON_STATE_IND* cbsi = new CHANGE_BUTTON_STATE_IND();
+			cbsi->buttonLabel = switchObj->label;
+			cbsi->value = switchObj->pos;
+			cachePtr->addToChildren(ucmModuleObj_, cbsi);
+			//delete ccdi;
+		}
+		
+	}
+}
+
+SWITCH* UCM::getSwitchByLabel(std::string name)
+{
+	for (const auto &obj : switchTopology->children)
+	{
+		if (obj->name == "SWITCH")
+		{
+			auto switchObj = static_cast<SWITCH*>(obj);
+			if (switchObj->label == name)
+				return switchObj;
+		}
+	}
+	return nullptr;
 }
 
 void UCM::getUCMModule()
@@ -106,10 +138,61 @@ void UCM::prepareSwitchTopology()
 		}
 		switchTopology->children.push_back(button);
 	}
+	prepareSwitchConnectorsTopology();
 	BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " created: " << switchTopology->children.size() << " buttons";
 	cachePtr->addToChildren(ucmModuleObj_, switchTopology);
 }
 
+void UCM::prepareSwitchConnectorsTopology()
+{
+	BOOST_LOG(logger_) << "INF " << __FUNCTION__;
+	auto connVec = cachePtr->getAllObjectsUnder(ucmModuleObj_, "SWITCH_CONNECTOR");
+	std::vector<std::string> labels;
+	if (!connVec.empty())
+	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " creating switches for switch connectors " << connVec.size();
+		for (const auto &obj : connVec)
+		{
+			auto swConn = static_cast<SWITCH_CONNECTOR*>(obj);
+			std::vector<std::string> slabel;
+			boost::split(slabel, swConn->label, boost::is_any_of("_"));
+			auto exist = [](std::vector<std::string> labelsVec, std::string label)->bool
+			{
+				if (labelsVec.empty())
+					return false;
+				for (const auto &obj : labelsVec)
+				{
+					if (obj == label)
+						return true;
+				}
+				return false;
+			}(labels, slabel[0] + "_" + slabel[1]);
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " " << slabel[0] + "_" + slabel[1] << " already exist " << exist;
+			if (!exist)
+			{
+				labels.push_back(slabel[0] + "_" + slabel[1]);
+			}
+		}
+		for (const auto &label : labels)
+		{
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " creating switch for " << label;
+			SWITCH* switchObj = new SWITCH();
+			switchObj->label = label;
+			for (const auto &conn : connVec)
+			{
+				auto swConn = static_cast<SWITCH_CONNECTOR*>(conn);
+				BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " adding ref: " << swConn->label << " to " << label;
+				if (swConn->label.find(label) != std::string::npos)
+					switchObj->refs.push_back(swConn->id);
+			}
+			BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " added refs: " << switchObj->refs.size();
+			switchTopology->children.push_back(switchObj);
+		}
+		auto switches = cachePtr->getAllObjectsUnder(switchTopology, "SWITCH");
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " SWITCHes number is " << switches.size();
+
+	}
+}
 
 void UCM::displayTopology()
 {
