@@ -123,9 +123,10 @@ void Router::receiver(std::string data)
 			}
 			//BOOST_LOG(logger_) << "INFO " << "Router::receiver: " << data;
 			if (cM_ != nullptr && (msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskExtendedProtocol
-				|| msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol))		//DONE do not change
+				|| msg->protocol == CMESSAGE::CMessage::EProtocol::CMaskProtocol 
+				|| (msg->protocol == CMESSAGE::CMessage::EProtocol::CInitialProtocol && msg->header == 187)))		//DONE do not change
 			{
-				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Protocol6 or 7 detected. Going to ConnectorManager";
+				BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " Protocol 6 or 7 detected. Going to ConnectorManager";
 				cM_->handleMaskConnectorChange(msg);
 				if (msg->header == BB)
 				{

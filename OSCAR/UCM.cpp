@@ -37,6 +37,7 @@ void UCM::handleConnectorChange(Obj* obj)
 	auto ccdi = static_cast<CHANGE_CONNECTOR_DONE_IND*>(obj);
 	if (ccdi->connector != nullptr && ccdi->connector->label.find("EMCY") != std::string::npos)
 	{
+		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " EMCY LIGHT BUTTON STATE change to: " << ccdi->connector->value;
 		CHANGE_BUTTON_STATE_IND* cbsi = new CHANGE_BUTTON_STATE_IND();
 		cbsi->buttonLabel = ccdi->connector->label;
 		cbsi->value = ccdi->connector->value;
@@ -58,7 +59,6 @@ void UCM::handleConnectorChange(Obj* obj)
 			cachePtr->addToChildren(ucmModuleObj_, cbsi);
 			//delete ccdi;
 		}
-		
 	}
 }
 

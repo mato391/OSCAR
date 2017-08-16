@@ -43,12 +43,16 @@ private:
 	int moduleTaskSubscrId_;
 	int ccIndSubscrId_;
 
+	void setDoorsInitialStates();
+	CONNECTOR* getGNDConnector(std::vector<int> refs);
+	CONNECTOR* getNotGNDConnector(std::vector<int> refs);
 	void getBDMModules();
 	void prepareTopology();
 	DOOR* getDoorByLabel(std::string label);
 	DOOR* getDoorByRefId(int ref);
 
 	void changeConnectorIndHandler(Obj* obj);
+
 	
 };
 

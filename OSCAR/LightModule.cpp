@@ -7,6 +7,7 @@ LightModule::LightModule(std::vector<Obj*>* cache, boost::log::sources::logger_m
 	cachePtr_ = cachePtr;
 	logger_ = logger;
 	eLA_ = new EmergencyLightsAgent(logger, cachePtr);
+	bLA_ = new BeamLightAgent(logger_, cachePtr_);
 	BOOST_LOG(logger_) << "DBG " << "LightModule ctor";
 }
 
@@ -20,6 +21,7 @@ void LightModule::setup()
 	cmdiSubscrId_ = cachePtr_->subscribe("CONNECTORS_MASKING_DONE_IND", std::bind(&LightModule::handleIndication, this, std::placeholders::_1), { 0 })[0];
 	doorsChangeSubscId_ = cachePtr_->subscribe("DOORS", std::bind(&LightModule::handleDoorsStateChange, this, std::placeholders::_1), { 0, 1 }); //subscribe for create
 	eLA_->getBlinkers();
+	bLA_->initialize();
 }
 
 void LightModule::initialize()
@@ -27,7 +29,7 @@ void LightModule::initialize()
 	BOOST_LOG(logger_) << "INF " << "LightModule::initialize";
 	getBDMModules();
 	createLightsTopology();
-	//bLA_ = new BeamLightAgent(logger_, cachePtr_);
+	
 	//displayTopology();
 }
 
@@ -110,6 +112,7 @@ void LightModule::createLightObjs(std::vector<std::string> labels)
 				|| (connC->label.find("GND") != std::string::npos && connC->label.find(slabel[0] + "_" + slabel[1] + "_" + slabel[2]) != std::string::npos)
 				|| (connC->label.find("BLINKER") != std::string::npos && connC->label.find("GND") != std::string::npos && connC->label.find(slabel[0] + "_" + slabel[1]) != std::string::npos))
 			{
+				BOOST_LOG(logger_) << "DBG " << __FUNCTION__ << " adding ref: " << connC->label << " to light: " << light->label;
 				light->refs.push_back(connC->id);
 			}
 		}

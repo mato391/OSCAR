@@ -32,6 +32,6 @@ private:
 	std::vector<Obj*> changed_;
 
 	std::vector<Obj*> getConnectorsFromModule(std::string domain);
-	void maskConnectors(std::vector<Obj*> connectors, std::vector<std::bitset<8>> masks);
+	void maskConnectors(std::vector<Obj*> connectors, std::vector<std::bitset<8>> masks, bool initial);
 };
 

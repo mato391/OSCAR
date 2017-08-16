@@ -29,10 +29,94 @@ void DoorModule::initialize()
 void DoorModule::setup()
 {
 	BOOST_LOG(logger_) << "DBG " << "DoorModule::setup";
+	setDoorsInitialStates();
 	bdmModuleObj_->protocol = MODULE::EProtocol::CSimpleMessage;
 	bdmModuleObj_->operationalState = MODULE::EOperationalState::enabled;
 	ccIndSubscrId_ = cachePtr_->subscribe("CHANGE_CONNECTOR_DONE_IND", std::bind(&DoorModule::changeConnectorIndHandler, this, std::placeholders::_1), { 0 })[0];
 	
+}
+
+void DoorModule::setDoorsInitialStates()
+{
+	DOOR::ELockingState lockingState;
+	DOOR::EOpeningState openingState;
+	for (const auto &door : doorsObj_->children)
+	{
+		auto doorC = static_cast<DOOR*>(door);
+		auto conn = getGNDConnector(doorC->refs);
+		if (conn != nullptr && conn->value == 0)
+		{
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " set lockingState to: UNLOCKED on doors: " << doorC->label;
+			doorC->lockingState = DOOR::ELockingState::unlocked;
+			lockingState = DOOR::ELockingState::unlocked;
+		}
+		else if (conn != nullptr && conn->value == 1)
+		{
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " set lockingState to: LOCKED on doors: " << doorC->label;
+			doorC->lockingState = DOOR::ELockingState::locked;
+			lockingState = DOOR::ELockingState::locked;
+		}
+		else
+		{
+			BOOST_LOG(logger_) << "ERR " << __FUNCTION__ << " topology errorin setting lockingState: " << doorC->label;
+		}
+		conn = getNotGNDConnector(doorC->refs);
+		if (conn != nullptr && conn->value == 0)
+		{
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " set lockingState to: OPENED on doors: " << doorC->label;
+			doorC->openingState = DOOR::EOpeningState::opened;
+			openingState = DOOR::EOpeningState::opened;
+		}
+		else if (conn != nullptr && conn->value == 1)
+		{
+			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " set lockingState to: CLOSED on doors: " << doorC->label;
+			doorC->openingState = DOOR::EOpeningState::closed;
+			openingState = DOOR::EOpeningState::closed;
+		}
+		else
+		{
+			BOOST_LOG(logger_) << "ERR " << __FUNCTION__ << " topology error in setting openingState: " << doorC->label;
+		}
+		if (lockingState == DOOR::ELockingState::locked)
+			doorsObj_->lockingState = DOORS::ELockingState::locked;
+		else
+			doorsObj_->lockingState = DOORS::ELockingState::unlocked;
+		if (openingState == DOOR::EOpeningState::opened)
+			doorsObj_->openingState = DOORS::EOpeningState::opened;
+		else
+			doorsObj_->openingState = DOORS::EOpeningState::closed;
+	}
+}
+
+CONNECTOR* DoorModule::getGNDConnector(std::vector<int> refs)
+{
+	auto connObjs = cachePtr_->getAllObjectsUnder(bdmModuleObj_, "CONNECTOR");
+	for (const auto &ref : refs)
+	{
+		for (const auto &obj : connObjs)
+		{
+			auto conn = static_cast<CONNECTOR*>(obj);
+			if (conn->id == ref && conn->label.find("GND") != std::string::npos)
+				return conn;
+		}
+	}
+	return nullptr;
+	
+}
+
+CONNECTOR* DoorModule::getNotGNDConnector(std::vector<int> refs)
+{
+	auto connObjs = cachePtr_->getAllObjectsUnder(bdmModuleObj_, "CONNECTOR");
+	for (const auto &ref : refs)
+	{
+		for (const auto &obj : connObjs)
+		{
+			auto conn = static_cast<CONNECTOR*>(obj);
+			if (conn->id == ref && conn->label.find("GND") == std::string::npos)
+				return conn;
+		}
+	}
+	return nullptr;
 }
 
 void DoorModule::changeConnectorIndHandler(Obj* obj)
@@ -48,14 +132,14 @@ void DoorModule::changeConnectorIndHandler(Obj* obj)
 			auto doorC = getDoorByRefId(connId);
 			if (doorC == nullptr)
 				return;
-			doorC->openingState = static_cast<DOOR::EOpeningState>(connValue);
+			doorC->openingState = static_cast<DOOR::EOpeningState>(((connValue == 0) ? 1 : 0));
 			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " door " << doorC->label << " has been "
 				<< ((doorC->openingState == DOOR::EOpeningState::closed) ? "closed" : "opened");
 			//checking if all doors are closed and changing state of doorsObj should be added
 		}
 		else
 		{
-			doorsObj_->setLockingState(connValue);
+			doorsObj_->setLockingState(((connValue == 0) ? 1 : 0));
 			BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " DOORS " << ((doorsObj_->lockingState == DOORS::ELockingState::locked) ? " locked " : " unlocked ");
 			cachePtr_->commitChanges(doorsObj_);
 		}

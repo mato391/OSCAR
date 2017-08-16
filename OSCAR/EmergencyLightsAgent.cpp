@@ -7,7 +7,6 @@ EmergencyLightsAgent::EmergencyLightsAgent(boost::log::sources::logger_mt logger
 	
 }
 
-
 EmergencyLightsAgent::~EmergencyLightsAgent()
 {
 
@@ -49,13 +48,13 @@ void EmergencyLightsAgent::getBlinkers()
 void EmergencyLightsAgent::handleChangeButtonStateIndication(Obj* obj)
 {
 	auto cbsi = static_cast<CHANGE_BUTTON_STATE_IND*>(obj);
-	if (cbsi->buttonLabel.find("EMCY_BUTTON") != std::string::npos && cbsi->value == 1)
+	if (cbsi->buttonLabel.find("EMCY_BUTTON") != std::string::npos && cbsi->value == 0)		//BUTTONS pushed == 0
 	{
 		bssf_ = true;
 		boost::thread t(std::bind(&EmergencyLightsAgent::startBlinkerService, this));
 		t.detach();
 	}
-	else if (cbsi->buttonLabel.find("EMCY_BUTTON") != std::string::npos && cbsi->value == 0)
+	else if (cbsi->buttonLabel.find("EMCY_BUTTON") != std::string::npos && cbsi->value == 1)
 	{
 		boost::thread t(std::bind(&EmergencyLightsAgent::stopBlinkerService, this));
 		t.detach();
@@ -76,7 +75,7 @@ void EmergencyLightsAgent::stopBlinkerService()
 	result->status = RESULT::EStatus::success;
 	cachePtr_->addToChildren(lightModuleObjPtr_, result);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	if (blinkersCommonConns_[0]->value == 1 && blinkersCommonConns_[1]->value == 1)
+	if (blinkersCommonConns_[0]->value == 0 && blinkersCommonConns_[1]->value == 0)
 	{
 		BOOST_LOG(logger_) << "INF " << __FUNCTION__ << " clearing blinkers";
 		auto masks = createMask();
@@ -90,7 +89,6 @@ void EmergencyLightsAgent::stopBlinkerService()
 		result->status = RESULT::EStatus::success;
 		cachePtr_->addToChildren(lightModuleObjPtr_, result);
 	}
-	
 }
 
 void EmergencyLightsAgent::startBlinkerService()
